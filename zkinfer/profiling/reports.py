@@ -172,6 +172,33 @@ def write_request_report(
         if preparation_time_s is not None and total_elapsed_time_s
         else None
     )
+    max_input_s3_read_time_s = _safe_max(
+        job_data,
+        "input_s3_read_time(s)",
+    )
+    aggregate_input_write_time_s = _safe_sum(
+        job_data,
+        "input_write_time(s)",
+    )
+    intermediate_generation_time_s = float(
+        request.preparation_metrics.get(
+            "intermediate_tensor_generation_time(s)",
+            0.0,
+        )
+        or 0.0
+    )
+    estimated_tensor_communication_time_s = (
+        aggregate_input_write_time_s + max_input_s3_read_time_s
+    )
+    estimated_tensor_overhead_time_s = (
+        intermediate_generation_time_s
+        + estimated_tensor_communication_time_s
+    )
+    estimated_tensor_overhead_pct = (
+        estimated_tensor_overhead_time_s / total_elapsed_time_s * 100.0
+        if total_elapsed_time_s
+        else None
+    )
 
     report = {
         "request_id": request.request_id,
@@ -252,7 +279,7 @@ def write_request_report(
 
         # Storage
         "agg_model_write_time(s)": _safe_sum(job_data, "model_write_time(s)"),
-        "agg_input_write_time(s)": _safe_sum(job_data, "input_write_time(s)"),
+        "agg_input_write_time(s)": aggregate_input_write_time_s,
         "agg_model_s3_read_time(s)": _safe_sum(
             job_data, "model_s3_read_time(s)"
         ),
@@ -265,6 +292,14 @@ def write_request_report(
             + _safe_sum(job_data, "input_s3_read_time(s)")
         ),
         "agg_s3_write_time(s)": _safe_sum(job_data, "total_s3_write_time(s)"),
+        "max_input_s3_read_time(s)": max_input_s3_read_time_s,
+        "estimated_tensor_communication_time(s)": (
+            estimated_tensor_communication_time_s
+        ),
+        "estimated_tensor_overhead_time(s)": estimated_tensor_overhead_time_s,
+        "estimated_tensor_overhead_pct_of_total(%)": (
+            estimated_tensor_overhead_pct
+        ),
         **request.preparation_metrics,
     }
 
