@@ -1,0 +1,5 @@
+name: nano_gpt_10_layers_64_embd 
+onnx_file: experiments/models/nanoGPT/nano_gpt_10_layers_64_embd.onnx
+input_file: experiments/models/nanoGPT/input.json
+input_shapes:
+  input: [1,64]
