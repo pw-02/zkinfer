@@ -401,6 +401,49 @@ class ZKProofWorker:
             #         os.path.join(local_paths.artifact_dir, "proof.pf"),
             #     )
 
+            # Preserve the request-specific proof and witness before tmp cleanup.
+            proof_output_path = os.path.join(
+                local_paths.artifact_dir,
+                "proof.pf",
+            )
+
+            witness_output_path = os.path.join(
+                local_paths.artifact_dir,
+                "witness.json",
+            )
+
+            if not os.path.exists(proof_stages.proof_path):
+                raise FileNotFoundError(
+                    f"Proof file was not generated: {proof_stages.proof_path}"
+                )
+
+            if not os.path.exists(proof_stages.witness_path):
+                raise FileNotFoundError(
+                    f"Witness file was not generated: {proof_stages.witness_path}"
+                )
+
+            shutil.copy2(
+                proof_stages.proof_path,
+                proof_output_path,
+            )
+
+            shutil.copy2(
+                proof_stages.witness_path,
+                witness_output_path,
+            )
+
+            self.logger.info(
+                "Preserved proof at %s",
+                proof_output_path,
+            )
+
+            self.logger.info(
+                "Preserved witness at %s",
+                witness_output_path,
+            )
+
+            
+
             settings_output_path = os.path.join(
                 local_paths.artifact_dir,
                 "ezkl_settings.json",
