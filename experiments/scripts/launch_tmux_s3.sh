@@ -63,7 +63,7 @@ storage.s3_bucket=${S3_BUCKET} \
 storage.s3_prefix=${S3_PREFIX} \
 storage.transfer_prefix=transfer \
 storage.proving_cache_enabled=true \
-storage.proving_cache_prefix=cache-v2 \
+storage.proving_cache_prefix=cache \
 storage.proving_cache_overwrite=false"
 
 echo "Checking access to S3 bucket: ${S3_BUCKET}"
