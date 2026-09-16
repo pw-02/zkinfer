@@ -154,10 +154,55 @@ class EZKLProofStages:
         ):
             return False, 0.0
 
+        # start = time.perf_counter()
+        # download_file(self.proving_cache_s3_bucket, pk_key, self.pk_path)
+        # download_file(self.proving_cache_s3_bucket, vk_key, self.vk_path)
+        # return True, time.perf_counter() - start
+        self._update_status("LOADING_KEYS_FROM_CACHE")
+
+        self.logger.info(
+            "Loading proving keys from S3 cache: prefix=%s",
+            self.proving_cache_s3_prefix,
+        )
+
         start = time.perf_counter()
-        download_file(self.proving_cache_s3_bucket, pk_key, self.pk_path)
-        download_file(self.proving_cache_s3_bucket, vk_key, self.vk_path)
-        return True, time.perf_counter() - start
+
+        download_file(
+            self.proving_cache_s3_bucket,
+            pk_key,
+            self.pk_path,
+        )
+
+        download_file(
+            self.proving_cache_s3_bucket,
+            vk_key,
+            self.vk_path,
+        )
+
+        read_time = time.perf_counter() - start
+
+        self.logger.info(
+            "Loaded proving keys from S3 cache in %.3fs: pk=%s vk=%s",
+            read_time,
+            pk_key,
+            vk_key,
+        )
+
+        return True, read_time
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
 
     def _load_settings(self) -> Dict[str, Any]:
         with open(self.settings_path, "r", encoding="utf-8") as f:
