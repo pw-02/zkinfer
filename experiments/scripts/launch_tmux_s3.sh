@@ -11,16 +11,13 @@ OPS_PER_CHUNK="${5:-1}"
 SESSION="${TMUX_SESSION:-zkexp}"
 CONDA_ENV="${CONDA_ENV:-zk}"
 
-# Required: bucket name only, without s3://
 S3_BUCKET="${ZKINFER_S3_BUCKET:-zkinfer}"
-
-# Keep this stable so proving artifacts can be reused across experiments.
 S3_PREFIX="${ZKINFER_S3_PREFIX:-zkinfer-reviewer}"
 
 if [[ -z "$S3_BUCKET" ]]; then
     echo "Error: ZKINFER_S3_BUCKET is not set."
     echo "Example:"
-    echo "  export ZKINFER_S3_BUCKET=my-zkinfer-bucket"
+    echo "  export ZKINFER_S3_BUCKET=zkinfer"
     exit 1
 fi
 
@@ -36,11 +33,13 @@ if [[ ! -f "${ROOT_DIR}/experiments/submit_job.py" ]]; then
     exit 1
 fi
 
-RUN_ID="$(date +%Y-%m-%d_%H-%M-%S)_${WORKLOAD}_g${OPS_PER_CHUNK}"
-RUN_DIR="${ROOT_DIR}/experiments/runs/${RUN_ID}"
-LOGS_DIR="${RUN_DIR}/logs"
+RUN_ID="$(date -u +%Y-%m-%d_%H-%M-%S)_${WORKLOAD}_g${OPS_PER_CHUNK}"
 
-mkdir -p "$LOGS_DIR"
+CAMPAIGN_DIR="${ROOT_DIR}/experiments/runs/${RUN_ID}"
+REQUESTS_DIR="${CAMPAIGN_DIR}/requests"
+LOGS_DIR="${CAMPAIGN_DIR}/logs"
+
+mkdir -p "$REQUESTS_DIR" "$LOGS_DIR"
 
 if tmux has-session -t "$SESSION" 2>/dev/null; then
     tmux kill-session -t "$SESSION"
@@ -55,16 +54,16 @@ export PYTHONPATH=${ROOT_DIR}:\${PYTHONPATH:-}"
 RUNTIME_CFG="\
 coordinator.host=${COORDINATOR_HOST} \
 coordinator.port=${COORDINATOR_PORT} \
-coordinator.runs_dir=${RUN_DIR} \
+coordinator.runs_dir=${REQUESTS_DIR} \
 coordinator.logs_dir=${LOGS_DIR} \
-worker.runs_dir=${RUN_DIR} \
+worker.runs_dir=${REQUESTS_DIR} \
 worker.logs_dir=${LOGS_DIR} \
 storage.backend=s3 \
 storage.s3_bucket=${S3_BUCKET} \
 storage.s3_prefix=${S3_PREFIX} \
 storage.transfer_prefix=transfer \
 storage.proving_cache_enabled=true \
-storage.proving_cache_prefix=cache \
+storage.proving_cache_prefix=cache-v2 \
 storage.proving_cache_overwrite=false"
 
 echo "Checking access to S3 bucket: ${S3_BUCKET}"
@@ -76,7 +75,7 @@ if command -v aws >/dev/null 2>&1; then
         exit 1
     fi
 else
-    echo "Warning: AWS CLI not found; skipping the S3 access check."
+    echo "Warning: AWS CLI not found; skipping S3 access check."
 fi
 
 tmux new-session -d -s "$SESSION" -n "coordinator"
@@ -122,14 +121,14 @@ for i in $(seq 1 "$NUM_WORKERS"); do
         C-m
 done
 
-# Give workers a moment to initialize and connect.
 sleep 2
 
 tmux new-window -t "$SESSION" -n "submit"
 
 tmux send-keys -t "$SESSION:submit" \
     "${BASE_CMD} && \
-    echo 'Run directory: ${RUN_DIR}' && \
+    echo 'Campaign directory: ${CAMPAIGN_DIR}' && \
+    echo 'Request results: ${REQUESTS_DIR}' && \
     echo 'Workload: ${WORKLOAD}' && \
     echo 'ops_per_chunk: ${OPS_PER_CHUNK}' && \
     echo 'S3 bucket: ${S3_BUCKET}' && \
@@ -140,12 +139,13 @@ tmux send-keys -t "$SESSION:submit" \
     execution.ops_per_chunk=${OPS_PER_CHUNK} \
     launch.coordinator_host=${COORDINATOR_HOST} \
     launch.coordinator_port=${COORDINATOR_PORT} \
-    2>&1 | tee ${LOGS_DIR}/submit.tmux.log" \
+    2>&1 | tee -a ${LOGS_DIR}/submit.tmux.log" \
     C-m
 
 echo
 echo "Started tmux session: ${SESSION}"
-echo "Run directory: ${RUN_DIR}"
+echo "Campaign directory: ${CAMPAIGN_DIR}"
+echo "Request results: ${REQUESTS_DIR}"
 echo "Logs: ${LOGS_DIR}"
 echo "Workload: ${WORKLOAD}"
 echo "Workers: ${NUM_WORKERS}"

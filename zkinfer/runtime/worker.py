@@ -27,6 +27,7 @@ from zkinfer.profiling.resource_parser import parse_resource_usage_file
 from zkinfer.storage.s3 import download_file
 from zkinfer.utils.network import get_ip
 
+
 def setup_logger(name: str, log_file: Optional[str] = None) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
@@ -49,6 +50,7 @@ def setup_logger(name: str, log_file: Optional[str] = None) -> logging.Logger:
         logger.addHandler(file_handler)
 
     return logger
+
 
 @dataclass
 class LocalJobPaths:
@@ -365,6 +367,93 @@ class ZKProofWorker:
             logger=self.logger,
         )
 
+    def preserve_job_artifacts(
+        self,
+        assignment,
+        local_paths: LocalJobPaths,
+        proof_stages: EZKLProofStages,
+    ) -> Dict[str, str]:
+        artifact_sources = {
+            "proof.pf": proof_stages.proof_path,
+            "witness.json": proof_stages.witness_path,
+            "vk.json": proof_stages.vk_path,
+            "settings.json": proof_stages.settings_path,
+        }
+
+        for artifact_name, source_path in artifact_sources.items():
+            if not source_path or not os.path.exists(source_path):
+                raise FileNotFoundError(
+                    f"Required artifact {artifact_name} was not generated: "
+                    f"{source_path}"
+                )
+
+        artifact_paths: Dict[str, str] = {}
+        artifact_metadata = {}
+        tmp_dir = Path(local_paths.tmp_dir).resolve()
+
+        for artifact_name, source_path in artifact_sources.items():
+            output_path = os.path.join(
+                local_paths.artifact_dir,
+                artifact_name,
+            )
+
+            source = Path(source_path).resolve()
+            try:
+                source.relative_to(tmp_dir)
+                source_is_temporary = True
+            except ValueError:
+                source_is_temporary = False
+
+            if source_is_temporary:
+                shutil.move(str(source), output_path)
+            else:
+                shutil.copy2(str(source), output_path)
+
+            artifact_paths[artifact_name] = output_path
+            artifact_metadata[artifact_name] = {
+                "file": artifact_name,
+                "size_bytes": os.path.getsize(output_path),
+            }
+
+        cache_prefix = local_paths.cache_prefix.rstrip("/")
+        cache_artifacts = {
+            "settings": f"{cache_prefix}/settings.json",
+            "compiled_circuit": f"{cache_prefix}/network.compiled",
+            "proving_key": f"{cache_prefix}/pk.json",
+            "verification_key": f"{cache_prefix}/vk.json",
+        }
+
+        manifest = {
+            "request_id": assignment.request_id,
+            "job_id": assignment.job_id,
+            "worker_id": self.worker_id,
+            "storage_backend": self.cfg.file_transfer.backend,
+            "s3_bucket": self.cfg.proving_cache.s3_bucket,
+            "model_source": assignment.model_path,
+            "input_source": assignment.input_path,
+            "cache_prefix": cache_prefix,
+            "cache_artifacts": cache_artifacts,
+            "srs_path": proof_stages.srs_path,
+            "artifacts": artifact_metadata,
+        }
+
+        manifest_path = os.path.join(
+            local_paths.artifact_dir,
+            "manifest.json",
+        )
+
+        with open(manifest_path, "w", encoding="utf-8") as file:
+            json.dump(manifest, file, indent=4)
+
+        self.logger.info(
+            "Preserved proof, witness, verification key, settings, and "
+            "manifest in %s",
+            local_paths.artifact_dir,
+        )
+
+        artifact_paths["manifest.json"] = manifest_path
+        return artifact_paths
+
     def run_assignment(self, assignment) -> None:
         job_id = assignment.job_id
 
@@ -391,66 +480,7 @@ class ZKProofWorker:
                 status_file=status_file,
             )
 
-            ezkl_metrics, ezkl_settings = proof_stages.run_all(setup_only=False)
-
-            #disabling proof upload for now to save time and space during development - can re-enable later if needed
-
-            # if os.path.exists(proof_stages.proof_path):
-            #     shutil.copy(
-            #         proof_stages.proof_path,
-            #         os.path.join(local_paths.artifact_dir, "proof.pf"),
-            #     )
-
-            # Preserve the request-specific proof and witness before tmp cleanup.
-            proof_output_path = os.path.join(
-                local_paths.artifact_dir,
-                "proof.pf",
-            )
-
-            witness_output_path = os.path.join(
-                local_paths.artifact_dir,
-                "witness.json",
-            )
-
-            if not os.path.exists(proof_stages.proof_path):
-                raise FileNotFoundError(
-                    f"Proof file was not generated: {proof_stages.proof_path}"
-                )
-
-            if not os.path.exists(proof_stages.witness_path):
-                raise FileNotFoundError(
-                    f"Witness file was not generated: {proof_stages.witness_path}"
-                )
-
-            shutil.copy2(
-                proof_stages.proof_path,
-                proof_output_path,
-            )
-
-            shutil.copy2(
-                proof_stages.witness_path,
-                witness_output_path,
-            )
-
-            self.logger.info(
-                "Preserved proof at %s",
-                proof_output_path,
-            )
-
-            self.logger.info(
-                "Preserved witness at %s",
-                witness_output_path,
-            )
-
-            
-
-            settings_output_path = os.path.join(
-                local_paths.artifact_dir,
-                "ezkl_settings.json",
-            )
-
-            with open(settings_output_path, "w", encoding="utf-8") as file:
-                json.dump(ezkl_settings, file, indent=4)
+            ezkl_metrics, _ = proof_stages.run_all(setup_only=False)
 
             metrics = self.collect_metrics(
                 artifact_dir=local_paths.artifact_dir,
@@ -463,10 +493,16 @@ class ZKProofWorker:
                 },
             )
 
+            artifact_paths = self.preserve_job_artifacts(
+                assignment=assignment,
+                local_paths=local_paths,
+                proof_stages=proof_stages,
+            )
+
             self.submit_job_result(
                 job_id=job_id,
                 status="COMPLETED",
-                proof=self.read_proof_bytes(proof_stages.proof_path),
+                proof=self.read_proof_bytes(artifact_paths["proof.pf"]),
                 perf_metrics=metrics,
                 message="Proof computation completed successfully",
             )
