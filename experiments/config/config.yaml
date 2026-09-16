@@ -17,7 +17,7 @@ execution:
   simplify_model: true
 
 jobs:
-  scheduler: fifo
+  scheduler: lpt
 
 launch:
   num_workers: 1
