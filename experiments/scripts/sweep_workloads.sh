@@ -7,10 +7,10 @@ COORDINATOR_HOST="${2:-127.0.0.1}"
 COORDINATOR_PORT="${3:-50051}"
 
 WORKLOADS=(
-  mnist_classifier
+  # mnist_classifier
   mnist_gan
-  mobilenet_v2
-  nano_gpt_4_layers_64_embd
+  # mobilenet_v2
+  # nano_gpt_4_layers_64_embd
 )
 
 for WORKLOAD in "${WORKLOADS[@]}"; do
