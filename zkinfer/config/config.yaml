@@ -22,7 +22,7 @@ worker:
   send_proofs_to_coordinator: false
 
 jobs:
-  scheduler: fifo
+  scheduler: lpt
   max_retries: 0
 
 heartbeat:
