@@ -27,7 +27,7 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 REPORT_SUFFIX = "request_report.csv"
-ECECSV_SUFFIX = "transfer_only/example_reference_metrics.csv"
+E2ECSV_SUFFIX = "transfer_only/reference_metrics.csv"
 INPUTR_DIRS = ["transfer_only/nano_gpt_4_layers_64"]
 NUM_WORKERS = 15
 OUTPUT_CSV = "transfer_only/nano_gpt_4_layers_64/transfer_overhead_summary.csv"
@@ -48,7 +48,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--e2e-csv",
-        default=None,
+        default=E2ECSV_SUFFIX,
         help="Optional CSV with columns model,g,e2e_s. Repeats are allowed.",
     )
     parser.add_argument(
