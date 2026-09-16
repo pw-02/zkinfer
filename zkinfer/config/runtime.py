@@ -86,6 +86,7 @@ class ProvingCacheConfig:
 class JobConfig:
     scheduler: str
     max_retries: int
+    transfer_only: bool
 
 
 @dataclass(frozen=True)
@@ -233,6 +234,7 @@ def build_runtime_config(
         jobs=JobConfig(
             scheduler=cfg.jobs.scheduler,
             max_retries=cfg.jobs.max_retries,
+            transfer_only=bool(cfg.jobs.get("transfer_only", False)),
         ),
         heartbeat=HeartbeatConfig(
             interval_sec=cfg.heartbeat.interval_sec,

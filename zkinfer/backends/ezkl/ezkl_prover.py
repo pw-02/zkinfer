@@ -154,55 +154,10 @@ class EZKLProofStages:
         ):
             return False, 0.0
 
-        # start = time.perf_counter()
-        # download_file(self.proving_cache_s3_bucket, pk_key, self.pk_path)
-        # download_file(self.proving_cache_s3_bucket, vk_key, self.vk_path)
-        # return True, time.perf_counter() - start
-        self._update_status("LOADING_KEYS_FROM_CACHE")
-
-        self.logger.info(
-            "Loading proving keys from S3 cache: prefix=%s",
-            self.proving_cache_s3_prefix,
-        )
-
         start = time.perf_counter()
-
-        download_file(
-            self.proving_cache_s3_bucket,
-            pk_key,
-            self.pk_path,
-        )
-
-        download_file(
-            self.proving_cache_s3_bucket,
-            vk_key,
-            self.vk_path,
-        )
-
-        read_time = time.perf_counter() - start
-
-        self.logger.info(
-            "Loaded proving keys from S3 cache in %.3fs: pk=%s vk=%s",
-            read_time,
-            pk_key,
-            vk_key,
-        )
-
-        return True, read_time
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
+        download_file(self.proving_cache_s3_bucket, pk_key, self.pk_path)
+        download_file(self.proving_cache_s3_bucket, vk_key, self.vk_path)
+        return True, time.perf_counter() - start
 
     def _load_settings(self) -> Dict[str, Any]:
         with open(self.settings_path, "r", encoding="utf-8") as f:
@@ -435,24 +390,13 @@ class EZKLProofStages:
             self.compiled_circuit_path,
             self.witness_path,
         )
+
     def gen_keys(self):
-        self._update_status("KEY_CACHE_LOOKUP")
+        self._update_status("KEY_GEN")
 
         used_cache, s3_read_time = self._try_load_keys_from_cache()
-
         if used_cache:
-            self.logger.info(
-                "Using cached proving keys for prefix=%s",
-                self.proving_cache_s3_prefix,
-            )
             return True, s3_read_time, 0.0
-
-        self._update_status("GENERATING_KEYS")
-
-        self.logger.info(
-            "Proving-key cache miss; generating keys for prefix=%s",
-            self.proving_cache_s3_prefix,
-        )
 
         if not self.srs_path:
             self.srs_path = self._resolve_srs_path()
@@ -464,48 +408,11 @@ class EZKLProofStages:
             srs_path=self.srs_path,
         )
 
-        self._update_status("UPLOADING_KEYS_TO_CACHE")
-
         s3_write_time = 0.0
-        s3_write_time += self._upload_to_cache(
-            self.pk_path,
-            "pk.json",
-        )
-        s3_write_time += self._upload_to_cache(
-            self.vk_path,
-            "vk.json",
-        )
-
-        self.logger.info(
-            "Generated and cached proving keys in %.3fs: prefix=%s",
-            s3_write_time,
-            self.proving_cache_s3_prefix,
-        )
+        s3_write_time += self._upload_to_cache(self.pk_path, "pk.json")
+        s3_write_time += self._upload_to_cache(self.vk_path, "vk.json")
 
         return False, 0.0, s3_write_time
-
-    # def gen_keys(self):
-    #     self._update_status("KEY_GEN")
-
-    #     used_cache, s3_read_time = self._try_load_keys_from_cache()
-    #     if used_cache:
-    #         return True, s3_read_time, 0.0
-
-    #     if not self.srs_path:
-    #         self.srs_path = self._resolve_srs_path()
-
-    #     self.ezkl.setup(
-    #         self.compiled_circuit_path,
-    #         self.vk_path,
-    #         self.pk_path,
-    #         srs_path=self.srs_path,
-    #     )
-
-    #     s3_write_time = 0.0
-    #     s3_write_time += self._upload_to_cache(self.pk_path, "pk.json")
-    #     s3_write_time += self._upload_to_cache(self.vk_path, "vk.json")
-
-    #     return False, 0.0, s3_write_time
 
     def compute_proof(self):
         self._update_status("PROVING")

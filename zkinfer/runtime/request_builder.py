@@ -24,9 +24,11 @@ class RequestBuilder:
         file_transfer: FileTransferConfig,
         proving_cache: ProvingCacheConfig,
         max_retries: int,
+        transfer_only: bool = False,
     ) -> List[ProofJob]:
         materialized_models = self._load_or_split_model(request)
         jobs: List[ProofJob] = []
+
         for item in materialized_models:
             job_dir = os.path.join(
                 file_transfer.root_dir,
@@ -35,16 +37,8 @@ class RequestBuilder:
                 item.sub_hash,
             )
 
-            model_file_path = os.path.join(
-                job_dir,
-                "model.onnx",
-            )
-
-            input_file_path = os.path.join(
-                job_dir,
-                "input.json",
-            )
-
+            model_file_path = os.path.join(job_dir, "model.onnx")
+            input_file_path = os.path.join(job_dir, "input.json")
             cache_path = self._build_cache_path(
                 request=request,
                 proving_cache=proving_cache,
@@ -53,35 +47,27 @@ class RequestBuilder:
                 model_hash=item.sub_hash,
             )
 
-            # Persist the profile across requests, beside this submodel's
-            # reusable proving artifacts.
-            profiling_file_path = os.path.join(
-                cache_path,
-                "profiling.json",
-            )
-
-            model_write_time = self._save_model_if_needed(
-                model_proto=item.model,
-                model_file_path=model_file_path,
-                file_transfer=file_transfer,
-            )
-
-            profiling_data = self._load_profiling_data(
-                model_name=item.name,
-                profiling_file_path=profiling_file_path,
-                file_transfer=file_transfer,
-            )
-
-            predicted_duration = float(
-                profiling_data.get("job_runtime(s)", 0.0) or 0.0
-            )
-
-            if predicted_duration > 0:
-                self.logger.info(
-                    "Loaded profile for %s: predicted_duration=%.3fs from %s",
-                    item.name,
-                    predicted_duration,
-                    profiling_file_path,
+            if transfer_only:
+                # The microbenchmark measures only request inputs. Do not upload
+                # models or read/write proving profiles.
+                model_write_time = 0.0
+                profiling_file_path = None
+                profiling_data = {}
+                predicted_duration = 0.0
+            else:
+                profiling_file_path = os.path.join(cache_path, "profiling.json")
+                model_write_time = self._save_model_if_needed(
+                    model_proto=item.model,
+                    model_file_path=model_file_path,
+                    file_transfer=file_transfer,
+                )
+                profiling_data = self._load_profiling_data(
+                    model_name=item.name,
+                    profiling_file_path=profiling_file_path,
+                    file_transfer=file_transfer,
+                )
+                predicted_duration = float(
+                    profiling_data.get("job_runtime(s)", 0.0) or 0.0
                 )
 
             input_write_time = self._save_input(
@@ -116,7 +102,6 @@ class RequestBuilder:
                     cache_path=cache_path,
                 )
             )
-
 
         return jobs
 

@@ -73,7 +73,10 @@ class Coordinator:
             file_transfer=self.file_transfer,
             proving_cache=self.proving_cache,
             max_retries=self.max_retries,
+            transfer_only=self.jobs_config.transfer_only,
         )
+
+        req.preparation_metrics["transfer_only"] = self.jobs_config.transfer_only
 
         self._enqueue_request(req)
 

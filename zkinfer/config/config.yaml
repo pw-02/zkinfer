@@ -22,8 +22,11 @@ worker:
   send_proofs_to_coordinator: false
 
 jobs:
-  scheduler: lpt
+  scheduler: fifo
   max_retries: 0
+  # Skip model transfer and proving, but retain real input materialization,
+  # S3 staging, scheduling, worker downloads, and JSON parsing.
+  transfer_only: false
 
 heartbeat:
   interval_sec: 15
@@ -36,13 +39,13 @@ storage:
   transfer_prefix: storage/transfer
 
   # Shared persistent proving cache.
-  proving_cache_enabled: true
+  proving_cache_enabled: false
   proving_cache_prefix: storage/cache
   proving_cache_overwrite: false
 
   # Used only when backend=s3.
-  s3_bucket: zkinfer
-  s3_prefix: zkinfer-reviewer
+  s3_bucket: null
+  s3_prefix: zkinfer
 
 hydra:
   run:

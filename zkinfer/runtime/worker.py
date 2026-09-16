@@ -80,6 +80,7 @@ class ZKProofWorker:
             self.cfg.worker.resource_monitor_interval_sec
         )
         self.send_proofs_to_coordinator = self.cfg.worker.send_proofs_to_coordinator
+        self.transfer_only = self.cfg.jobs.transfer_only
 
         self.grpc_max_message_bytes = (
             self.cfg.coordinator.grpc_max_message_mb * 1024 * 1024
@@ -180,7 +181,11 @@ class ZKProofWorker:
 
         self.logger.info("Submitted final result for job %s: %s", job_id, status)
 
-    def prepare_local_paths(self, assignment) -> LocalJobPaths:
+    def prepare_local_paths(
+        self,
+        assignment,
+        input_only: bool = False,
+    ) -> LocalJobPaths:
         job_id = assignment.job_id
 
         model_path = assignment.model_path
@@ -197,7 +202,7 @@ class ZKProofWorker:
         cache_prefix = assignment.cache_path or self.cfg.proving_cache.root_dir
 
         if self.cfg.file_transfer.backend != "s3":
-            if not os.path.exists(model_path):
+            if not input_only and not os.path.exists(model_path):
                 raise FileNotFoundError(f"Model path does not exist: {model_path}")
 
             if not os.path.exists(input_path):
@@ -217,13 +222,15 @@ class ZKProofWorker:
         local_model_path = tmp_dir / os.path.basename(model_path)
         local_input_path = tmp_dir / "input.json"
 
-        start = time.perf_counter()
-        download_file(
-            self.cfg.file_transfer.s3_bucket,
-            model_path,
-            str(local_model_path),
-        )
-        model_s3_read_time = time.perf_counter() - start
+        model_s3_read_time = 0.0
+        if not input_only:
+            start = time.perf_counter()
+            download_file(
+                self.cfg.file_transfer.s3_bucket,
+                model_path,
+                str(local_model_path),
+            )
+            model_s3_read_time = time.perf_counter() - start
 
         start = time.perf_counter()
         download_file(
@@ -462,7 +469,35 @@ class ZKProofWorker:
         resource_proc = None
 
         try:
-            local_paths = self.prepare_local_paths(assignment)
+            local_paths = self.prepare_local_paths(
+                assignment,
+                input_only=self.transfer_only,
+            )
+
+            if self.transfer_only:
+                parse_start = time.perf_counter()
+                with open(local_paths.input_path, "r", encoding="utf-8") as file:
+                    json.load(file)
+                input_parse_time = time.perf_counter() - parse_start
+
+                metrics = {
+                    "worker_id": self.worker_id,
+                    "transfer_only": True,
+                    "model_s3_read_time(s)": 0.0,
+                    "input_s3_read_time(s)": local_paths.input_s3_read_time,
+                    "input_parse_time(s)": input_parse_time,
+                    "input_transfer_bytes": os.path.getsize(local_paths.input_path),
+                }
+
+                self.submit_job_result(
+                    job_id=job_id,
+                    status="COMPLETED",
+                    perf_metrics=metrics,
+                    message="Transfer-only benchmark completed",
+                )
+                self.logger.info("Completed transfer-only job %s", job_id)
+                return
+
             status_file = os.path.join(local_paths.artifact_dir, "status.txt")
 
             (

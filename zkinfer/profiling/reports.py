@@ -106,6 +106,9 @@ def write_job_report(
         "input_s3_read_time(s)": perf_metrics.get(
             "input_s3_read_time(s)", 0.0
         ),
+        "input_parse_time(s)": perf_metrics.get("input_parse_time(s)", 0.0),
+        "input_transfer_bytes": perf_metrics.get("input_transfer_bytes", 0),
+        "transfer_only": perf_metrics.get("transfer_only", False),
         "ezkl_setup_s3_write_time(s)": perf_metrics.get(
             "ezkl_setup_s3_write_time(s)", 0.0
         ),
@@ -199,6 +202,22 @@ def write_request_report(
         if total_elapsed_time_s
         else None
     )
+    transfer_only = bool(request.preparation_metrics.get("transfer_only", False))
+    aggregate_input_transfer_bytes = _safe_sum(
+        job_data,
+        "input_transfer_bytes",
+    )
+    max_input_transfer_bytes = _safe_max(
+        job_data,
+        "input_transfer_bytes",
+    )
+    boundary_microbenchmark_wall_time_s = (
+        intermediate_generation_time_s
+        + aggregate_input_write_time_s
+        + (request_runtime_s or 0.0)
+        if transfer_only
+        else None
+    )
 
     report = {
         "request_id": request.request_id,
@@ -241,6 +260,7 @@ def write_request_report(
         "preparation_time_pct_of_total(%)": preparation_pct_of_total,
         "request_runtime(s)": request_runtime_s,
         "total_elapsed_time(s)": total_elapsed_time_s,
+        "transfer_only": transfer_only,
 
         # Aggregated job timings
         "agg_job_runtime(s)": _safe_sum(job_data, "job_runtime(s)"),
@@ -293,6 +313,13 @@ def write_request_report(
         ),
         "agg_s3_write_time(s)": _safe_sum(job_data, "total_s3_write_time(s)"),
         "max_input_s3_read_time(s)": max_input_s3_read_time_s,
+        "agg_input_transfer_bytes": aggregate_input_transfer_bytes,
+        "agg_input_transfer_MiB": aggregate_input_transfer_bytes / (1024 ** 2),
+        "max_job_input_transfer_bytes": max_input_transfer_bytes,
+        "max_job_input_transfer_MiB": max_input_transfer_bytes / (1024 ** 2),
+        "boundary_microbenchmark_wall_time(s)": (
+            boundary_microbenchmark_wall_time_s
+        ),
         "estimated_tensor_communication_time(s)": (
             estimated_tensor_communication_time_s
         ),
