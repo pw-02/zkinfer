@@ -6,6 +6,8 @@ import json
 import math
 from venv import logger
 from pathlib import Path
+
+import ezkl
 from zkinfer.storage.s3 import (
     download_file,
     upload_file,
@@ -33,7 +35,14 @@ class EZKLProofStages:
     ):
         import ezkl
 
+
+
         self.ezkl = ezkl
+
+        run_args = self.ezkl.PyRunArgs()
+        run_args.input_visibility = "public"
+        run_args.param_visibility = "fixed"
+        run_args.output_visibility = "public"
 
         self.input_data_path = input_data_path
         self.onnx_model_path = onnx_model_path

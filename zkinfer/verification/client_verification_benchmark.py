@@ -9,8 +9,9 @@ commitment swapping before verification.
 
 Alternatively, pass ``--full-job-dir``, ``--split-jobs-dir``, and optionally
 ``--srs-dir`` to discover the standard zkInfer artifact layout directly.
-Use ``--swap-split-witnesses`` when each split job's preserved witness contains
-the commitments that should be substituted before verification.
+Use ``--swap-split-witnesses`` to verify the commitment chain. In directory
+discovery mode, proof i is rewritten using the witness from partition i-1;
+the first partition is verified without swapping.
 
 If monolithic artifacts are not yet available, omit ``--full-job-dir`` and
 pass a previously measured value with ``--full-verification-s``. If neither is
@@ -73,9 +74,10 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 import ezkl
-import ezkl
+
 SPLIT_JOB_DIR = "e2e_runs/2026-09-16_15-18-48_nano_gpt_4_layers_64_embd_g1/requests/nano-gpt-4-layers-64-embd_split-fixed_ops-1_sched-lpt_simplified_2026-09-16_15-18-53/artifacts/jobs"
 SRS_DIR = "srs"
+
 
 @dataclass(frozen=True)
 class ProofSpec:
@@ -121,14 +123,17 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--download-missing-srs",
-        default=True,
         action="store_true",
         help="Download required public SRS files that are absent from --srs-dir",
     )
     parser.add_argument(
         "--swap-split-witnesses",
+        default=True,
         action="store_true",
-        help="Run commitment swapping with each split job's witness.json",
+        help=(
+            "For every split proof after the first, swap its input commitments "
+            "using the preceding job's witness.json"
+        ),
     )
     parser.add_argument(
         "--swap-full-witness",
@@ -152,6 +157,15 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=0,
         help="Also benchmark split proofs in parallel with this many processes",
+    )
+    parser.add_argument(
+        "--check-all",
+        default=True,
+        action="store_true",
+        help=(
+            "Verify every discovered proof once, record PASS/FAIL per job, "
+            "and continue after verification errors without running timings"
+        ),
     )
     parser.add_argument(
         "--output-dir",
@@ -311,17 +325,37 @@ def discover_groups(args: argparse.Namespace) -> Dict[str, List[ProofSpec]]:
     if not split_dirs:
         raise ValueError(f"No job directories containing proof.pf found in {split_root}")
 
-    groups = {
-        "split": [
-            proof_spec_from_job_dir(
-                job_dir,
-                args.srs_dir,
-                args.swap_split_witnesses,
-                args.download_missing_srs,
+    split_specs = [
+        proof_spec_from_job_dir(
+            job_dir,
+            args.srs_dir,
+            False,
+            args.download_missing_srs,
+        )
+        for job_dir in split_dirs
+    ]
+
+    if args.swap_split_witnesses:
+        chained_specs: List[ProofSpec] = []
+        for index, spec in enumerate(split_specs):
+            previous_witness = (
+                split_dirs[index - 1] / "witness.json"
+                if index > 0
+                else None
             )
-            for job_dir in split_dirs
-        ],
-    }
+            chained_specs.append(
+                ProofSpec(
+                    name=spec.name,
+                    proof=spec.proof,
+                    settings=spec.settings,
+                    vk=spec.vk,
+                    srs=spec.srs,
+                    swap_witness=previous_witness,
+                )
+            )
+        split_specs = chained_specs
+
+    groups = {"split": split_specs}
     if args.full_job_dir is not None:
         groups["full"] = [
             proof_spec_from_job_dir(
@@ -389,6 +423,80 @@ def verify_one(spec: ProofSpec, scratch_dir: Path) -> Dict[str, Any]:
         "proof_bytes": spec.proof.stat().st_size,
         "vk_bytes": spec.vk.stat().st_size,
     }
+
+
+def check_one(spec: ProofSpec, scratch_dir: Path) -> Dict[str, Any]:
+    """Verify one proof while converting any failure into a report row."""
+    started = time.perf_counter()
+    try:
+        result = verify_one(spec, scratch_dir)
+        return {
+            "job": spec.name,
+            "status": "PASS",
+            "elapsed_time_s": result["total_time_s"],
+            "error_type": "",
+            "error_message": "",
+            "proof_path": str(spec.proof),
+            "settings_path": str(spec.settings),
+            "vk_path": str(spec.vk),
+            "srs_path": str(spec.srs) if spec.srs is not None else "",
+        }
+    except Exception as exc:
+        return {
+            "job": spec.name,
+            "status": "FAIL",
+            "elapsed_time_s": time.perf_counter() - started,
+            "error_type": type(exc).__name__,
+            "error_message": str(exc),
+            "proof_path": str(spec.proof),
+            "settings_path": str(spec.settings),
+            "vk_path": str(spec.vk),
+            "srs_path": str(spec.srs) if spec.srs is not None else "",
+        }
+
+
+def check_all_groups(
+    groups: Dict[str, List[ProofSpec]],
+    output_dir: Path,
+) -> None:
+    """Check every proof once without allowing one failure to stop the scan."""
+    rows: List[Dict[str, Any]] = []
+
+    for group, specs in groups.items():
+        with tempfile.TemporaryDirectory(
+            prefix=f"zkinfer_check_{group}_"
+        ) as tmp:
+            scratch_dir = Path(tmp)
+            for spec in specs:
+                row = check_one(spec, scratch_dir)
+                row = {"group": group, **row}
+                rows.append(row)
+
+                detail = ""
+                if row["status"] == "FAIL":
+                    detail = (
+                        f" | {row['error_type']}: {row['error_message']}"
+                    )
+                print(
+                    f"{row['status']:4} group={group} job={spec.name} "
+                    f"elapsed={row['elapsed_time_s']:.6f}s{detail}"
+                )
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    write_csv(output_dir / "verification_check.csv", rows)
+
+    passed = sum(row["status"] == "PASS" for row in rows)
+    failed = len(rows) - passed
+    print(
+        f"\nVerification check complete: {passed} passed, {failed} failed, "
+        f"{len(rows)} total."
+    )
+    print(f"Per-job results: {(output_dir / 'verification_check.csv').resolve()}")
+    if failed:
+        print(
+            "Timing results were not produced because at least one proof failed. "
+            "Fix or regenerate the failed artifacts, then rerun without --check-all."
+        )
 
 
 def run_group(group: str, specs: List[ProofSpec], trial: int) -> Dict[str, Any]:
@@ -501,6 +609,10 @@ def main() -> None:
             "Use either --full-job-dir or --full-verification-s, not both"
         )
     validate_specs(spec for specs in groups.values() for spec in specs)
+
+    if args.check_all:
+        check_all_groups(groups, args.output_dir)
+        return
 
     trial_rows: List[Dict[str, Any]] = []
     executor = None
