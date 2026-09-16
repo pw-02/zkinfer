@@ -68,8 +68,6 @@ class RequestBuilder:
                 file_transfer=file_transfer,
             )
 
-            total_write_time = model_write_time + input_write_time
-
             jobs.append(
                 ProofJob(
                     inference_request_name=request.name,
@@ -79,7 +77,12 @@ class RequestBuilder:
                     input_path=input_file_path,
                     profiling_file_path=profiling_file_path,
                     model_write_time=(
-                        total_write_time
+                        model_write_time
+                        if file_transfer.backend == "s3"
+                        else 0.0
+                    ),
+                    input_write_time=(
+                        input_write_time
                         if file_transfer.backend == "s3"
                         else 0.0
                     ),
@@ -114,6 +117,7 @@ class RequestBuilder:
             simplified_model_path=getattr(request, "simplified_model_path", None),
             input_shapes=getattr(request, "input_shapes", None),
             model_name=request.name,
+            metrics=request.preparation_metrics,
         )
 
     def _build_cache_path(

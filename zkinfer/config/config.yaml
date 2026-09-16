@@ -30,7 +30,7 @@ heartbeat:
   timeout_sec: 60
 
 storage:
-  backend: filesystem # filesystem | s3
+  backend: s3 # filesystem | s3
 
   # Shared storage for coordinator <-> worker communication.
   transfer_prefix: storage/transfer

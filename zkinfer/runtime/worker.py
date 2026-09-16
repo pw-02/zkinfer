@@ -57,7 +57,8 @@ class LocalJobPaths:
     tmp_dir: str
     artifact_dir: str
     cache_prefix: str
-    s3_read_time: float = 0.0
+    model_s3_read_time: float = 0.0
+    input_s3_read_time: float = 0.0
 
 
 class ZKProofWorker:
@@ -214,15 +215,13 @@ class ZKProofWorker:
         local_model_path = tmp_dir / os.path.basename(model_path)
         local_input_path = tmp_dir / "input.json"
 
-        s3_read_time = 0.0
-
         start = time.perf_counter()
         download_file(
             self.cfg.file_transfer.s3_bucket,
             model_path,
             str(local_model_path),
         )
-        s3_read_time += time.perf_counter() - start
+        model_s3_read_time = time.perf_counter() - start
 
         start = time.perf_counter()
         download_file(
@@ -230,7 +229,7 @@ class ZKProofWorker:
             input_path,
             str(local_input_path),
         )
-        s3_read_time += time.perf_counter() - start
+        input_s3_read_time = time.perf_counter() - start
 
         return LocalJobPaths(
             model_path=str(local_model_path),
@@ -238,7 +237,8 @@ class ZKProofWorker:
             tmp_dir=str(tmp_dir),
             artifact_dir=str(artifact_dir),
             cache_prefix=cache_prefix,
-            s3_read_time=s3_read_time,
+            model_s3_read_time=model_s3_read_time,
+            input_s3_read_time=input_s3_read_time,
         )
 
     def start_monitoring_processes(
@@ -415,7 +415,8 @@ class ZKProofWorker:
                 proof_stages=proof_stages,
                 ezkl_metrics={
                     **ezkl_metrics,
-                    "s3_read_time": local_paths.s3_read_time,
+                    "model_s3_read_time(s)": local_paths.model_s3_read_time,
+                    "input_s3_read_time(s)": local_paths.input_s3_read_time,
                 },
             )
 

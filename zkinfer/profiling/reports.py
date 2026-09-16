@@ -57,6 +57,7 @@ def write_job_report(
         perf_metrics.get("ezkl_setup_s3_write_time(s)", 0.0) or 0.0
     )
     total_s3_write_time += job.model_write_time or 0.0
+    total_s3_write_time += job.input_write_time or 0.0
 
     report = {
         "request_id": job.inference_request_id,
@@ -78,6 +79,7 @@ def write_job_report(
         "total_elapsed_time(s)": total_elapsed_time_s,
 
         "model_write_time(s)": job.model_write_time,
+        "input_write_time(s)": job.input_write_time,
 
         # EZKL timings
         "ezkl_setup_time(s)": perf_metrics.get("ezkl_setup_time(s)", 0.0),
@@ -97,6 +99,12 @@ def write_job_report(
         # Storage/cache
         "ezkl_setup_s3_read_time(s)": perf_metrics.get(
             "ezkl_setup_s3_read_time(s)", 0.0
+        ),
+        "model_s3_read_time(s)": perf_metrics.get(
+            "model_s3_read_time(s)", 0.0
+        ),
+        "input_s3_read_time(s)": perf_metrics.get(
+            "input_s3_read_time(s)", 0.0
         ),
         "ezkl_setup_s3_write_time(s)": perf_metrics.get(
             "ezkl_setup_s3_write_time(s)", 0.0
@@ -158,6 +166,12 @@ def write_request_report(
     queue_wait_time_s = _duration_seconds(request.queued_time, request.started_time)
     request_runtime_s = _duration_seconds(request.started_time, request.completed_time)
     total_elapsed_time_s = _duration_seconds(request.created_time, request.completed_time)
+    preparation_time_s = _duration_seconds(request.created_time, request.queued_time)
+    preparation_pct_of_total = (
+        preparation_time_s / total_elapsed_time_s * 100.0
+        if preparation_time_s is not None and total_elapsed_time_s
+        else None
+    )
 
     report = {
         "request_id": request.request_id,
@@ -196,6 +210,8 @@ def write_request_report(
         "error_message": request.error_message,
 
         "queue_wait_time(s)": queue_wait_time_s,
+        "preparation_time(s)": preparation_time_s,
+        "preparation_time_pct_of_total(%)": preparation_pct_of_total,
         "request_runtime(s)": request_runtime_s,
         "total_elapsed_time(s)": total_elapsed_time_s,
 
@@ -235,8 +251,21 @@ def write_request_report(
         "max_vk_file_size(GB)": _safe_max(job_data, "vk_file_size(GB)"),
 
         # Storage
-        "agg_s3_read_time(s)": _safe_sum(job_data, "ezkl_setup_s3_read_time(s)"),
+        "agg_model_write_time(s)": _safe_sum(job_data, "model_write_time(s)"),
+        "agg_input_write_time(s)": _safe_sum(job_data, "input_write_time(s)"),
+        "agg_model_s3_read_time(s)": _safe_sum(
+            job_data, "model_s3_read_time(s)"
+        ),
+        "agg_input_s3_read_time(s)": _safe_sum(
+            job_data, "input_s3_read_time(s)"
+        ),
+        "agg_s3_read_time(s)": (
+            _safe_sum(job_data, "ezkl_setup_s3_read_time(s)")
+            + _safe_sum(job_data, "model_s3_read_time(s)")
+            + _safe_sum(job_data, "input_s3_read_time(s)")
+        ),
         "agg_s3_write_time(s)": _safe_sum(job_data, "total_s3_write_time(s)"),
+        **request.preparation_metrics,
     }
 
     write_dict_to_csv(report, os.path.join(out_dir, "request_report.csv"))

@@ -1,0 +1,1000 @@
+ 1008  conda activate zk-torch
+ 1009  conda list
+ 1010  conda activate dzkml
+ 1011  maturin build --release --features python-bindings --out ./wheels/cpu
+ 1012  cd ezkl
+ 1013  maturin build --release --features python-bindings --out ./wheels/cpu
+ 1014  cd
+ 1015  ls
+ 1016  cd dzkml
+ 1017  code .
+ 1018  cd
+ 1019  cd aws
+ 1020  cd
+ 1021  ls
+ 1022  cd
+ 1023  ls
+ 1024  cd icicletest
+ 1025  ls
+ 1026  code .
+ 1027  cd ../icicle
+ 1028  ls
+ 1029  cd ../
+ 1030  ls
+ 1031  rm dr icicle
+ 1032  rm -dr icicle
+ 1033  rm -dr icicle --force
+ 1034  rm -dr icicletest --force
+ 1035  export ICICLE_BACKEND_INSTALL_DIR=halo2/icicle/backend/cuda
+ 1036  cd halo2_proofs
+ 1037  export ICICLE_BACKEND_INSTALL_DIR=halo2/icicle/backend/cuda
+ 1038  redis-cli
+ 1039  redis-serve
+ 1040  redis-server
+ 1041  flushdb
+ 1042  redis-cli
+ 1043  redis-cli
+ 1044  redis-server
+ 1045  redis-cli
+ 1046  cd
+ 1047  ls
+ 1048  redis-servwe
+ 1049  redis-servee
+ 1050  redis-server
+ 1051  conda activate cedar
+ 1052  git pull
+ 1053  pip install -r requirements.txt
+ 1054  pip install -e .
+ 1055  conda activate cedar
+ 1056  pip install -e .
+ 1057  conda activate cedar
+ 1058  conda env list
+ 1059  conda env remove --name super
+ 1060  conda env list
+ 1061  conda activate cedar
+ 1062  pip install requirements.txt
+ 1063  pip install -r requirements.txt
+ 1064  pips show torch
+ 1065  pip show torch
+ 1066  pip install boto3
+ 1067  pip uninstall torch torchvision torchaudio torchdata torchtext
+ 1068  pip install torch==2.0.1 torchvision torchaudio torchdata torchtext --index-url https://download.pytorch.org/whl/cpu
+ 1069  pip3 install torch torchvision torchtext torchaudio --index-url https://download.pytorch.org/whl/cu126
+ 1070  pip3 install torch torchvision torchtext torchaudio --index-url https://download.pytorch.org/whl/cpu
+ 1071  pip uninstall -y torch torchvision torchaudio torchdata torchtext
+ 1072  rm -rf /home/pw/miniconda3/envs/cedar/lib/python3.10/site-packages/torchaudio*
+ 1073  pip install torch==2.0.1 torchvision torchaudio torchdata torchtext --index-url https://download.pytorch.org/whl/cpu
+ 1074  pip install -U "ray[default]" boto3
+ 1075  pip install -r requirements.txt
+ 1076  pip uninstall -y ray setproctitle
+ 1077  rm -rf /home/pw/miniconda3/envs/cedar/lib/python3.10/site-packages/ray*
+ 1078  rm -rf /home/pw/miniconda3/envs/cedar/lib/python3.10/site-packages/setproctitle*
+ 1079  pip install ray[default]
+ 1080  pip install -r requirements.txt
+ 1081  pip install tensorflow==2.16.1
+ 1082  pip show tensorflow
+ 1083  conda activate base
+ 1084  conda remove --name cedar
+ 1085  conda env remove --name cedar
+ 1086  ls
+ 1087  conda create -n cedar python=3.10
+ 1088  conda activate cedar
+ 1089  pip install -r requirements.txt
+ 1090  pip install -r requirements.txt --index-url https://download.pytorch.org/whl/cpu
+ 1091  pip install -r requirements.txt
+ 1092  pip install -e .
+ 1093  pip install boto3
+ 1094  conda activate cedar
+ 1095  pip install -e .
+ 1096  pip install -e .
+ 1097  pip install lightning
+ 1098  conda activate cedar
+ 1099  ip un
+ 1100  pip install timm
+ 1101  pip uninstall timm
+ 1102  pip install timm
+ 1103  conda activate cedar
+ 1104  pip show torch
+ 1105  pip show torchvision
+ 1106  conda activate cedar
+ 1107  pip install -e .
+ 1108  pip install -r requirements.txt
+ 1109  pip uninstall torchvision
+ 1110  pip install -r requirements.txt
+ 1111  pip uninstall torchvision
+ 1112  pip uninstall torch
+ 1113  pip uninstall torchaudio
+ 1114  pip uninstall torchdata
+ 1115  pip unistall torchtext
+ 1116  pip unnistall torchtext
+ 1117  pip uninstall torchtext
+ 1118  pip install -r requirements.txt --index-url https://download.pytorch.org/whl/cpu
+ 1119  conda activate cedar
+ 1120  git pull
+ 1121  conda activate cedar
+ 1122  CD ../
+ 1123  cd ../
+ 1124  code .
+ 1125  redis-cli
+ 1126  redis-server
+ 1127  conda create -n radiomics python=3.10
+ 1128  conda activate radiomics     
+ 1129  pip install pyradiomics
+ 1130  conda remove -n radiomics --all
+ 1131  conda activate base
+ 1132  conda remove -n radiomics --all
+ 1133  conda create -n radiomics python=3.7
+ 1134  conda activate radiomics
+ 1135  pip install pyradiomics
+ 1136  conda activate radiomics
+ 1137  pip install numpy
+ 1138  pip install pillow
+ 1139  pip install matplotlib
+ 1140  cd
+ 1141  ls
+ 1142  git clone https://github.com/pw-02/deep-prove.git
+ 1143  ls
+ 1144  cd deep-prove
+ 1145  code .
+ 1146  vscode .
+ 1147  pwd
+ 1148  code
+ 1149  pwd
+ 1150  ls
+ 1151  cd projets
+ 1152  cd projects
+ 1153  ls
+ 1154  conda create -n hermes python=3.11
+ 1155  conda activate hermes
+ 1156  git clone --recurse-submodules https://github.com/pw-02/Hermes.git
+ 1157  cd hermes
+ 1158  code .
+ 1159  ls -la /sys/class/powercap/
+ 1160  ls -la /sys/class/powercap/intel-rapl/ 2>/dev/null
+ 1161  ls
+ 1162  ped
+ 1163  pwd
+ 1164  nvidia-smi
+ 1165  cond activate hermes
+ 1166  conda activate hermes
+ 1167  pip install transformers datasets pynvml matplotlib pymongo
+ 1168  wsl -l -v
+ 1169  conda install -c pytorch -c nvidia   pytorch pytorch-cuda=12.1 faiss-gpu numpy
+ 1170  conda activate hermes
+ 1171  pip uninstall -y numpy pyarrow datasets
+ 1172  conda install -y numpy pyarrow datasets
+ 1173  pip uninstall -y numpy
+ 1174  conda remove -y numpy
+ 1175  conda install -y numpy
+ 1176  conda install -y faiss-gpu pyarrow datasets
+ 1177  ls
+ 1178  cd projetcs
+ 1179  ls
+ 1180  cd projects
+ 1181  ls
+ 1182  rm -dr Hermes
+ 1183  rm -dr Hermes --force
+ 1184  conda remove --name hermes --all
+ 1185  conda activate faasrag
+ 1186  export PYTHONPATH=".:$PYTHONPATH"
+ 1187  pip install wheels/proximipy-0.1.0-cp311-cp311-manylinux_2_34_x86_64.whl
+ 1188  git pull
+ 1189  cd
+ 1190  ls
+ 1191  cd projects
+ 1192  git clone https://github.com/pw-02/faas-rag.git
+ 1193  ls
+ 1194  cd projects
+ 1195  ls
+ 1196  cd ../faas-rag
+ 1197  ls
+ 1198  conda ls
+ 1199  conda list
+ 1200  conda envs
+ 1201  conda env
+ 1202  conda env list
+ 1203  conda create -n faasrag python=3.11
+ 1204  conda activate faasrag
+ 1205  pip install -r requirements.txt
+ 1206  python pwrag/microbenchmarks/eval_proximity_cache_vs_faiss.py
+ 1207  code .
+ 1208  cd
+ 1209  ls
+ 1210  cd projects
+ 1211  ls
+ 1212  cd faas-rag
+ 1213  git pull
+ 1214  code .
+ 1215  conda activate faasrag
+ 1216  pip install vllm
+ 1217  pip install vllm>=0.4.1
+ 1218  conda activate faasrag
+ 1219  export PYTHONPATH=".:$PYTHONPATH"
+ 1220  conda activate faasrag
+ 1221  pip install vllm>=0.4.1
+ 1222  conda activate faasrag
+ 1223  git pull
+ 1224  cd
+ 1225  cd projects
+ 1226  ls
+ 1227  cd projects
+ 1228  ls
+ 1229  cd ../
+ 1230  git clone https://github.com/pw-02/Search-o1.git
+ 1231  conda create -n search01 python=3.11
+ 1232  conda activate search01
+ 1233  ls
+ 1234  cd Search-o1
+ 1235  pip install -r requirements.txt
+ 1236  code .
+ 1237  cd ../
+ 1238  conda activate faasrag
+ 1239  export PYTHONPATH=".:$PYTHONPATH"
+ 1240  conda activate search_o1
+ 1241  conda activate search01
+ 1242  pip install pyext
+ 1243  pip install tqdm
+ 1244  pip install torch
+ 1245  conda activate base
+ 1246  conda remove -n search01 --all
+ 1247  conda create -n search_o1 python=3.
+ 1248  conda create -n search_o1 python=3.9
+ 1249  conda activate search_o1
+ 1250  pip install -r requirements.txt
+ 1251  pip install numpy
+ 1252  conda activate faasrag
+ 1253  export PYTHONPATH=".:$PYTHONPATH"
+ 1254  conda activate faasrag
+ 1255  git pull
+ 1256  git stash
+ 1257  git pull
+ 1258  clear
+ 1259  cd
+ 1260  ls
+ 1261  cd projects
+ 1262  ls
+ 1263  cd  faas-rag
+ 1264  git pull
+ 1265  code .
+ 1266  conda activate search_o1
+ 1267  pip install bs4
+ 1268  conda activate search_o1
+ 1269  pip install pdfplumber
+ 1270  pip install beautifulsoup4
+ 1271  conda activate search_o1
+ 1272  conda activate faasrag
+ 1273  export PYTHONPATH=".:$PYTHONPATH"
+ 1274  pip install nltk
+ 1275  pip install pdfplumber
+ 1276  pip install langid
+ 1277  pip install beautifulsoup4
+ 1278  pip install vllm==0.6.4
+ 1279  pip uninstall torchaudio
+ 1280  pip uninstall cupy
+ 1281  pip install vllm==0.6.4
+ 1282  conda activate faasrag
+ 1283  export PYTHONPATH=".:$PYTHONPATH"
+ 1284  conda activate faasrag
+ 1285  export PYTHONPATH=".:$PYTHONPATH"
+ 1286  git pull
+ 1287  cd
+ 1288  ls
+ 1289  cd project
+ 1290  ls
+ 1291  cd ../projects
+ 1292  ls
+ 1293  cd faas-rag
+ 1294  git pull
+ 1295  code .
+ 1296  git pull
+ 1297  cd
+ 1298  ls
+ 1299  cd projects
+ 1300  ls
+ 1301  got clone https://github.com/pw-02/malleable-inference-job.git
+ 1302  git clone https://github.com/pw-02/malleable-inference-job.git
+ 1303  ls
+ 1304  cd projects
+ 1305  ls
+ 1306  cd ../
+ 1307  ls
+ 1308  cd malleable-inference-job
+ 1309  code .
+ 1310  ls
+ 1311  rm ../
+ 1312  ls
+ 1313  cd ../
+ 1314  ls
+ 1315  rm -dr malleable-inference-job
+ 1316  rm -dr malleable-inference-job --force
+ 1317  clear
+ 1318  git clone https://github.com/pw-02/bftrainer.git
+ 1319  ls
+ 1320  cd bftrainer
+ 1321  code .
+ 1322  conda activtae faasrag
+ 1323  conda activatae faasrag
+ 1324  conda activata faasrag
+ 1325  conda activate faasrag
+ 1326  pip install matplotlib
+ 1327  g["time_delta"]
+ 1328  cd 
+ 1329  cd prokects
+ 1330  cd projects
+ 1331  ls
+ 1332  git clone https://github.com/pw-02/tfdata-exploration.git
+ 1333  ls
+ 1334  cd tfdata-exploration
+ 1335  code .
+ 1336  conda create -n tfdata python=3.10 -y
+ 1337  conda activate tfdata
+ 1338  pip intall -r requirements.txt
+ 1339  pip isntall -r requirements.txt
+ 1340  pip install -r requirements.txt
+ 1341  export PYTHONPATH=.:$PYTHONPATH
+ 1342  cd bench
+ 1343  export PYTHONPATH=.:$PYTHONPATH
+ 1344  cd /tmp
+ 1345  ls
+ 1346  cd  tf_data_dispatcher
+ 1347  ls
+ 1348  cd datasets
+ 1349  ls
+ 1350  cd 100
+ 1351  cat 100
+ 1352  cd 100
+ 1353  cd../
+ 1354  cd ../
+ 1355  ls
+ 1356  cd ../
+ 1357  ls
+ 1358  cd tf_data_dispatcher_bench
+ 1359  ls
+ 1360  cd datasets
+ 1361  s
+ 1362  aws iam list-instance-profiles
+ 1363  aws iam get-instance-profile --instance-profile-name ec2-ssm-role
+ 1364  iam_instance_profile_name
+ 1365  aws iam list-instance-profiles
+ 1366  cat > trust-policy.json <<'EOF'
+ 1367  {
+ 1368    "Version": "2012-10-17",
+ 1369    "Statement": [
+ 1370      {
+ 1371        "Effect": "Allow",
+ 1372        "Principal": { "Service": "ec2.amazonaws.com" },
+ 1373        "Action": "sts:AssumeRole"
+ 1374      }
+ 1375    ]
+ 1376  }
+ 1377  EOF
+ 1378  aws iam create-role   --role-name TFDataBenchSSMRole   --assume-role-policy-document file://trust-policy.json
+ 1379  aws iam attach-role-policy   --role-name TFDataBenchSSMRole   --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+ 1380  aws iam attach-role-policy   --role-name TFDataBenchSSMRole   --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+ 1381  aws iam create-instance-profile   --instance-profile-name TFDataBenchSSMInstanceProfile
+ 1382  aws iam add-role-to-instance-profile   --instance-profile-name TFDataBenchSSMInstanceProfile   --role-name TFDataBenchSSMRole
+ 1383  aws iam list-instance-profiles
+ 1384  pip show tf
+ 1385  pip show tensorflow
+ 1386  pip show tensorflow-io
+ 1387  conda activate tfdata
+ 1388  tensorflow-io
+ 1389  pip show tensorflow-io
+ 1390  pip shpw tensorflow
+ 1391  pip show tensorflow
+ 1392  python --version
+ 1393  aws iam put-role-policy   --role-name TFDataBenchSSMInstanceProfile   --policy-name TFDataBenchS3WriteAccess   --policy-document file://s3-write-policy.json
+ 1394  aws iam get-instance-profile   --instance-profile-name TFDataBenchSSMInstanceProfile
+ 1395  aws iam put-role-policy   --role-name TFDataBenchSSMRole   --policy-name TFDataBenchS3WriteAccess   --policy-document file://s3-write-policy.json
+ 1396  aws iam list-role-policies   --role-name TFDataBenchSSMRole
+ 1397  aws iam get-role-policy   --role-name TFDataBenchSSMRole   --policy-name TFDataBenchS3WriteAccess
+ 1398  aws iam put-role-policy   --role-name TFDataBenchSSMRole   --policy-name TFDataBenchS3WriteAccess   --policy-document file://s3-write-policy.json
+ 1399  aws iam get-role-policy   --role-name TFDataBenchSSMRole   --policy-name TFDataBenchS3WriteAccess
+ 1400  cd ./results
+ 1401  cd .
+ 1402  cd ../
+ 1403  ld
+ 1404  ls
+ 1405  gsutil cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl
+ 1406  sudo apt  install gsutil
+ 1407  gsutil cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl .
+ 1408  gsutil cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl
+ 1409  /usr/bin/gsutil cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl .
+ 1410  clear
+ 1411  gsutil cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl .
+ 1412  cd cachew
+ 1413  conda create -n cachew python3.9
+ 1414  conda create -n cachew python=3.9
+ 1415  conda activate cachew
+ 1416  clea
+ 1417  clear
+ 1418  gsutil cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl .
+ 1419  gsutil version
+ 1420  which gsutil
+ 1421  gcloud storage cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl .
+ 1422  sudo apt remove gsutil
+ 1423  curl https://sdk.cloud.google.com | bash
+ 1424  cd ~
+ 1425  curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-linux-x86_64.tar.gz
+ 1426  tar -xf google-cloud-cli-linux-x86_64.tar.gz
+ 1427  ~/google-cloud-sdk/install.sh
+ 1428  sudo apt-get install snapd
+ 1429  sudo snap install core
+ 1430  sudo snap install google-cloud-cli --classic
+ 1431  gsutil cp gs://cachew-builds/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl .
+ 1432  wget https://github.com/intexcor/TensorFlow-no-AVX-no-GPU-Python-3.7-3.10-for-Linux/raw/main/tensorflow-2.8.0-cp39-cp39-linux_x86_64.whl
+ 1433  conda activate cachew
+ 1434  cd
+ 1435  ls
+ 1436  cd projects
+ 1437  ls
+ 1438  git clone https://github.com/eth-easl/cachew.git
+ 1439  cd build
+ 1440  ./build.sh cpu
+ 1441  conda activate pecan
+ 1442  ./build.sh cpu
+ 1443  python --version
+ 1444  which python
+ 1445  python --version
+ 1446  which python
+ 1447  grep -E "PYTHON_BIN_PATH|PYTHON_LIB_PATH" .tf_configure.bazelrc
+ 1448  cd ../cachew
+ 1449  pwd
+ 1450  ls
+ 1451  cd /home/pw/projects/pecan-exploration/cachew/tensorflow
+ 1452  which python
+ 1453  python --version
+ 1454  bazel clean --expunge
+ 1455  rm -f .tf_configure.bazelrc .bazelrc.user
+ 1456  export PYTHON_BIN_PATH=/home/pw/miniconda3/envs/pecan/bin/python
+ 1457  ./configure
+ 1458  cd build
+ 1459  ./build.sh cpu
+ 1460  bazel build //tensorflow/tools/pip_package:build_pip_package
+ 1461  ./build.sh cpu
+ 1462  clear
+ 1463  mkdir -p ~/bazel-distdir
+ 1464  cd ~/bazel-distdir
+ 1465  wget https://dl.google.com/go/go1.12.5.linux-amd64.tar.gz
+ 1466  wget https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+ 1467  conda create -n pecan python=3.8
+ 1468  conda activate pecan
+ 1469  clear
+ 1470  cp gs://easl-atc24-ae-files/tensorflow-2.8.0-cp38-cp38-linux_x86_64.whl .
+ 1471  gcloud storage ls gs://easl-atc24-ae-files/
+ 1472  wget https://github.com/bazelbuild/bazel/releases/download/4.2.1/bazel-4.2.1-installer-linux-x86_64.sh
+ 1473  chmod +x bazel-4.2.1-installer-linux-x86_64.sh
+ 1474  ./bazel-4.2.1-installer-linux-x86_64.sh --prefix=/home/pw/projects/pecan-exploration/bazel
+ 1475  rm bazel-4.2.1-installer-linux-x86_64.sh
+ 1476  echo "export PATH=/home/pw/projects/pecan-exploration/bazel/bin:\$PATH" >> ~/.bashrc
+ 1477  git clone https://github.com/eth-easl/cachew.git
+ 1478  mkdir -p bazel_dump/cpu bazel_dump/tpu bazel_dump/gpu tf_build/cpu tf_build/tpu tf_build/gpu
+ 1479  cd build
+ 1480  ./build.sh cpu
+ 1481  bazel --version
+ 1482  cd
+ 1483  ls
+ 1484  cd
+ 1485  cd projects/pecan
+ 1486  cd projects
+ 1487  ls
+ 1488  cd pecan-exploration
+ 1489  code .
+ 1490  cd
+ 1491  cd projects
+ 1492  ls
+ 1493  cd tfdata-exploration
+ 1494  ls
+ 1495  code .
+ 1496  ls
+ 1497  cd
+ 1498  cd projects
+ 1499  clea
+ 1500  clear
+ 1501  ls
+ 1502  cd pecan-exploration
+ 1503  # install Bazel 4.2.1
+ 1504  version="4.2.1"
+ 1505  install_dir="$HOME/bazel-4.2.1"
+ 1506  wget https://github.com/bazelbuild/bazel/releases/download/${version}/bazel-${version}-installer-linux-x86_64.sh
+ 1507  chmod +x bazel-${version}-installer-linux-x86_64.sh
+ 1508  ./bazel-${version}-installer-linux-x86_64.sh --prefix=${install_dir}
+ 1509  rm bazel-${version}-installer-linux-x86_64.sh
+ 1510  echo 'export PATH=$HOME/bazel-4.2.1/bin:$PATH' >> ~/.bashrc
+ 1511  source ~/.bashrc
+ 1512  bazel --version
+ 1513  mkdir -p bazel_dump/cpu bazel_dump/tpu bazel_dump/gpu          tf_build/cpu tf_build/tpu tf_build/gpu
+ 1514  ls
+ 1515  git clone https://github.com/eth-easl/cachew.git
+ 1516  code .
+ 1517  cona activate pecan
+ 1518  conda activate pecan
+ 1519  cd build
+ 1520  bazel clean --expunge
+ 1521  ./build.sh cpu
+ 1522  ./build.sh gpu
+ 1523  ls
+ 1524  ./build.sh gpu
+ 1525  ./build.sh cuda
+ 1526  git pull
+ 1527  cd ../
+ 1528  ls
+ 1529  pip install /home/pw/projects/pecan-exploration/tf_build/cpu/tensorflow-2.8.0-cp38-cp38-linux_x86_64.whl
+ 1530  pip install -r /home/pw/projects/pecan-exploration/requirements2.txt
+ 1531  ls
+ 1532  cd
+ 1533  ls
+ 1534  cd projects
+ 1535  ls
+ 1536  cd pecan-exploration
+ 1537  code ./
+ 1538  conda env list
+ 1539  conda remove --name cachew --all   
+ 1540  conda env list
+ 1541  conda remove --name radiomics --all   
+ 1542  conda remove --name cedar --all   
+ 1543  conda env list
+ 1544  conda remove --name search_o1  --all   
+ 1545  conda env list
+ 1546  conda activate tfdata
+ 1547  python --version
+ 1548  conda activate pecan
+ 1549  pip install -r /home/pw/projects/pecan-exploration/requirements2.txt
+ 1550  pip install boto3
+ 1551  pip install pandas
+ 1552  pip install matplotlib
+ 1553  pip install tensorflow-io
+ 1554  conda activate pecan
+ 1555  conda install python=3.10
+ 1556  pip install tf_build/cpu/tensorflow-2.8.0-cp38-cp38-linux_x86_64.whl
+ 1557  cd  build
+ 1558  ./build cpu
+ 1559  ./build.sh cpu
+ 1560  cd 
+ 1561  cd projects/bftrainer
+ 1562  code .
+ 1563  cd
+ 1564  ls
+ 1565  cd projects
+ 1566  ls
+ 1567  cd bftrainer
+ 1568  code .
+ 1569  python make_synthetic_kv_cache_dataset.py   --output synthetic_high_reuse.jsonl   --num-requests 1000   --num-docs 200   --num-hot-docs 10   --docs-per-request 4   --hot-doc-prob 0.9   --repeat-block-size 24
+ 1570  cd prompt_datasets.py
+ 1571  ls
+ 1572  cd prompt_datasets
+ 1573  cd prompt-datasets
+ 1574  python make_synthetic_kv_cache_dataset.py   --output synthetic_high_reuse.jsonl   --num-requests 1000   --num-docs 200   --num-hot-docs 10   --docs-per-request 4   --hot-doc-prob 0.9   --repeat-block-size 24
+ 1575  python make_synthetic_kv_cache_dataset.py   --output synthetic_medium_reuse.jsonl   --num-requests 1000   --num-docs 200   --num-hot-docs 30   --docs-per-request 4   --hot-doc-prob 0.6   --repeat-block-size 20
+ 1576  python make_synthetic_kv_cache_dataset.py   --output synthetic_low_reuse.jsonl   --num-requests 1000   --num-docs 500   --num-hot-docs 50   --docs-per-request 4   --hot-doc-prob 0.2   --repeat-block-size 16
+ 1577  cd
+ 1578  cd projects
+ 1579  ls
+ 1580  cd bftrainer
+ 1581  code .
+ 1582  ssh pwatters@polaris.alcf.anl.gov
+ 1583  npm start
+ 1584  git add .
+ 1585  git commit -m "your message"
+ 1586  git push --force
+ 1587  huggingface-cli login
+ 1588  git update-index --chmod=+x scripts/run_local_k6.sh
+ 1589  git commit -m "Make run_local_k6.sh executable"
+ 1590  git push
+ 1591  git update-index --chmod=+x scripts/run_local_k6.sh
+ 1592  git commit -m "make k6 script executable"
+ 1593  git push
+ 1594  chmod +x run_experiment.sh
+ 1595  git add run_experiment.sh
+ 1596  git commit -m "fix: make script executable"
+ 1597  cd
+ 1598  ls
+ 1599  cd projects
+ 1600  ls
+ 1601  cd ../project
+ 1602  ls
+ 1603  cd ../projects
+ 1604  cd ../pw
+ 1605  ls
+ 1606  cd ../
+ 1607  ls
+ 1608  cd projects
+ 1609  ls
+ 1610  cd bftrainer
+ 1611  code .
+ 1612  ssh pwatters@ret.cse.unr.edu
+ 1613  exit
+ 1614  conda ls
+ 1615  conda list
+ 1616  conda env list
+ 1617  DRY_RUN=true REPLAY_MODE=ordered_parallel VUS=4 DEBUG_LIMIT=20 DURATION=30s DATASET_FILE=./dataset.jsonl k6 run workloads/replay_synthetic_kv_dataset_dry.js
+ 1618  sudo snap install k6
+ 1619  sudo gpg -k
+ 1620  sudo apt update
+ 1621  sudo apt install -y gnupg ca-certificates
+ 1622  curl -s https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg
+ 1623  echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+ 1624  sudo apt update
+ 1625  sudo apt install k6
+ 1626  k6 run - <<EOF
+ 1627  import http from "k6/http";
+ 1628  export default function () {
+ 1629    http.get("https://test.k6.io");
+ 1630  }
+ 1631  EOF
+ 1632  DRY_RUN=true REPLAY_MODE=ordered_parallel VUS=4 DEBUG_LIMIT=20 DURATION=30s DATASET_FILE=./dataset.jsonl k6 run workloads/replay_synthetic_kv_dataset_dry.js
+ 1633  DRY_RUN=true TARGET_URL=http://dummy REPLAY_MODE=ordered_parallel VUS=4 DEBUG_LIMIT=20 DURATION=30s DATASET_FILE=./dataset.jsonl k6 run workloads/replay_synthetic_kv_dataset_dry.js
+ 1634  DRY_RUN=true TARGET_URL=http://dummy MODEL=dummy REPLAY_MODE=ordered_parallel VUS=4 DEBUG_LIMIT=20 DURATION=30s DATASET_FILE=./dataset.jsonl k6 run workloads/replay_synthetic_kv_dataset_dry.js
+ 1635  DRY_RUN=true TARGET_URL=http://dummy MODEL=dummy REPLAY_MODE=ordered_parallel VUS=4 DEBUG_LIMIT=20 DURATION=30s DATASET_FILE=workloads/datasets/mooncake_replay/synthetic_trace_replay_128_scaled.jsonl k6 run workloads/replay_synthetic_kv_dataset_dry.js
+ 1636  DRY_RUN=true TARGET_URL=http://dummy MODEL=dummy REPLAY_MODE=ordered_parallel VUS=4 DEBUG_LIMIT=20 DURATION=30s DATASET_FILE=../workloads/datasets/mooncake_replay/synthetic_trace_replay_128_scaled.jsonl k6 run workloads/replay_synthetic_kv_dataset_dry.js
+ 1637  clear
+ 1638  DRY_RUN=true REPLAY_MODE=ordered_parallel VUS=4 DEBUG_LIMIT=20 DURATION=30s DATASET_FILE=../workloads/datasets/mooncake_replay/synthetic_trace_replay_128_scaled.jsonl k6 run workloads/replay_synthetic_kv_dataset_dry.js
+ 1639  $env:PYTHONPATH=".;$env:PYTHONPATH"
+ 1640  $env:PYTHONPATH=".;$env:PYTHONPATH"
+ 1641  cd
+ 1642  ls
+ 1643  cd projects
+ 1644  ls
+ 1645  cd  ezkl-exploration
+ 1646  ls
+ 1647  code .
+ 1648  exit
+ 1649  cd
+ 1650  rm -dr .ezkl
+ 1651  pip install ezkl==10.2.9
+ 1652  /home/pwatters/.ezkl/srs
+ 1653  cd /home
+ 1654  ls
+ 1655  cd .ezkl
+ 1656  echo $HOME
+ 1657  cd $HOME
+ 1658  ls
+ 1659  pwd
+ 1660  cd .ezkl
+ 1661  ;s
+ 1662  ls
+ 1663  cd srs
+ 1664  ls
+ 1665  pwd
+ 1666  scp -r /home/pw/.ezkl/srs pwatters@ret.cse.unr.edu:/home/pwatters/.ezkl/srs
+ 1667  pip install onnxscript
+ 1668  cd
+ 1669  cls
+ 1670  ls
+ 1671  cd .ezkl
+ 1672  ls
+ 1673  cd srs
+ 1674  ls
+ 1675  cd 
+ 1676  ls
+ 1677  cd .ezkl
+ 1678  ls
+ 1679  cd cache
+ 1680  ls
+ 1681  cd ../../
+ 1682  ls
+ 1683  rm -dr .ezkl
+ 1684  pip uninstall ezkl
+ 1685  pip install ezkl
+ 1686  pip uninstall ezkl
+ 1687  pip install ezkl==10.29
+ 1688  pip uninstall ezkl
+ 1689  pip install ezkl==11.0.13
+ 1690  pip install ezkl==11.0.14
+ 1691  pip uninstall ezkl
+ 1692  pip install ezkl==10.29
+ 1693  pip install ezkl
+ 1694  pip uninstall ezkl
+ 1695  pip install wheels/cpu/ezkl-0.0.0-cp37-abi3-manylinux_2_35_x86_64.whl
+ 1696  pip install ezkl==10.29
+ 1697  pip install ezkl==10.2.9
+ 1698  conda env remove -n zk
+ 1699  conda activate base
+ 1700  conda env remove -n zk
+ 1701  conda create -n zk python=3.10
+ 1702  conda activate zk
+ 1703  pip install -r requirements.txt\
+ 1704  pip install -r requirements.txt
+ 1705  curl https://raw.githubusercontent.com/zkonduit/ezkl/main/install_ezkl_cli.sh | bash
+ 1706  ezkl gen-srs --logrows 24
+ 1707  ezkl
+ 1708  ezkl gen-srs --logrows 24
+ 1709  curl https://raw.githubusercontent.com/zkonduit/ezkl/main/install_ezkl_cli.sh | bash
+ 1710  ezkl gen-srs --logrows 24
+ 1711  curl https://raw.githubusercontent.com/zkonduit/ezkl/main/install_ezkl_cli.sh | bash
+ 1712  ezkl gen-srs --logrows 24
+ 1713  pip install optimum
+ 1714  pip install transformers
+ 1715  pip install optimum[onnxruntime]
+ 1716  pip install accelerate
+ 1717  cd experiments/models
+ 1718  ls
+ 1719  cd tiny_lama
+ 1720  ls
+ 1721  pip install sentencepiece
+ 1722  pip uninstall ezkl
+ 1723  pip install ezkl
+ 1724  pip uninstall ezkl
+ 1725  pip install wheels/cpu/ezkl-0.0.0-cp37-abi3-manylinux_2_34_x86_64.whl
+ 1726  cd
+ 1727  cd ./ezkl
+ 1728  cd .ezkl
+ 1729  ls
+ 1730  cd srs
+ 1731  ls
+ 1732  clear
+ 1733  ./
+ 1734  rm -dr .ezkl
+ 1735  cd
+ 1736  rm -dr .ezkl
+ 1737  clear
+ 1738  tar -tzf workloads/traces/summit_trace/ndstat-10sdn6-evt.tar.gz
+ 1739  tar -xzf workloads/traces/summit_trace/ndstat-10sdn6-evt.tar.gz   -C workloads/traces/summit_trace/
+ 1740  scp -r  "/home/pw/projects/bftrainer/workloads" pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/bftrainer/
+ 1741  scp -r  "/home/pw/projects/bftrainer/workloads" pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve
+ 1742  git pull
+ 1743  ls
+ 1744  cd 
+ 1745  ls
+ 1746  cd prjects
+ 1747  cd projects
+ 1748  ls
+ 1749  rm -dr bftrainer
+ 1750  rm -dr bftrainer -force
+ 1751  ls
+ 1752  rm -dr bftrainer --force
+ 1753  git clone https://github.com/pw-02/malle-serve.git
+ 1754  ls
+ 1755  cd malle-serve    
+ 1756  sed -i 's/\r$//' experiments/single-node/experiments.tsv
+ 1757  sudo sed -i 's/\r$//' experiments/single-node/experiments.tsv
+ 1758  ls
+ 1759  sudo sed -i 's/\r$//' experiments.tsv
+ 1760  conda create -n malle python=3.11
+ 1761  conda activate malle
+ 1762  pip install -r requiremnts.txt
+ 1763  pip install matplotlib
+ 1764  pip install pandas
+ 1765  pip show onnxruntime
+ 1766  pip show onnx
+ 1767  pip uninstall ezkl
+ 1768  pip install ezkl
+ 1769  pip uninstall ezkl
+ 1770  pip install wheels/cpu/ezkl-0.0.0-cp37-abi3-manylinux_2_34_x86_64.whl
+ 1771  ls
+ 1772  pip insatll psutil
+ 1773  pip install psutil
+ 1774  pip install requests
+ 1775  pip install AsyncClient
+ 1776  pip install httpx
+ 1777  pip install fastapi
+ 1778  pip install prometheus-client
+ 1779  pip install uvicorn
+ 1780  pip install transformers
+ 1781  ls
+ 1782  cd projects
+ 1783  ls
+ 1784  cd 
+ 1785  ls
+ 1786  cd project
+ 1787  ls
+ 1788  cd 
+ 1789  cd  projects
+ 1790  ls
+ 1791  cd
+ 1792  ls
+ 1793  cd projects
+ 1794  ls
+ 1795  cd malle-serve 
+ 1796  code .
+ 1797  ssh pwatters@polaris.alcf.anl.gov
+ 1798  pip install matplotlib
+ 1799  cd
+ 1800  ls
+ 1801  cd project
+ 1802  ls
+ 1803  cd
+ 1804  ld
+ 1805  cd projects
+ 1806  l
+ 1807  cd projects
+ 1808  ls
+ 1809  cd ../
+ 1810  cd dzkml
+ 1811  ls
+ 1812  pip insatll graphviz
+ 1813  pip install graphviz
+ 1814  dot -V
+ 1815  sudo apt install graphviz
+ 1816  cd
+ 1817  ls
+ 1818  cd projects
+ 1819  ls
+ 1820  cd ezkl-build 
+ 1821  ls
+ 1822  cd ../
+ 1823  cd dzkml
+ 1824  ls
+ 1825  cd ../
+ 1826  ls
+ 1827  cd projects
+ 1828  ls
+ 1829  cd
+ 1830  ls
+ 1831  cd projects
+ 1832  ls
+ 1833  cd ../
+ 1834  ls
+ 1835  cd project
+ 1836  ls
+ 1837  cd ../
+ 1838  cd projects
+ 1839  ls
+ 1840  cd projects
+ 1841  ls
+ 1842  cd ../
+ 1843  ls
+ 1844  cd    malle-serve 
+ 1845  code .
+ 1846  cd
+ 1847  ls
+ 1848  cd project
+ 1849  ls
+ 1850  cd ../projects
+ 1851  ls
+ 1852  cd  malle-serve  
+ 1853  code /
+ 1854  code .
+ 1855  # Close all VS Code windows first if possible
+ 1856  rm -rf ~/.vscode-server/bin/6a44c352bd24569c417e530095901b649960f9f8
+ 1857  cd ~/projects/malle-serve
+ 1858  code .
+ 1859  pip install tabulate 
+ 1860  export PYTHONPATH=".:${PYTHONPATH:-}"
+ 1861  cd
+ 1862  ls
+ 1863  cd projects
+ 1864  ls
+ 1865  cd projects
+ 1866  ls
+ 1867  cd ../
+ 1868  ls
+ 1869  cd //
+ 1870  cd ../
+ 1871  ls
+ 1872  cd ../
+ 1873  l
+ 1874  cd 
+ 1875  cd projects
+ 1876  ls
+ 1877  cd ../project
+ 1878  ls
+ 1879  cd src
+ 1880  ls
+ 1881  cd ../../
+ 1882  ls
+ 1883  cd
+ 1884  cd porjects
+ 1885  ls
+ 1886  cd projecrs
+ 1887  cd projects
+ 1888  ls
+ 1889  cd  zkinfer
+ 1890  code .
+ 1891  rm -rf ~/.vscode-server/bin/fc3def6774c76082adf699d366f31a557ce5573f
+ 1892  code .
+ 1893  ls
+ 1894  cd ../
+ 1895  ls
+ 1896  cd dzkml
+ 1897  ls
+ 1898  redis-cli
+ 1899  sudo apt start redis
+ 1900  sudo systemctl start redis-server
+ 1901  redis-cli
+ 1902  cd
+ 1903  ls
+ 1904  cd cache
+ 1905  ls
+ 1906  cd repos
+ 1907  ls
+ 1908  cd v1
+ 1909  ls
+ 1910  cd ../../
+ 1911  rm cache
+ 1912  rm -dr cache
+ 1913  cd ../
+ 1914  ls
+ 1915  cd projects
+ 1916  ls
+ 1917  cd malle-serve
+ 1918  ls
+ 1919  sudo systemctl start redis-server
+ 1920  redis-cli
+ 1921  ls
+ 1922  c
+ 1923  cd
+ 1924  sudo systemctl start redis-server
+ 1925  redis-cli
+ 1926  /home/pw/miniconda3/envs/malle/bin/python
+ 1927  scp -r /home/pw/projects/malle-serve/workloads pwatters@ret.cse.unr.edu:/lus/grand/projects/BFTrainer/pwatters/malle-serve/workloads
+ 1928  scp -r /home/pw/projects/malle-serve/workloads pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/workloads
+ 1929  rsync -av --ignore-existing /home/pw/projects/malle-serve/workloads/   pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/workloads/
+ 1930  pip install pynvml
+ 1931  git fetch origin
+ 1932  git reset --hard origin/"$(git branch --show-current)"
+ 1933  git pull
+ 1934  git fetch origin
+ 1935  git reset --hard origin/"$(git branch --show-current)"
+ 1936  rsync -av --ignore-existing /home/pw/projects/malle-serve/workloads/   pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/workloads/
+ 1937  qsub -I -l select=1 -l walltime=01:00:00 -q by-node -A BFTrainer -l filesystems=home:grand
+ 1938  pip show vllm
+ 1939  # Install vLLM with a specific CUDA version (e.g., 13.0).
+ 1940  export VLLM_VERSION=$(curl -s https://api.github.com/repos/vllm-project/vllm/releases/latest | jq -r .tag_name | sed 's/^v//')
+ 1941  export CUDA_VERSION=130 # or other
+ 1942  export CPU_ARCH=$(uname -m) # x86_64 or aarch64
+ 1943  uv pip install https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cu${CUDA_VERSION}-cp38-abi3-manylinux_2_28_${CPU_ARCH}.whl --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION}
+ 1944  sudo snap install astral-uv
+ 1945  pip install uv
+ 1946  # Install vLLM with a specific CUDA version (e.g., 13.0).
+ 1947  export VLLM_VERSION=$(curl -s https://api.github.com/repos/vllm-project/vllm/releases/latest | jq -r .tag_name | sed 's/^v//')
+ 1948  export CUDA_VERSION=130 # or other
+ 1949  export CPU_ARCH=$(uname -m) # x86_64 or aarch64
+ 1950  uv pip install https://github.com/vllm-project/vllm/releases/download/v${VLLM_VERSION}/vllm-${VLLM_VERSION}+cu${CUDA_VERSION}-cp38-abi3-manylinux_2_28_${CPU_ARCH}.whl --extra-index-url https://download.pytorch.org/whl/cu${CUDA_VERSION}
+ 1951  python -m pip install --upgrade uv
+ 1952  uv pip install     --python "$(which python)"     vllm     --torch-backend=auto
+ 1953  python -m pip uninstall pynvml
+ 1954  python -m pip install nvidia-ml-py
+ 1955  conda activate malle
+ 1956  export VLLM_WSL2_ENABLE_PIN_MEMORY=1
+ 1957  unset VLLM_VERSION
+ 1958  python run_local.py
+ 1959  rsync -av --ignore-existing  pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/workloads/ /home/pw/projects/malle-serve/workloads/
+ 1960  rsync -av --ignore-existing /home/pw/projects/malle-serve/workloads/ pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/
+ 1961  python workloads/generators/generate_lmcache_prefix_dataset.py   --prefix-tokens 2048   --output workloads/prepared/lmcache_prefix_2048_n60.jsonl
+ 1962  python workloads/generators/generate_lmcache_prefix_dataset.py   --prefix-tokens 8192   --output workloads/prepared/lmcache_prefix_8192_n60.jsonl
+ 1963  python workloads/generators/generate_lmcache_prefix_dataset.py   --prefix-tokens 16384   --output workloads/prepared/lmcache_prefix_16384_n60.jsonl
+ 1964  python workloads/generators/generate_lmcache_prefix_dataset.py   --prefix-tokens 2048   --output workloads/prepared/lmcache_prefix_2048_n60.jsonl
+ 1965  python workloads/generators/generate_lmcache_prefix_dataset.py   --prefix-tokens 8192   --output workloads/prepared/lmcache_prefix_8192_n60.jsonl
+ 1966  python workloads/generators/generate_lmcache_prefix_dataset.py   --prefix-tokens 16384   --output workloads/prepared/lmcache_prefix_16384_n60.jsonl
+ 1967  python workloads/generators/generate_lmcache_prefix_dataset.py   --prefix-tokens 32768   --output workloads/prepared/lmcache_prefix_32768_n60.jsonl
+ 1968  rsync -av --ignore-existing /home/pw/projects/malle-serve/workloads/ pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/
+ 1969  rsync -av --ignore-existing /home/pw/projects/malle-serve/workloads/ pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/workloads
+ 1970  python -m malleserve.telemetry.compare   --paths exp_results/lmcache_prefix_sweep/runs   --output-directory exp_results/lmcache_prefix_sweep/comparison
+ 1971  RUNS_ROOT="exp_results/lmcache_prefix_sweep/runs"
+ 1972  find "$RUNS_ROOT" -type f -name "k6_summary.json" -print0 |   sort -z |   while IFS= read -r -d '' summary; do     run_dir="$(dirname "$summary")";     echo "Analyzing: $run_dir";     python -m malleserve.telemetry.analyze "$run_dir" || exit 1;   done
+ 1973  RUNS_ROOT="exp_results/lmcache_load_sweep/runs"
+ 1974  find "$RUNS_ROOT" -type f -name "k6_summary.json" -print0 |   sort -z |   while IFS= read -r -d '' summary; do     run_dir="$(dirname "$summary")";     echo "Analyzing: $run_dir";     python -m malleserve.telemetry.analyze "$run_dir" || exit 1;   done
+ 1975  rsync -av --ignore-existing /home/pw/projects/malle-serve/datasets/ pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/datasets
+ 1976  rsync -av --ignore-existing /home/pw/projects/malle-serve/workloads/ pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/workloads
+ 1977  rsync -av --ignore-existing /home/pw/projects/malle-serve/datasets/ pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/dataets
+ 1978  rsync -av --ignore-existing /home/pw/projects/malle-serve/datasets/ pwatters@polaris.alcf.anl.gov:/lus/grand/projects/BFTrainer/pwatters/malle-serve/datasets
+ 1979  xs 
+ 1980  cd
+ 1981  ls
+ 1982  cd projects
+ 1983  ls
+ 1984  cd zkinfer
+ 1985  cd ../
+ 1986  ls
+ 1987  cd   dzkml
+ 1988  ls
+ 1989  cd ../
+ 1990  ls
+ 1991  cd projects
+ 1992  ls
+ 1993  cd zkml
+ 1994  ls
+ 1995  cd ../
+ 1996  ls
+ 1997  cd zkinfer
+ 1998  ls
+ 1999  cd
+ 2000  ls
+ 2001  cd projects
+ 2002  ls
+ 2003  cd zkinfer
+ 2004  code .
+ 2005  ls
+ 2006  conda list
+ 2007  history > command-history.txt

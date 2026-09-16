@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 from onnx import TensorProto
@@ -443,7 +444,9 @@ def split_onnx_model_with_inputs(
     simplified_model_path: Optional[str] = None,
     input_shapes: Optional[Dict[str, List[int]]] = None,
     model_name: Optional[str] = None,
+    metrics: Optional[Dict[str, Any]] = None,
 ) -> List[MaterializedSubmodel]:
+    metrics = metrics if metrics is not None else {}
     split_mode = (split_mode or "none").lower()
 
     prepared_model_path = simplify_model_if_requested(
@@ -457,6 +460,15 @@ def split_onnx_model_with_inputs(
     model_hash = compute_bytes_md5_hex(model.SerializeToString())
 
     if split_mode == "none":
+        metrics.update(
+            {
+                "intermediate_tensor_generation_time(s)": 0.0,
+                "unique_boundary_tensors": 0,
+                "unique_boundary_tensor_bytes": 0,
+                "consumer_boundary_tensor_bytes": 0,
+                "boundary_fanout_ratio": 0.0,
+            }
+        )
         return [
             materialize_full_model(
                 model=model,
@@ -466,15 +478,56 @@ def split_onnx_model_with_inputs(
             )
         ]
 
+    start = time.perf_counter()
     tensor_values = collect_tensor_values(
         model=model,
         input_data_path=input_data_path,
+    )
+    metrics["intermediate_tensor_generation_time(s)"] = (
+        time.perf_counter() - start
     )
 
     sub_models = partition_model(
         model=model,
         split_mode=split_mode,
         split_group_size=split_group_size,
+    )
+
+    initializer_names = {
+        initializer.name for initializer in model.graph.initializer
+    }
+    original_inputs = {
+        graph_input.name for graph_input in model.graph.input
+    } - initializer_names
+
+    boundary_refs = [
+        name
+        for partition, _ in sub_models
+        for name in partition.input_names
+        if name not in original_inputs and name in tensor_values
+    ]
+    unique_boundary_names = set(boundary_refs)
+
+    unique_boundary_bytes = sum(
+        int(np.asarray(tensor_values[name]).nbytes)
+        for name in unique_boundary_names
+    )
+    consumer_boundary_bytes = sum(
+        int(np.asarray(tensor_values[name]).nbytes)
+        for name in boundary_refs
+    )
+
+    metrics.update(
+        {
+            "unique_boundary_tensors": len(unique_boundary_names),
+            "unique_boundary_tensor_bytes": unique_boundary_bytes,
+            "consumer_boundary_tensor_bytes": consumer_boundary_bytes,
+            "boundary_fanout_ratio": (
+                consumer_boundary_bytes / unique_boundary_bytes
+                if unique_boundary_bytes
+                else 0.0
+            ),
+        }
     )
 
     return materialize_submodels(

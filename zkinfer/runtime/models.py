@@ -41,6 +41,7 @@ class ProofJob:
     profiling_file_path: Optional[str] = None
 
     model_write_time: float = 0.0
+    input_write_time: float = 0.0
     profiling_data: Dict = field(default_factory=dict)
 
     predicted_duration: float = 0.0
@@ -92,6 +93,7 @@ class InferenceRequest:
     request_id: str = field(init=False)
 
     proof_jobs: List[ProofJob] = field(default_factory=list)
+    preparation_metrics: Dict = field(default_factory=dict)
 
     created_time: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
