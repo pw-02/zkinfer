@@ -12,7 +12,7 @@ SESSION="${TMUX_SESSION:-zkexp}"
 CONDA_ENV="${CONDA_ENV:-zk}"
 
 # Required: bucket name only, without s3://
-S3_BUCKET="${ZKINFER_S3_BUCKET:-}"
+S3_BUCKET="${ZKINFER_S3_BUCKET:-zkinfer}"
 
 # Keep this stable so proving artifacts can be reused across experiments.
 S3_PREFIX="${ZKINFER_S3_PREFIX:-zkinfer-reviewer}"
