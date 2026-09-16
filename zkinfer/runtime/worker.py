@@ -359,7 +359,7 @@ class ZKProofWorker:
             proving_cache_type=self.cfg.proving_cache.backend,
             proving_cache_root_dir=local_paths.cache_prefix,
             proving_cache_s3_bucket=self.cfg.proving_cache.s3_bucket,
-            proving_cache_s3_prefix=self.cfg.proving_cache.s3_prefix,
+            proving_cache_s3_prefix=local_paths.cache_prefix,
             status_file=status_file,
             local_tmp_dir=local_paths.tmp_dir,
             logger=self.logger,
