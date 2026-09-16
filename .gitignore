@@ -17,3 +17,4 @@ onnx_graphs
 results
 figures
 transfer_only
+e2e_runs

@@ -1,9 +1,20 @@
+
+
 #!/usr/bin/env python3
 """Benchmark EZKL verification for one monolithic proof and one split request.
 
 The input is one JSON manifest. Paths may be absolute or relative to the
 manifest file. Add ``swap_witness`` only when that proof must undergo EZKL
 commitment swapping before verification.
+
+Alternatively, pass ``--full-job-dir``, ``--split-jobs-dir``, and optionally
+``--srs-dir`` to discover the standard zkInfer artifact layout directly.
+Use ``--swap-split-witnesses`` when each split job's preserved witness contains
+the commitments that should be substituted before verification.
+
+If monolithic artifacts are not yet available, omit ``--full-job-dir`` and
+pass a previously measured value with ``--full-verification-s``. If neither is
+provided, the script runs the split benchmark without a monolithic comparison.
 
 Pass ``--parallel-workers N`` to additionally measure split-request wall time
 with N persistent verifier processes. Process startup is excluded by warm-up.
@@ -52,6 +63,7 @@ from concurrent.futures import ProcessPoolExecutor
 import csv
 import json
 import multiprocessing
+import re
 import shutil
 import statistics
 import tempfile
@@ -61,7 +73,9 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
 import ezkl
-
+import ezkl
+SPLIT_JOB_DIR = "e2e_runs/2026-09-16_15-18-48_nano_gpt_4_layers_64_embd_g1/requests/nano-gpt-4-layers-64-embd_split-fixed_ops-1_sched-lpt_simplified_2026-09-16_15-18-53/artifacts/jobs"
+SRS_DIR = "srs"
 
 @dataclass(frozen=True)
 class ProofSpec:
@@ -75,7 +89,52 @@ class ProofSpec:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("manifest", type=Path, help="Verification manifest JSON")
+    parser.add_argument(
+        "manifest",
+        type=Path,
+        nargs="?",
+        help="Optional verification manifest JSON",
+    )
+    parser.add_argument(
+        "--full-job-dir",
+        type=Path,
+        default=None,
+        help="Monolithic job directory containing proof.pf, settings.json, and vk.json",
+    )
+    parser.add_argument(
+        "--full-verification-s",
+        type=float,
+        default=None,
+        help="Optional previously measured monolithic verification time",
+    )
+    parser.add_argument(
+        "--split-jobs-dir",
+        type=Path,
+        default=SPLIT_JOB_DIR,
+        help="Directory containing the split sub_model_* job directories",
+    )
+    parser.add_argument(
+        "--srs-dir",
+        type=Path,
+        default=SRS_DIR,
+        help="Directory containing kzg<logrows>.srs or ipa<logrows>.srs files",
+    )
+    parser.add_argument(
+        "--download-missing-srs",
+        default=True,
+        action="store_true",
+        help="Download required public SRS files that are absent from --srs-dir",
+    )
+    parser.add_argument(
+        "--swap-split-witnesses",
+        action="store_true",
+        help="Run commitment swapping with each split job's witness.json",
+    )
+    parser.add_argument(
+        "--swap-full-witness",
+        action="store_true",
+        help="Also run commitment swapping for the monolithic proof",
+    )
     parser.add_argument(
         "--trials",
         type=int,
@@ -149,6 +208,133 @@ def load_group(manifest_path: Path, data: Dict[str, Any], group: str) -> List[Pr
         )
 
     return specs
+
+
+def resolve_srs_from_settings(
+    settings_path: Path,
+    srs_dir: Optional[Path],
+    download_missing_srs: bool,
+) -> Optional[Path]:
+    if srs_dir is None:
+        if download_missing_srs:
+            raise ValueError("--download-missing-srs requires --srs-dir")
+        return None
+
+    with settings_path.open("r", encoding="utf-8") as handle:
+        settings = json.load(handle)
+
+    run_args = settings.get("run_args") or {}
+    logrows = run_args.get("logrows")
+    if logrows is None:
+        raise ValueError(f"{settings_path} does not contain run_args.logrows")
+
+    commitment = str(run_args.get("commitment") or "kzg").lower()
+    prefix = "ipa" if commitment == "ipa" else "kzg"
+    resolved_srs_dir = Path(srs_dir).expanduser().resolve()
+    resolved_srs_dir.mkdir(parents=True, exist_ok=True)
+    srs_path = resolved_srs_dir / f"{prefix}{int(logrows)}.srs"
+    if not srs_path.is_file() and download_missing_srs:
+        print(f"Downloading public SRS to {srs_path}")
+        downloaded = bool(
+            ezkl.get_srs(
+                settings_path=str(settings_path),
+                srs_path=str(srs_path),
+            )
+        )
+        if not downloaded:
+            raise RuntimeError(f"SRS download failed for {settings_path}")
+    if not srs_path.is_file():
+        raise FileNotFoundError(
+            f"SRS required by {settings_path} was not found at {srs_path}. "
+            "Add --download-missing-srs to download it."
+        )
+    return srs_path
+
+
+def proof_spec_from_job_dir(
+    job_dir: Path,
+    srs_dir: Optional[Path],
+    swap_witness: bool,
+    download_missing_srs: bool,
+) -> ProofSpec:
+    job_dir = job_dir.expanduser().resolve()
+    settings_path = job_dir / "settings.json"
+    witness_path = job_dir / "witness.json"
+    return ProofSpec(
+        name=job_dir.name,
+        proof=job_dir / "proof.pf",
+        settings=settings_path,
+        vk=job_dir / "vk.json",
+        srs=resolve_srs_from_settings(
+            settings_path,
+            srs_dir,
+            download_missing_srs,
+        ),
+        swap_witness=witness_path if swap_witness else None,
+    )
+
+
+def submodel_sort_key(path: Path):
+    match = re.search(r"sub_model_(\d+)", path.name)
+    return (int(match.group(1)), path.name) if match else (10**12, path.name)
+
+
+def discover_groups(args: argparse.Namespace) -> Dict[str, List[ProofSpec]]:
+    if args.manifest is not None:
+        if args.full_job_dir is not None or args.split_jobs_dir is not None:
+            raise ValueError("Use either a manifest or the job-directory arguments, not both")
+        manifest_path = args.manifest.resolve()
+        with manifest_path.open("r", encoding="utf-8") as handle:
+            manifest = json.load(handle)
+        return {
+            "full": load_group(manifest_path, manifest, "full"),
+            "split": load_group(manifest_path, manifest, "split"),
+        }
+
+    if args.split_jobs_dir is None:
+        raise ValueError(
+            "Provide a manifest or provide --split-jobs-dir"
+        )
+
+    split_root = args.split_jobs_dir.expanduser().resolve()
+    if not split_root.is_dir():
+        raise NotADirectoryError(f"Split jobs directory not found at {split_root}")
+
+    split_dirs = sorted(
+        (
+            path
+            for path in split_root.iterdir()
+            if path.is_dir() and (path / "proof.pf").is_file()
+        ),
+        key=submodel_sort_key,
+    )
+    if not split_dirs:
+        raise ValueError(f"No job directories containing proof.pf found in {split_root}")
+
+    groups = {
+        "split": [
+            proof_spec_from_job_dir(
+                job_dir,
+                args.srs_dir,
+                args.swap_split_witnesses,
+                args.download_missing_srs,
+            )
+            for job_dir in split_dirs
+        ],
+    }
+    if args.full_job_dir is not None:
+        groups["full"] = [
+            proof_spec_from_job_dir(
+                args.full_job_dir,
+                args.srs_dir,
+                args.swap_full_witness,
+                args.download_missing_srs,
+            )
+        ]
+    elif args.swap_full_witness:
+        raise ValueError("--swap-full-witness requires --full-job-dir")
+
+    return groups
 
 
 def validate_specs(specs: Iterable[ProofSpec]) -> None:
@@ -306,15 +492,14 @@ def main() -> None:
         raise ValueError("--full-e2e-s must be positive")
     if args.split_e2e_s is not None and args.split_e2e_s <= 0:
         raise ValueError("--split-e2e-s must be positive")
+    if args.full_verification_s is not None and args.full_verification_s <= 0:
+        raise ValueError("--full-verification-s must be positive")
 
-    manifest_path = args.manifest.resolve()
-    with manifest_path.open("r", encoding="utf-8") as handle:
-        manifest = json.load(handle)
-
-    groups = {
-        "full": load_group(manifest_path, manifest, "full"),
-        "split": load_group(manifest_path, manifest, "split"),
-    }
+    groups = discover_groups(args)
+    if "full" in groups and args.full_verification_s is not None:
+        raise ValueError(
+            "Use either --full-job-dir or --full-verification-s, not both"
+        )
     validate_specs(spec for specs in groups.values() for spec in specs)
 
     trial_rows: List[Dict[str, Any]] = []
@@ -381,13 +566,19 @@ def main() -> None:
         ]
         summaries.append(summarize("split", "parallel", groups["split"], rows))
 
-    full_total = float(
-        next(
-            row
-            for row in summaries
-            if row["group"] == "full" and row["mode"] == "sequential"
-        )["median_total_time_s"]
-    )
+    full_total = args.full_verification_s
+    full_baseline_source = None
+    if "full" in groups:
+        full_total = float(
+            next(
+                row
+                for row in summaries
+                if row["group"] == "full" and row["mode"] == "sequential"
+            )["median_total_time_s"]
+        )
+        full_baseline_source = "measured_in_this_run"
+    elif full_total is not None:
+        full_baseline_source = "provided_with_full_verification_s"
     split_total = float(
         next(
             row
@@ -405,12 +596,18 @@ def main() -> None:
             )["median_total_time_s"]
         )
     comparison = {
-        "split_minus_full_time_s": split_total - full_total,
-        "split_over_full_time_ratio": split_total / full_total if full_total else None,
+        "full_verification_time_s": full_total,
+        "full_baseline_source": full_baseline_source,
+        "split_minus_full_time_s": (
+            split_total - full_total if full_total is not None else None
+        ),
+        "split_over_full_time_ratio": (
+            split_total / full_total if full_total else None
+        ),
         "split_parallel_time_s": split_parallel_total,
         "split_parallel_minus_full_time_s": (
             split_parallel_total - full_total
-            if split_parallel_total is not None
+            if split_parallel_total is not None and full_total is not None
             else None
         ),
         "split_parallel_over_full_time_ratio": (
@@ -419,7 +616,9 @@ def main() -> None:
             else None
         ),
         "full_verification_pct_of_e2e": (
-            100.0 * full_total / args.full_e2e_s if args.full_e2e_s else None
+            100.0 * full_total / args.full_e2e_s
+            if args.full_e2e_s and full_total is not None
+            else None
         ),
         "split_verification_pct_of_e2e": (
             100.0 * split_total / args.split_e2e_s if args.split_e2e_s else None
@@ -456,11 +655,17 @@ def main() -> None:
             f"proofs={row['proof_bytes'] / (1024 ** 2):.3f}MiB "
             f"proofs+VKs={row['client_artifact_bytes'] / (1024 ** 2):.3f}MiB"
         )
-    print(
-        f"split minus full={comparison['split_minus_full_time_s']:.6f}s "
-        f"ratio={comparison['split_over_full_time_ratio']:.3f}x"
-    )
-    if comparison["split_parallel_time_s"] is not None:
+    if full_total is not None:
+        print(
+            f"full baseline={full_total:.6f}s source={full_baseline_source}"
+        )
+        print(
+            f"split minus full={comparison['split_minus_full_time_s']:.6f}s "
+            f"ratio={comparison['split_over_full_time_ratio']:.3f}x"
+        )
+    else:
+        print("No monolithic baseline supplied; split-only results were recorded.")
+    if comparison["split_parallel_minus_full_time_s"] is not None:
         print(
             f"parallel split minus full={comparison['split_parallel_minus_full_time_s']:.6f}s "
             f"ratio={comparison['split_parallel_over_full_time_ratio']:.3f}x"
