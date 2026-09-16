@@ -6,18 +6,41 @@ NUM_WORKERS="${1:-1}"
 WORKLOAD="${2:-mnist_gan}"
 COORDINATOR_HOST="${3:-127.0.0.1}"
 COORDINATOR_PORT="${4:-50051}"
+OPS_PER_CHUNK="${5:-1}"
 
-SESSION="zkexp"
+SESSION="${TMUX_SESSION:-zkexp}"
 CONDA_ENV="${CONDA_ENV:-zk}"
+
+# Required: bucket name only, without s3://
+S3_BUCKET="${ZKINFER_S3_BUCKET:-}"
+
+# Keep this stable so proving artifacts can be reused across experiments.
+S3_PREFIX="${ZKINFER_S3_PREFIX:-zkinfer-reviewer}"
+
+if [[ -z "$S3_BUCKET" ]]; then
+    echo "Error: ZKINFER_S3_BUCKET is not set."
+    echo "Example:"
+    echo "  export ZKINFER_S3_BUCKET=my-zkinfer-bucket"
+    exit 1
+fi
+
+if [[ ! "$OPS_PER_CHUNK" =~ ^[1-9][0-9]*$ ]]; then
+    echo "Error: ops_per_chunk must be a positive integer."
+    exit 1
+fi
+
 ROOT_DIR="$(pwd)"
 
-RUN_ID="$(date +%Y-%m-%d_%H-%M-%S)_${WORKLOAD}"
+if [[ ! -f "${ROOT_DIR}/experiments/submit_job.py" ]]; then
+    echo "Error: run this script from the zkinfer repository root."
+    exit 1
+fi
+
+RUN_ID="$(date +%Y-%m-%d_%H-%M-%S)_${WORKLOAD}_g${OPS_PER_CHUNK}"
 RUN_DIR="${ROOT_DIR}/experiments/runs/${RUN_ID}"
 LOGS_DIR="${RUN_DIR}/logs"
-SHARED_DIR="${RUN_DIR}/shared"
-CACHE_DIR="${RUN_DIR}/cache"
 
-mkdir -p "$LOGS_DIR" "$SHARED_DIR" "$CACHE_DIR"
+mkdir -p "$LOGS_DIR"
 
 if tmux has-session -t "$SESSION" 2>/dev/null; then
     tmux kill-session -t "$SESSION"
@@ -36,15 +59,32 @@ coordinator.runs_dir=${RUN_DIR} \
 coordinator.logs_dir=${LOGS_DIR} \
 worker.runs_dir=${RUN_DIR} \
 worker.logs_dir=${LOGS_DIR} \
-storage.backend=filesystem \
-storage.transfer_prefix=${SHARED_DIR} \
-storage.proving_cache_prefix=${CACHE_DIR}"
+storage.backend=s3 \
+storage.s3_bucket=${S3_BUCKET} \
+storage.s3_prefix=${S3_PREFIX} \
+storage.transfer_prefix=transfer \
+storage.proving_cache_enabled=true \
+storage.proving_cache_prefix=cache \
+storage.proving_cache_overwrite=false"
+
+echo "Checking access to S3 bucket: ${S3_BUCKET}"
+
+if command -v aws >/dev/null 2>&1; then
+    if ! aws s3api head-bucket --bucket "$S3_BUCKET"; then
+        echo "Error: cannot access S3 bucket ${S3_BUCKET}."
+        echo "Check your AWS credentials, region, and bucket permissions."
+        exit 1
+    fi
+else
+    echo "Warning: AWS CLI not found; skipping the S3 access check."
+fi
 
 tmux new-session -d -s "$SESSION" -n "coordinator"
 
 tmux send-keys -t "$SESSION:coordinator" \
     "${BASE_CMD} && \
-    python -m zkinfer.runtime.coordinator_grpc ${RUNTIME_CFG} \
+    python -m zkinfer.runtime.coordinator_grpc \
+    ${RUNTIME_CFG} \
     2>&1 | tee ${LOGS_DIR}/coordinator.tmux.log" \
     C-m
 
@@ -82,20 +122,35 @@ for i in $(seq 1 "$NUM_WORKERS"); do
         C-m
 done
 
+# Give workers a moment to initialize and connect.
+sleep 2
+
 tmux new-window -t "$SESSION" -n "submit"
 
 tmux send-keys -t "$SESSION:submit" \
     "${BASE_CMD} && \
     echo 'Run directory: ${RUN_DIR}' && \
+    echo 'Workload: ${WORKLOAD}' && \
+    echo 'ops_per_chunk: ${OPS_PER_CHUNK}' && \
+    echo 'S3 bucket: ${S3_BUCKET}' && \
+    echo 'S3 prefix: ${S3_PREFIX}' && \
     python experiments/submit_job.py \
     +workload=${WORKLOAD} \
+    execution.split_mode=fixed \
+    execution.ops_per_chunk=${OPS_PER_CHUNK} \
     launch.coordinator_host=${COORDINATOR_HOST} \
     launch.coordinator_port=${COORDINATOR_PORT} \
     2>&1 | tee ${LOGS_DIR}/submit.tmux.log" \
     C-m
 
+echo
 echo "Started tmux session: ${SESSION}"
 echo "Run directory: ${RUN_DIR}"
 echo "Logs: ${LOGS_DIR}"
+echo "Workload: ${WORKLOAD}"
+echo "Workers: ${NUM_WORKERS}"
+echo "ops_per_chunk: ${OPS_PER_CHUNK}"
+echo "S3 location: s3://${S3_BUCKET}/${S3_PREFIX}"
+echo
 
 tmux attach -t "$SESSION"
