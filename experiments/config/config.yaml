@@ -14,7 +14,7 @@ suite:
 execution:
   split_mode: fixed #none, fixed, auto
   ops_per_chunk: 1
-  simplify_model: false
+  simplify_model: true
 
 jobs:
   scheduler: lpt
