@@ -33,7 +33,7 @@ if [[ ! -f "${ROOT_DIR}/experiments/submit_job.py" ]]; then
     exit 1
 fi
 
-RUN_ID="$(date -u +%Y-%m-%d_%H-%M-%S)_${WORKLOAD}_g${OPS_PER_CHUNK}"
+RUN_ID="$(date -u +%Y-%m-%d_%H-%M-%S)_${WORKLOAD}_g${OPS_PER_CHUNK}_w${NUM_WORKERS}"
 
 CAMPAIGN_DIR="${ROOT_DIR}/experiments/runs/${RUN_ID}"
 REQUESTS_DIR="${CAMPAIGN_DIR}/requests"
@@ -130,6 +130,7 @@ tmux send-keys -t "$SESSION:submit" \
     echo 'Campaign directory: ${CAMPAIGN_DIR}' && \
     echo 'Request results: ${REQUESTS_DIR}' && \
     echo 'Workload: ${WORKLOAD}' && \
+    echo 'Workers: ${NUM_WORKERS}' && \
     echo 'ops_per_chunk: ${OPS_PER_CHUNK}' && \
     echo 'S3 bucket: ${S3_BUCKET}' && \
     echo 'S3 prefix: ${S3_PREFIX}' && \
