@@ -22,7 +22,7 @@ worker:
   send_proofs_to_coordinator: false
 
 jobs:
-  scheduler: fifo
+  scheduler: lpt
   max_retries: 0
   # Skip model transfer and proving, but retain real input materialization,
   # S3 staging, scheduling, worker downloads, and JSON parsing.
