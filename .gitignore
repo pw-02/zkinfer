@@ -16,3 +16,4 @@ experiments/results
 onnx_graphs
 results
 figures
+transfer_only
