@@ -75,7 +75,7 @@ from typing import Any, Dict, Iterable, List, Optional
 
 import ezkl
 
-SPLIT_JOB_DIR = "e2e_runs/2026-09-16_15-18-48_nano_gpt_4_layers_64_embd_g1/requests/nano-gpt-4-layers-64-embd_split-fixed_ops-1_sched-lpt_simplified_2026-09-16_15-18-53/artifacts/jobs"
+SPLIT_JOB_DIR = "e2e_runs/2026-09-16_17-08-31_nano_gpt_4_layers_64_embd_g1_w8/requests/nano-gpt-4-layers-64-embd_split-fixed_ops-1_sched-lpt_simplified_2026-09-16_17-08-36/artifacts/jobs"
 SRS_DIR = "srs"
 
 

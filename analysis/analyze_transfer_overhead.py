@@ -28,10 +28,10 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 REPORT_SUFFIX = "request_report.csv"
 E2ECSV_SUFFIX = "transfer_only/reference_metrics.csv"
-INPUTR_DIRS = ["transfer_only/nano_gpt_4_layers_64"]
+INPUTR_DIRS = ["transfer_only/mobilenet_v2"]
 NUM_WORKERS = 15
-OUTPUT_CSV = "transfer_only/nano_gpt_4_layers_64/transfer_overhead_summary.csv"
-MD_REPORT = "transfer_only/nano_gpt_4_layers_64/transfer_overhead_summary.md"
+OUTPUT_CSV = "transfer_only/mobilenet_v2/transfer_overhead_summary.csv"
+MD_REPORT = "transfer_only/mobilenet_v2/transfer_overhead_summary.md"
 
 REPORT_NAME = "request_report.csv"
 
