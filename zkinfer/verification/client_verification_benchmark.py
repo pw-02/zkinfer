@@ -54,7 +54,7 @@ Example manifest
 For a chained job, ``swap_witness`` must contain the commitments that the
 client is meant to substitute, including the upstream commitment used for the
 downstream boundary. A job's ordinary witness is not automatically evidence
-that two adjacent proofs are linked.
+that two adjacent proofs are linke
 """
 
 from __future__ import annotations
