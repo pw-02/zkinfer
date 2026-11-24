@@ -23,6 +23,7 @@ from zkinfer.profiling.msm_fft_parser import (
 )
 from zkinfer.profiling.resource_parser import parse_resource_usage_file
 from zkinfer.profiling.halo2_phases import write_phase_report
+from zkinfer.profiling.execution_trace import write_execution_trace
 from zkinfer.runtime.data_plane import ArtifactRef
 from zkinfer.runtime.node.stage_admission import StageAdmissionController
 from zkinfer.storage.s3 import upload_file
@@ -257,17 +258,18 @@ class ProverTaskRunner:
 
         try:
             proof_stages = self._build_proof_stages(task, status_file)
-            with open(
-                os.path.join(task.output_dir, "admission_profile_before.json"),
-                "w",
-                encoding="utf-8",
-            ) as file:
-                json.dump(
-                    proof_stages.admission.profiles.load(task.setup_key),
-                    file,
-                    indent=2,
-                    sort_keys=True,
-                )
+            if os.environ.get("ZKINFER_PROFILING_MODE", "research") == "debug":
+                with open(
+                    os.path.join(task.output_dir, "admission_profile_before.json"),
+                    "w",
+                    encoding="utf-8",
+                ) as file:
+                    json.dump(
+                        proof_stages.admission.profiles.load(task.setup_key),
+                        file,
+                        indent=2,
+                        sort_keys=True,
+                    )
 
             # Enter before preparation and retain the reservation through output
             # publication. The outer finally also releases it after exceptions.
@@ -282,7 +284,19 @@ class ProverTaskRunner:
         self, task: LocalProverTask, resource_usage_file: str,
         proof_stages: StageAwareEZKLProofStages, job_info: Dict[str, Any],
     ) -> ProverTaskResult:
-        ezkl_metrics, _ = proof_stages.run_all(setup_only=False)
+        ezkl_metrics, settings = proof_stages.run_all(setup_only=False)
+        try:
+            circuit_features = {
+                "setup_key": task.setup_key,
+                "settings": settings,
+                "halo2": read_csv_first_row(os.path.join(task.output_dir, "halo2_circuit.csv")),
+                "profiling_mode": os.environ.get("ZKINFER_PROFILING_MODE", "research"),
+                "rayon_num_threads": os.environ.get("RAYON_NUM_THREADS"),
+            }
+            with open(os.path.join(task.output_dir, "circuit_features.json"), "w", encoding="utf-8") as file:
+                json.dump(circuit_features, file, indent=2)
+        except Exception as exc:
+            self.logger.warning("Failed to save circuit features: %s", exc)
         ezkl_metrics.update(proof_stages.admission_metrics)
         ezkl_metrics["whole_job_admission_wait_time(s)"] = float(
             job_info.get("wait_time_s", 0.0)
@@ -446,6 +460,10 @@ class ProverTaskRunner:
                 "avg_system_cpu(%)": None,
             }
 
+        try:
+            write_execution_trace(task.output_dir)
+        except Exception as exc:
+            self.logger.warning("Failed to consolidate execution trace: %s", exc)
         try:
             phase_metrics = write_phase_report(task.output_dir)
         except Exception as exc:
