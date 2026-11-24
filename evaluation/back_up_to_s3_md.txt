@@ -51,7 +51,7 @@ from fnmatch import fnmatch
 from zipfile import ZipFile, ZIP_DEFLATED
 from datetime import datetime, timezone
 
-root = Path("evaluation/results/paper-day-v2")
+root = Path("evaluation/results/paper-day-v3")
 if not root.is_dir():
     raise SystemExit(f"Missing results directory: {root}")
 
@@ -73,7 +73,7 @@ keep = [
 skip_dirs = {"cache", "trial-setup", "tmp"}
 
 stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-output = Path(f"paper-day-v2-analysis-{stamp}.zip")
+output = Path(f"paper-day-v3-analysis-{stamp}.zip")
 count = 0
 
 with ZipFile(output, "x", ZIP_DEFLATED, compresslevel=1) as archive:

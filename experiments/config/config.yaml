@@ -11,7 +11,7 @@ execution:
   # false = one proof job for the whole model
   # true  = partition the model into consecutive groups of partition_size
   partitioning_enabled: true
-  partition_size: 1
+  partition_size: 4
   simplify_model: true
 
 coordinator:
