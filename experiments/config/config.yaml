@@ -1,97 +1,28 @@
-defaults:
-  - _self_
-  - override hydra/hydra_logging: disabled
-  - override hydra/job_logging: disabled
+# Edit this file, then run: bash experiments/scripts/launch_tmux.sh
+# Logs, measurements and reports are always retained in experiments/runs/.
 
-# User-facing configuration for local experiments and launch_tmux.sh.
-# zkinfer/config/config.yaml supplies standalone runtime defaults.
+workload: mnist_classifier # Name of a YAML file in config/workload/ (without .yaml).
+
+partitioning:
+  enabled: true # false proves the entire model as one job.
+  size: 1 # Number of consecutive ONNX operators per partition.
+  simplify: true
+
+scheduling:
+  policy: resource_aware # fifo | lpt | cache_aware | resource_aware
+  max_concurrent_jobs: 1 # 1 = isolated; null = admission-controlled concurrency.
+  memory_admission: disabled # disabled | whole_job | stage
+  memory_reserve_gib: 8 # RAM reserved for the OS and other processes.
+
+cache:
+  setup: true # false = regenerate circuit and keys for every job.
+  profiles: true # false = do not reuse profiles from previous experiments.
+
 profiling:
-  mode: research # basic | research | debug
-
-suite:
-  workloads:
-    - nano_gpt_4_layers_64_embd #mnist_gan
-
-execution:
-  # false = one proof job for the whole model
-  # true  = partition the model into consecutive groups of partition_size
-  partitioning_enabled: true
-  partition_size: 4
-  simplify_model: true
-
-coordinator:
-  # fifo | lpt | cache_aware | resource_aware
-  # fifo: request-fair queue order
-  # lpt: longest predicted job first within the selected request
-  # cache_aware: prefer setup already present on the polling node
-  # resource_aware: reject jobs that cannot fit the machine, then use cache
-  # locality and duration only as coarse placement preferences. Stage-level
-  # admission remains node-local.
-  scheduling_policy: lpt
-
-node:
-  node_id: local-node
-
-  # Optional hard cap used for isolated runs and fixed-concurrency baselines.
-  # Set null when stage admission should control concurrency.
-  max_concurrent_jobs: 1
-
-  # Sampling interval for resource_usage.csv. Stage-transition timestamps are
-  # recorded separately and do not depend on this interval.
-  resource_sampling_interval_sec: 0.1
-
-  stage_admission:
-    mode: stage # stage | whole_job; enabled controls both modes
-    # false is appropriate for isolated Section 3 characterization runs.
-    # Memory is the admission resource. The fixed reserve is independent of
-    # historical predictions.
-    enabled: false
-    memory_safety_reserve_gb: 8
-    history_percentile: 0.90
-
-storage:
-  reusable_setup:
-    enabled: true
-    path: storage/setup
-
-  request_data:
-    path: storage/requests
-
-  resource_profiles:
-    enabled: true
-    path: null
-
-  local_cache:
-    path: storage/node/cache
-    max_gb: 500
+  mode: research # basic | research | debug (retains extra diagnostic files).
+  sampling_interval_sec: 0.1 # CPU/RSS sampling interval in seconds.
 
 output:
-  # Copy proof/witness/setup artifacts into experiments/runs for debugging.
-  # Traces, logs, manifests, and reports are always retained.
-  keep_proof_artifacts: false
-
-  # Keep canonical request-owned inputs/proofs under storage.request_data.path
-  # after the experiment finishes. Reusable setup and experiment records are
-  # never removed by this cleanup.
-  keep_request_data: True
-
-launch:
-  coordinator_host: localhost
-  coordinator_port: 50051
-  coordinator_ready_timeout_sec: 30
-  node_startup_delay_sec: 1
-  poll_completion_interval_sec: 5
-
-paths:
-  runs_dir: experiments/runs
-
-hydra:
-  run:
-    dir: .
-  sweep:
-    dir: .
-  output_subdir: null
-  job_logging:
-    level: DISABLE
-  hydra_logging:
-    level: DISABLE
+  keep_proofs: false # false = remove request-owned bulky data after success.
+  keep_cache: true # false = use fresh run-owned caches, then delete them on success.
+                   # Existing persistent caches are never deleted by this setting.
