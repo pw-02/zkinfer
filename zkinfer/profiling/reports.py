@@ -101,10 +101,10 @@ def write_job_report(
         "avg_system_cpu(%)": perf_metrics.get("avg_system_cpu(%)"),
         "avg_process_cpu_raw(%)": perf_metrics.get("avg_process_cpu_raw(%)"),
         "avg_process_cpu_machine(%)": perf_metrics.get("avg_process_cpu_machine(%)"),
-        "fft_count": perf_metrics.get("fft_count", 0),
-        "fft_total_time(s)": perf_metrics.get("fft_total_time(s)", 0.0),
-        "msm_count": perf_metrics.get("msm_count", 0),
-        "msm_total_time(s)": perf_metrics.get("msm_total_time(s)", 0.0),
+        "fft_count": perf_metrics.get("fft_count"),
+        "fft_total_time(s)": perf_metrics.get("fft_total_time(s)"),
+        "msm_count": perf_metrics.get("msm_count"),
+        "msm_total_time(s)": perf_metrics.get("msm_total_time(s)"),
     }
 
     for key, value in perf_metrics.items():
@@ -115,6 +115,7 @@ def write_job_report(
             or key.startswith("output_")
             or key.startswith("prover_")
             or key.startswith("node_")
+            or key.startswith("halo2_phase_")
         ):
             report[key] = value
 
