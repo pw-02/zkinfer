@@ -377,6 +377,25 @@ def cleanup_request_store(
         )
 
 
+def prune_empty_run_dirs(run_dir: Path, request_ids: List[str]) -> None:
+    """Remove only empty, run-owned temporary directories."""
+    root = run_dir.resolve()
+    targets = [root / "storage"]
+    targets.extend(root / "requests" / rid / "tmp" for rid in request_ids
+                   if rid and Path(rid).name == rid and rid not in (".", ".."))
+    for target in targets:
+        if not target.is_dir() or target.is_symlink():
+            continue
+        for current, dirs, files in os.walk(target, topdown=False, followlinks=False):
+            path = Path(current)
+            if path.is_symlink():
+                continue
+            try:
+                path.rmdir()
+            except OSError:
+                pass  # Never remove nonempty directories.
+
+
 def run(cfg: DictConfig) -> None:
     active_log = ActiveRunLog()
     logger = setup_logger(active_log)
@@ -464,6 +483,7 @@ def run(cfg: DictConfig) -> None:
                 shutil.rmtree(root / "cache")
             if (root / "runtime").exists():
                 shutil.rmtree(root / "runtime")
+            prune_empty_run_dirs(Path(str(cfg.paths.runs_dir)), submitted_request_ids)
         else:
             logger.warning("Run failed, was interrupted, or required forced shutdown; retaining diagnostic storage")
 
