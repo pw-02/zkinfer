@@ -1,0 +1,835 @@
+model,job_id,elapsed_s,memory_gib,stage
+TinyBERT,sub_model_4_c6bf7913,0.000168,0.151695,Preparation
+TinyBERT,sub_model_4_c6bf7913,1.023769,0.769821,Preparation
+TinyBERT,sub_model_4_c6bf7913,2.051381,1.564987,Preparation
+TinyBERT,sub_model_4_c6bf7913,3.079333,2.059971,Preparation
+TinyBERT,sub_model_4_c6bf7913,4.107715,2.458065,Preparation
+TinyBERT,sub_model_4_c6bf7913,5.135438,3.457027,Preparation
+TinyBERT,sub_model_4_c6bf7913,6.163460,3.698643,Preparation
+TinyBERT,sub_model_4_c6bf7913,7.192695,4.668015,Preparation
+TinyBERT,sub_model_4_c6bf7913,8.220171,5.330776,Preparation
+TinyBERT,sub_model_4_c6bf7913,9.248641,2.430473,Preparation
+TinyBERT,sub_model_4_c6bf7913,10.289450,0.433464,Preparation
+TinyBERT,sub_model_4_c6bf7913,11.316824,0.663532,Preparation
+TinyBERT,sub_model_4_c6bf7913,12.359069,1.421654,Preparation
+TinyBERT,sub_model_4_c6bf7913,13.401257,1.785172,Preparation
+TinyBERT,sub_model_4_c6bf7913,14.442131,3.091812,Preparation
+TinyBERT,sub_model_4_c6bf7913,15.482756,3.352734,Preparation
+TinyBERT,sub_model_4_c6bf7913,16.523732,3.754101,Preparation
+TinyBERT,sub_model_4_c6bf7913,17.564481,4.507523,Preparation
+TinyBERT,sub_model_4_c6bf7913,18.606832,5.968357,Preparation
+TinyBERT,sub_model_4_c6bf7913,19.648196,2.287907,Preparation
+TinyBERT,sub_model_4_c6bf7913,20.688889,0.803089,Preparation
+TinyBERT,sub_model_4_c6bf7913,21.729592,1.705437,Preparation
+TinyBERT,sub_model_4_c6bf7913,22.770323,2.173637,Preparation
+TinyBERT,sub_model_4_c6bf7913,23.811227,2.606041,Preparation
+TinyBERT,sub_model_4_c6bf7913,24.851931,3.360344,Preparation
+TinyBERT,sub_model_4_c6bf7913,25.892749,3.761711,Preparation
+TinyBERT,sub_model_4_c6bf7913,26.934056,4.603802,Preparation
+TinyBERT,sub_model_4_c6bf7913,27.975333,6.064838,Preparation
+TinyBERT,sub_model_4_c6bf7913,29.018485,2.386539,Preparation
+TinyBERT,sub_model_4_c6bf7913,30.059283,1.117252,Preparation
+TinyBERT,sub_model_4_c6bf7913,31.099995,1.829605,Preparation
+TinyBERT,sub_model_4_c6bf7913,32.140763,2.519482,Preparation
+TinyBERT,sub_model_4_c6bf7913,33.181730,2.644054,Preparation
+TinyBERT,sub_model_4_c6bf7913,34.222668,3.625244,Preparation
+TinyBERT,sub_model_4_c6bf7913,35.263668,4.219006,Preparation
+TinyBERT,sub_model_4_c6bf7913,36.304332,5.245495,Preparation
+TinyBERT,sub_model_4_c6bf7913,37.345043,5.639912,Preparation
+TinyBERT,sub_model_4_c6bf7913,38.385436,3.038517,Preparation
+TinyBERT,sub_model_4_c6bf7913,39.426183,0.790363,Preparation
+TinyBERT,sub_model_4_c6bf7913,40.466827,1.277248,Preparation
+TinyBERT,sub_model_4_c6bf7913,41.507513,1.675369,Preparation
+TinyBERT,sub_model_4_c6bf7913,42.548266,2.935848,Preparation
+TinyBERT,sub_model_4_c6bf7913,43.590654,3.328960,Preparation
+TinyBERT,sub_model_4_c6bf7913,44.633055,3.785118,Preparation
+TinyBERT,sub_model_4_c6bf7913,45.674002,4.350773,Preparation
+TinyBERT,sub_model_4_c6bf7913,46.714997,5.803341,Preparation
+TinyBERT,sub_model_4_c6bf7913,47.755556,2.129398,Preparation
+TinyBERT,sub_model_4_c6bf7913,48.796436,0.650288,Preparation
+TinyBERT,sub_model_4_c6bf7913,49.837517,1.679367,Preparation
+TinyBERT,sub_model_4_c6bf7913,50.878396,2.031765,Preparation
+TinyBERT,sub_model_4_c6bf7913,51.919480,2.548981,Preparation
+TinyBERT,sub_model_4_c6bf7913,52.960450,3.385307,Preparation
+TinyBERT,sub_model_4_c6bf7913,54.001337,3.785118,Preparation
+TinyBERT,sub_model_4_c6bf7913,55.042042,4.409309,Preparation
+TinyBERT,sub_model_4_c6bf7913,56.083009,5.861935,Preparation
+TinyBERT,sub_model_4_c6bf7913,57.123895,2.174702,Preparation
+TinyBERT,sub_model_4_c6bf7913,58.164690,0.925655,Preparation
+TinyBERT,sub_model_4_c6bf7913,59.205539,1.852768,Preparation
+TinyBERT,sub_model_4_c6bf7913,60.246480,2.318558,Preparation
+TinyBERT,sub_model_4_c6bf7913,61.287371,2.751301,Preparation
+TinyBERT,sub_model_4_c6bf7913,62.328379,3.755436,Preparation
+TinyBERT,sub_model_4_c6bf7913,63.369426,4.008232,Preparation
+TinyBERT,sub_model_4_c6bf7913,64.410416,5.000305,Preparation
+TinyBERT,sub_model_4_c6bf7913,65.451176,5.571930,Preparation
+TinyBERT,sub_model_4_c6bf7913,66.491867,2.804245,Preparation
+TinyBERT,sub_model_4_c6bf7913,67.534157,0.773094,Preparation
+TinyBERT,sub_model_4_c6bf7913,68.561658,0.983898,Preparation
+TinyBERT,sub_model_4_c6bf7913,69.604072,1.375271,Preparation
+TinyBERT,sub_model_4_c6bf7913,70.644852,2.619698,Preparation
+TinyBERT,sub_model_4_c6bf7913,71.685709,3.185318,Preparation
+TinyBERT,sub_model_4_c6bf7913,72.726638,4.004917,Preparation
+TinyBERT,sub_model_4_c6bf7913,73.769072,4.716515,Preparation
+TinyBERT,sub_model_4_c6bf7913,74.811220,5.839161,Preparation
+TinyBERT,sub_model_4_c6bf7913,75.853576,3.760334,Preparation
+TinyBERT,sub_model_4_c6bf7913,76.895989,1.006924,Preparation
+TinyBERT,sub_model_4_c6bf7913,77.936735,1.330742,Preparation
+TinyBERT,sub_model_4_c6bf7913,78.977845,1.716797,Preparation
+TinyBERT,sub_model_4_c6bf7913,80.018810,2.973717,Preparation
+TinyBERT,sub_model_4_c6bf7913,81.059802,3.210880,Preparation
+TinyBERT,sub_model_4_c6bf7913,82.100726,4.042740,Preparation
+TinyBERT,sub_model_4_c6bf7913,83.141679,4.766872,Preparation
+TinyBERT,sub_model_4_c6bf7913,84.184168,5.491608,Preparation
+TinyBERT,sub_model_4_c6bf7913,85.226512,3.313221,Preparation
+TinyBERT,sub_model_4_c6bf7913,86.267166,0.618294,Preparation
+TinyBERT,sub_model_4_c6bf7913,87.308044,1.655388,Preparation
+TinyBERT,sub_model_4_c6bf7913,88.348604,2.012310,Preparation
+TinyBERT,sub_model_4_c6bf7913,89.389378,3.326393,Preparation
+TinyBERT,sub_model_4_c6bf7913,90.430298,3.508911,Preparation
+TinyBERT,sub_model_4_c6bf7913,91.471206,3.910278,Preparation
+TinyBERT,sub_model_4_c6bf7913,92.512057,4.680756,Preparation
+TinyBERT,sub_model_4_c6bf7913,93.554147,6.146057,Preparation
+TinyBERT,sub_model_4_c6bf7913,94.594991,2.493484,Preparation
+TinyBERT,sub_model_4_c6bf7913,95.635658,0.561001,Preparation
+TinyBERT,sub_model_4_c6bf7913,96.677512,1.287849,Preparation
+TinyBERT,sub_model_4_c6bf7913,97.718294,1.115398,Preparation
+TinyBERT,sub_model_4_c6bf7913,98.759212,2.813026,Preparation
+TinyBERT,sub_model_4_c6bf7913,99.800230,2.941803,Preparation
+TinyBERT,sub_model_4_c6bf7913,100.841174,3.792564,Preparation
+TinyBERT,sub_model_4_c6bf7913,101.882176,4.498032,Preparation
+TinyBERT,sub_model_4_c6bf7913,102.923167,5.609093,Preparation
+TinyBERT,sub_model_4_c6bf7913,103.964325,5.093639,Preparation
+TinyBERT,sub_model_4_c6bf7913,105.005225,2.066387,Preparation
+TinyBERT,sub_model_4_c6bf7913,106.046203,1.133804,Preparation
+TinyBERT,sub_model_4_c6bf7913,107.087178,1.532036,Preparation
+TinyBERT,sub_model_4_c6bf7913,108.127933,2.799736,Preparation
+TinyBERT,sub_model_4_c6bf7913,109.168714,3.047283,Preparation
+TinyBERT,sub_model_4_c6bf7913,110.209514,3.878899,Preparation
+TinyBERT,sub_model_4_c6bf7913,111.237454,4.614174,Preparation
+TinyBERT,sub_model_4_c6bf7913,112.278359,5.747410,Preparation
+TinyBERT,sub_model_4_c6bf7913,113.319146,4.199802,Preparation
+TinyBERT,sub_model_4_c6bf7913,114.359909,1.422955,Preparation
+TinyBERT,sub_model_4_c6bf7913,115.400866,1.517132,Preparation
+TinyBERT,sub_model_4_c6bf7913,116.441712,1.887989,Preparation
+TinyBERT,sub_model_4_c6bf7913,117.484016,3.197666,Preparation
+TinyBERT,sub_model_4_c6bf7913,118.524821,3.579239,Preparation
+TinyBERT,sub_model_4_c6bf7913,119.565782,3.918106,Preparation
+TinyBERT,sub_model_4_c6bf7913,120.608201,4.613823,Preparation
+TinyBERT,sub_model_4_c6bf7913,121.649022,6.084637,Preparation
+TinyBERT,sub_model_4_c6bf7913,122.689864,2.432041,Preparation
+TinyBERT,sub_model_4_c6bf7913,123.733158,0.527462,Preparation
+TinyBERT,sub_model_4_c6bf7913,124.763593,1.205009,Preparation
+TinyBERT,sub_model_4_c6bf7913,125.804582,1.029991,Preparation
+TinyBERT,sub_model_4_c6bf7913,126.845517,2.734634,Preparation
+TinyBERT,sub_model_4_c6bf7913,127.886488,2.863518,Preparation
+TinyBERT,sub_model_4_c6bf7913,128.927339,3.724400,Preparation
+TinyBERT,sub_model_4_c6bf7913,129.968487,4.450020,Preparation
+TinyBERT,sub_model_4_c6bf7913,131.009243,5.552757,Preparation
+TinyBERT,sub_model_4_c6bf7913,132.050012,5.485878,Preparation
+TinyBERT,sub_model_4_c6bf7913,133.090836,2.513165,Preparation
+TinyBERT,sub_model_4_c6bf7913,134.131664,1.078655,Preparation
+TinyBERT,sub_model_4_c6bf7913,135.172492,1.481754,Preparation
+TinyBERT,sub_model_4_c6bf7913,136.213522,2.752949,Preparation
+TinyBERT,sub_model_4_c6bf7913,137.254177,3.000946,Preparation
+TinyBERT,sub_model_4_c6bf7913,138.294659,3.862019,Preparation
+TinyBERT,sub_model_4_c6bf7913,139.335457,4.597530,Preparation
+TinyBERT,sub_model_4_c6bf7913,140.376185,5.728130,Preparation
+TinyBERT,sub_model_4_c6bf7913,141.417183,4.461639,Preparation
+TinyBERT,sub_model_4_c6bf7913,142.458037,1.664814,Preparation
+TinyBERT,sub_model_4_c6bf7913,143.498912,1.471859,Preparation
+TinyBERT,sub_model_4_c6bf7913,144.540455,1.873062,Preparation
+TinyBERT,sub_model_4_c6bf7913,145.581828,3.147827,Preparation
+TinyBERT,sub_model_4_c6bf7913,146.622620,3.529449,Preparation
+TinyBERT,sub_model_4_c6bf7913,147.663395,3.923481,Preparation
+TinyBERT,sub_model_4_c6bf7913,148.705811,4.551956,Preparation
+TinyBERT,sub_model_4_c6bf7913,149.748156,6.021137,Preparation
+TinyBERT,sub_model_4_c6bf7913,150.790499,2.360443,Preparation
+TinyBERT,sub_model_4_c6bf7913,151.831542,0.522621,Preparation
+TinyBERT,sub_model_4_c6bf7913,152.882965,1.169338,Preparation
+TinyBERT,sub_model_4_c6bf7913,153.910558,1.257664,Preparation
+TinyBERT,sub_model_4_c6bf7913,154.938035,2.676071,Preparation
+TinyBERT,sub_model_4_c6bf7913,155.979181,2.796635,Preparation
+TinyBERT,sub_model_4_c6bf7913,157.019752,3.667618,Preparation
+TinyBERT,sub_model_4_c6bf7913,158.060610,4.395279,Preparation
+TinyBERT,sub_model_4_c6bf7913,159.101447,5.492611,Preparation
+TinyBERT,sub_model_4_c6bf7913,160.142347,5.830711,Preparation
+TinyBERT,sub_model_4_c6bf7913,161.183286,3.025055,Preparation
+TinyBERT,sub_model_4_c6bf7913,162.225174,1.120869,Preparation
+TinyBERT,sub_model_4_c6bf7913,163.264583,1.395767,Preparation
+TinyBERT,sub_model_4_c6bf7913,164.305535,2.671814,Preparation
+TinyBERT,sub_model_4_c6bf7913,165.346407,2.920750,Preparation
+TinyBERT,sub_model_4_c6bf7913,166.387701,3.793438,Preparation
+TinyBERT,sub_model_4_c6bf7913,167.428737,4.527851,Preparation
+TinyBERT,sub_model_4_c6bf7913,168.469759,5.650230,Preparation
+TinyBERT,sub_model_4_c6bf7913,169.510742,5.003635,Preparation
+TinyBERT,sub_model_4_c6bf7913,170.551673,2.087368,Preparation
+TinyBERT,sub_model_4_c6bf7913,171.592965,1.403477,Preparation
+TinyBERT,sub_model_4_c6bf7913,172.633829,1.803890,Preparation
+TinyBERT,sub_model_4_c6bf7913,173.676399,3.072639,Preparation
+TinyBERT,sub_model_4_c6bf7913,174.717180,3.473312,Preparation
+TinyBERT,sub_model_4_c6bf7913,175.759523,3.939087,Preparation
+TinyBERT,sub_model_4_c6bf7913,176.800446,4.486210,Preparation
+TinyBERT,sub_model_4_c6bf7913,177.841870,5.956341,Preparation
+TinyBERT,sub_model_4_c6bf7913,178.883412,2.330902,Preparation
+TinyBERT,sub_model_4_c6bf7913,179.924885,0.534595,Preparation
+TinyBERT,sub_model_4_c6bf7913,180.968346,1.213490,Preparation
+TinyBERT,sub_model_4_c6bf7913,182.009626,1.767239,Preparation
+TinyBERT,sub_model_4_c6bf7913,183.051179,2.610569,Preparation
+TinyBERT,sub_model_4_c6bf7913,184.092475,2.708561,Preparation
+TinyBERT,sub_model_4_c6bf7913,185.133143,3.558136,Preparation
+TinyBERT,sub_model_4_c6bf7913,186.173887,4.230907,Preparation
+TinyBERT,sub_model_4_c6bf7913,187.214740,5.195816,Preparation
+TinyBERT,sub_model_4_c6bf7913,188.255381,5.496090,Preparation
+TinyBERT,sub_model_4_c6bf7913,189.296018,2.762329,Preparation
+TinyBERT,sub_model_4_c6bf7913,190.336852,1.224579,Preparation
+TinyBERT,sub_model_4_c6bf7913,191.377506,1.776928,Preparation
+TinyBERT,sub_model_4_c6bf7913,192.418184,2.638702,Preparation
+TinyBERT,sub_model_4_c6bf7913,193.459036,2.697800,Preparation
+TinyBERT,sub_model_4_c6bf7913,194.502057,3.558136,Preparation
+TinyBERT,sub_model_4_c6bf7913,195.543427,3.992981,Preparation
+TinyBERT,sub_model_4_c6bf7913,196.584494,4.939999,Preparation
+TinyBERT,sub_model_4_c6bf7913,197.625666,5.854195,Preparation
+TinyBERT,sub_model_4_c6bf7913,198.668548,2.528877,Preparation
+TinyBERT,sub_model_4_c6bf7913,199.709794,1.245457,Preparation
+TinyBERT,sub_model_4_c6bf7913,200.750992,1.893364,Preparation
+TinyBERT,sub_model_4_c6bf7913,201.792074,2.633694,Preparation
+TinyBERT,sub_model_4_c6bf7913,202.820016,2.734550,Preparation
+TinyBERT,sub_model_4_c6bf7913,203.860657,3.674572,Preparation
+TinyBERT,sub_model_4_c6bf7913,204.901214,4.272015,Preparation
+TinyBERT,sub_model_4_c6bf7913,205.941879,5.225811,Preparation
+TinyBERT,sub_model_4_c6bf7913,206.982553,5.612526,Preparation
+TinyBERT,sub_model_4_c6bf7913,208.023039,2.837429,Preparation
+TinyBERT,sub_model_4_c6bf7913,209.063573,0.812878,Preparation
+TinyBERT,sub_model_4_c6bf7913,210.104062,1.279537,Preparation
+TinyBERT,sub_model_4_c6bf7913,211.131586,1.364700,Preparation
+TinyBERT,sub_model_4_c6bf7913,212.172453,2.657631,Preparation
+TinyBERT,sub_model_4_c6bf7913,213.213417,3.276386,Preparation
+TinyBERT,sub_model_4_c6bf7913,214.254068,4.012653,Preparation
+TinyBERT,sub_model_4_c6bf7913,215.294935,4.830376,Preparation
+TinyBERT,sub_model_4_c6bf7913,216.335780,5.541153,Preparation
+TinyBERT,sub_model_4_c6bf7913,217.376603,3.237259,Preparation
+TinyBERT,sub_model_4_c6bf7913,218.417349,0.674896,Preparation
+TinyBERT,sub_model_4_c6bf7913,219.458189,1.471260,Preparation
+TinyBERT,sub_model_4_c6bf7913,220.498863,1.779636,Preparation
+TinyBERT,sub_model_4_c6bf7913,221.526503,3.075890,Preparation
+TinyBERT,sub_model_4_c6bf7913,222.567521,3.327156,Preparation
+TinyBERT,sub_model_4_c6bf7913,223.608053,3.828865,Preparation
+TinyBERT,sub_model_4_c6bf7913,224.648629,4.364021,Preparation
+TinyBERT,sub_model_4_c6bf7913,225.689390,5.699997,Preparation
+TinyBERT,sub_model_4_c6bf7913,226.730172,2.324009,Preparation
+TinyBERT,sub_model_4_c6bf7913,227.770928,0.824993,Preparation
+TinyBERT,sub_model_4_c6bf7913,228.813472,1.887119,Preparation
+TinyBERT,sub_model_4_c6bf7913,229.854349,2.245506,Preparation
+TinyBERT,sub_model_4_c6bf7913,230.895141,2.744438,Preparation
+TinyBERT,sub_model_4_c6bf7913,231.935954,3.789825,Preparation
+TinyBERT,sub_model_4_c6bf7913,232.976917,4.057514,Preparation
+TinyBERT,sub_model_4_c6bf7913,234.017908,5.061062,Preparation
+TinyBERT,sub_model_4_c6bf7913,235.058861,5.615677,Preparation
+TinyBERT,sub_model_4_c6bf7913,236.099784,2.881237,Preparation
+TinyBERT,sub_model_4_c6bf7913,237.140672,0.758324,Preparation
+TinyBERT,sub_model_4_c6bf7913,238.183015,1.104588,Preparation
+TinyBERT,sub_model_4_c6bf7913,239.211251,1.507946,Preparation
+TinyBERT,sub_model_4_c6bf7913,240.252169,2.803230,Preparation
+TinyBERT,sub_model_4_c6bf7913,241.293166,3.330276,Preparation
+TinyBERT,sub_model_4_c6bf7913,242.334157,3.831985,Preparation
+TinyBERT,sub_model_4_c6bf7913,243.375064,4.680332,Preparation
+TinyBERT,sub_model_4_c6bf7913,244.417246,5.649769,Preparation
+TinyBERT,sub_model_4_c6bf7913,245.458042,2.705536,Preparation
+TinyBERT,sub_model_4_c6bf7913,246.499159,0.653431,Preparation
+TinyBERT,sub_model_4_c6bf7913,247.540174,1.590778,Preparation
+TinyBERT,sub_model_4_c6bf7913,248.583262,1.951595,Preparation
+TinyBERT,sub_model_4_c6bf7913,249.624204,3.276455,Preparation
+TinyBERT,sub_model_4_c6bf7913,250.665202,3.363724,Preparation
+TinyBERT,sub_model_4_c6bf7913,251.706133,3.831985,Preparation
+TinyBERT,sub_model_4_c6bf7913,252.746866,4.392529,Preparation
+TinyBERT,sub_model_4_c6bf7913,253.788890,5.852535,Preparation
+TinyBERT,sub_model_4_c6bf7913,254.829730,2.185795,Preparation
+TinyBERT,sub_model_4_c6bf7913,255.870557,0.964428,Preparation
+TinyBERT,sub_model_4_c6bf7913,256.911542,1.899635,Preparation
+TinyBERT,sub_model_4_c6bf7913,257.953977,2.375950,Preparation
+TinyBERT,sub_model_4_c6bf7913,258.994704,2.826603,Preparation
+TinyBERT,sub_model_4_c6bf7913,260.035625,3.680843,Preparation
+TinyBERT,sub_model_4_c6bf7913,261.076595,4.125973,Preparation
+TinyBERT,sub_model_4_c6bf7913,262.117345,5.140182,Preparation
+TinyBERT,sub_model_4_c6bf7913,263.158421,5.618797,Preparation
+TinyBERT,sub_model_4_c6bf7913,264.200054,2.961937,Preparation
+TinyBERT,sub_model_4_c6bf7913,265.241456,0.685501,Preparation
+TinyBERT,sub_model_4_c6bf7913,266.269359,1.153580,Preparation
+TinyBERT,sub_model_4_c6bf7913,267.309927,1.549526,Preparation
+TinyBERT,sub_model_4_c6bf7913,268.350797,2.801815,Preparation
+TinyBERT,sub_model_4_c6bf7913,269.391794,3.333923,Preparation
+TinyBERT,sub_model_4_c6bf7913,270.432724,3.837418,Preparation
+TinyBERT,sub_model_4_c6bf7913,271.473509,4.833740,Preparation
+TinyBERT,sub_model_4_c6bf7913,272.514291,5.634487,Preparation
+TinyBERT,sub_model_4_c6bf7913,273.555210,2.867401,Preparation
+TinyBERT,sub_model_4_c6bf7913,274.596028,0.746666,Preparation
+TinyBERT,sub_model_4_c6bf7913,275.637179,1.550785,Preparation
+TinyBERT,sub_model_4_c6bf7913,276.678057,1.912163,Preparation
+TinyBERT,sub_model_4_c6bf7913,277.719055,3.224991,Preparation
+TinyBERT,sub_model_4_c6bf7913,278.761414,3.375015,Preparation
+TinyBERT,sub_model_4_c6bf7913,279.802226,3.837418,Preparation
+TinyBERT,sub_model_4_c6bf7913,280.843145,4.372574,Preparation
+TinyBERT,sub_model_4_c6bf7913,281.883937,5.796577,Preparation
+TinyBERT,sub_model_4_c6bf7913,282.924895,2.140316,Preparation
+TinyBERT,sub_model_4_c6bf7913,283.966465,0.900665,Preparation
+TinyBERT,sub_model_4_c6bf7913,285.007980,1.905067,Preparation
+TinyBERT,sub_model_4_c6bf7913,286.049492,2.272514,Preparation
+TinyBERT,sub_model_4_c6bf7913,287.080626,2.725880,Preparation
+TinyBERT,sub_model_4_c6bf7913,288.121836,3.728844,Preparation
+TinyBERT,sub_model_4_c6bf7913,289.163218,4.000538,Preparation
+TinyBERT,sub_model_4_c6bf7913,290.204951,4.997051,Preparation
+TinyBERT,sub_model_4_c6bf7913,291.246773,5.624229,Preparation
+TinyBERT,sub_model_4_c6bf7913,292.288531,2.836693,Preparation
+TinyBERT,sub_model_4_c6bf7913,293.330409,0.864334,Preparation
+TinyBERT,sub_model_4_c6bf7913,294.372180,1.055195,Preparation
+TinyBERT,sub_model_4_c6bf7913,295.413930,1.458302,Preparation
+TinyBERT,sub_model_4_c6bf7913,296.455831,2.723415,Preparation
+TinyBERT,sub_model_4_c6bf7913,297.497150,3.300854,Preparation
+TinyBERT,sub_model_4_c6bf7913,298.538308,3.963291,Preparation
+TinyBERT,sub_model_4_c6bf7913,299.579644,4.855946,Preparation
+TinyBERT,sub_model_4_c6bf7913,300.620792,5.577339,Preparation
+TinyBERT,sub_model_4_c6bf7913,301.661995,3.169636,Preparation
+TinyBERT,sub_model_4_c6bf7913,302.703137,0.695587,Preparation
+TinyBERT,sub_model_4_c6bf7913,303.737687,1.493454,Preparation
+TinyBERT,sub_model_4_c6bf7913,304.778945,1.854103,Preparation
+TinyBERT,sub_model_4_c6bf7913,305.821145,3.158497,Preparation
+TinyBERT,sub_model_4_c6bf7913,306.862388,3.347874,Preparation
+TinyBERT,sub_model_4_c6bf7913,307.903569,3.843689,Preparation
+TinyBERT,sub_model_4_c6bf7913,308.944775,4.378841,Preparation
+TinyBERT,sub_model_4_c6bf7913,309.985937,5.712605,Preparation
+TinyBERT,sub_model_4_c6bf7913,311.027306,2.410290,Preparation
+TinyBERT,sub_model_4_c6bf7913,312.069174,0.822617,Preparation
+TinyBERT,sub_model_4_c6bf7913,313.110948,1.883106,Preparation
+TinyBERT,sub_model_4_c6bf7913,314.152983,2.234737,Preparation
+TinyBERT,sub_model_4_c6bf7913,315.194946,2.694645,Preparation
+TinyBERT,sub_model_4_c6bf7913,316.236892,3.674129,Preparation
+TinyBERT,sub_model_4_c6bf7913,317.278661,3.960125,Preparation
+TinyBERT,sub_model_4_c6bf7913,318.320369,4.920341,Preparation
+TinyBERT,sub_model_4_c6bf7913,319.362240,6.185844,Preparation
+TinyBERT,sub_model_4_c6bf7913,320.404139,2.745453,Preparation
+TinyBERT,sub_model_4_c6bf7913,321.446503,0.667797,Preparation
+TinyBERT,sub_model_4_c6bf7913,322.488388,1.402458,Preparation
+TinyBERT,sub_model_4_c6bf7913,323.530241,1.228924,Preparation
+TinyBERT,sub_model_4_c6bf7913,324.571481,2.923023,Preparation
+TinyBERT,sub_model_4_c6bf7913,325.612689,3.061321,Preparation
+TinyBERT,sub_model_4_c6bf7913,326.653942,3.902409,Preparation
+TinyBERT,sub_model_4_c6bf7913,327.695156,4.625145,Preparation
+TinyBERT,sub_model_4_c6bf7913,328.736437,5.742935,Preparation
+TinyBERT,sub_model_4_c6bf7913,329.777582,4.651352,Preparation
+TinyBERT,sub_model_4_c6bf7913,330.819067,1.778652,Preparation
+TinyBERT,sub_model_4_c6bf7913,331.861838,1.245167,Preparation
+TinyBERT,sub_model_4_c6bf7913,332.902953,1.632748,Preparation
+TinyBERT,sub_model_4_c6bf7913,333.944161,2.894562,Preparation
+TinyBERT,sub_model_4_c6bf7913,334.985534,3.140102,Preparation
+TinyBERT,sub_model_4_c6bf7913,336.026814,3.984936,Preparation
+TinyBERT,sub_model_4_c6bf7913,337.067978,4.717468,Preparation
+TinyBERT,sub_model_4_c6bf7913,338.109055,5.852211,Preparation
+TinyBERT,sub_model_4_c6bf7913,339.150470,3.948082,Preparation
+TinyBERT,sub_model_4_c6bf7913,340.191697,1.188622,Preparation
+TinyBERT,sub_model_4_c6bf7913,341.232933,1.616657,Preparation
+TinyBERT,sub_model_4_c6bf7913,342.274010,1.981705,Preparation
+TinyBERT,sub_model_4_c6bf7913,343.316203,3.296284,Preparation
+TinyBERT,sub_model_4_c6bf7913,344.357346,3.563847,Preparation
+TinyBERT,sub_model_4_c6bf7913,345.398630,3.965214,Preparation
+TinyBERT,sub_model_4_c6bf7913,346.439851,4.704468,Preparation
+TinyBERT,sub_model_4_c6bf7913,347.481166,6.174885,Preparation
+TinyBERT,sub_model_4_c6bf7913,348.522293,2.512726,Preparation
+TinyBERT,sub_model_4_c6bf7913,349.563550,0.622932,Preparation
+TinyBERT,sub_model_4_c6bf7913,350.606071,1.335304,Preparation
+TinyBERT,sub_model_4_c6bf7913,351.647230,1.160183,Preparation
+TinyBERT,sub_model_4_c6bf7913,352.688398,2.850452,Preparation
+TinyBERT,sub_model_4_c6bf7913,353.729578,2.958954,Preparation
+TinyBERT,sub_model_4_c6bf7913,354.770897,3.816109,Preparation
+TinyBERT,sub_model_4_c6bf7913,355.813506,4.534058,Preparation
+TinyBERT,sub_model_4_c6bf7913,356.851712,5.641594,Preparation
+TinyBERT,sub_model_4_c6bf7913,357.893394,5.263763,Preparation
+TinyBERT,sub_model_4_c6bf7913,358.934191,2.336502,Preparation
+TinyBERT,sub_model_4_c6bf7913,359.975129,1.087009,Preparation
+TinyBERT,sub_model_4_c6bf7913,361.015933,1.481071,Preparation
+TinyBERT,sub_model_4_c6bf7913,362.056904,2.776085,Preparation
+TinyBERT,sub_model_4_c6bf7913,363.097920,3.069141,Preparation
+TinyBERT,sub_model_4_c6bf7913,364.139034,3.923336,Preparation
+TinyBERT,sub_model_4_c6bf7913,365.179945,4.639534,Preparation
+TinyBERT,sub_model_4_c6bf7913,366.221036,5.763363,Preparation
+TinyBERT,sub_model_4_c6bf7913,367.262586,4.504890,Preparation
+TinyBERT,sub_model_4_c6bf7913,368.303307,1.784115,Preparation
+TinyBERT,sub_model_4_c6bf7913,369.345993,1.511795,Preparation
+TinyBERT,sub_model_4_c6bf7913,370.387046,1.914368,Preparation
+TinyBERT,sub_model_4_c6bf7913,371.428052,3.213051,Preparation
+TinyBERT,sub_model_4_c6bf7913,372.469112,3.610390,Preparation
+TinyBERT,sub_model_4_c6bf7913,373.510024,3.968788,Preparation
+TinyBERT,sub_model_4_c6bf7913,374.551193,4.663841,Preparation
+TinyBERT,sub_model_4_c6bf7913,375.592157,6.132927,Preparation
+TinyBERT,sub_model_4_c6bf7913,376.633284,2.489857,Preparation
+TinyBERT,sub_model_4_c6bf7913,377.675161,0.571571,Preparation
+TinyBERT,sub_model_4_c6bf7913,378.707863,1.283089,Preparation
+TinyBERT,sub_model_4_c6bf7913,379.748708,1.107185,Preparation
+TinyBERT,sub_model_4_c6bf7913,380.789747,2.817726,Preparation
+TinyBERT,sub_model_4_c6bf7913,381.830514,2.991405,Preparation
+TinyBERT,sub_model_4_c6bf7913,382.871743,3.847733,Preparation
+TinyBERT,sub_model_4_c6bf7913,383.912562,4.575127,Preparation
+TinyBERT,sub_model_4_c6bf7913,384.953674,5.687012,Preparation
+TinyBERT,sub_model_4_c6bf7913,385.994486,4.999302,Preparation
+TinyBERT,sub_model_4_c6bf7913,387.035870,2.005894,Preparation
+TinyBERT,sub_model_4_c6bf7913,388.078044,1.212578,Preparation
+TinyBERT,sub_model_4_c6bf7913,389.120623,1.618523,Preparation
+TinyBERT,sub_model_4_c6bf7913,390.163044,2.902443,Preparation
+TinyBERT,sub_model_4_c6bf7913,391.203844,3.174686,Preparation
+TinyBERT,sub_model_4_c6bf7913,392.244653,4.026264,Preparation
+TinyBERT,sub_model_4_c6bf7913,393.285551,4.763981,Preparation
+TinyBERT,sub_model_4_c6bf7913,394.326546,5.899437,Preparation
+TinyBERT,sub_model_4_c6bf7913,395.367684,3.790092,Preparation
+TinyBERT,sub_model_4_c6bf7913,396.409000,0.978550,Preparation
+TinyBERT,sub_model_4_c6bf7913,397.450493,1.662369,Preparation
+TinyBERT,sub_model_4_c6bf7913,398.492010,2.026585,Preparation
+TinyBERT,sub_model_4_c6bf7913,399.532905,3.365063,Preparation
+TinyBERT,sub_model_4_c6bf7913,400.573892,3.570381,Preparation
+TinyBERT,sub_model_4_c6bf7913,401.614671,3.971748,Preparation
+TinyBERT,sub_model_4_c6bf7913,402.655504,4.809647,Preparation
+TinyBERT,sub_model_4_c6bf7913,403.696745,6.278133,Preparation
+TinyBERT,sub_model_4_c6bf7913,404.737628,2.636375,Preparation
+TinyBERT,sub_model_4_c6bf7913,405.778805,0.677963,Preparation
+TinyBERT,sub_model_4_c6bf7913,406.821132,1.444790,Preparation
+TinyBERT,sub_model_4_c6bf7913,407.861986,1.275898,Preparation
+TinyBERT,sub_model_4_c6bf7913,408.904384,2.631851,Preparation
+TinyBERT,sub_model_4_c6bf7913,409.945192,3.155293,Preparation
+TinyBERT,sub_model_4_c6bf7913,410.986049,3.998653,Preparation
+TinyBERT,sub_model_4_c6bf7913,412.026964,4.725174,Preparation
+TinyBERT,sub_model_4_c6bf7913,413.067857,5.851337,Preparation
+TinyBERT,sub_model_4_c6bf7913,414.108828,4.022194,Preparation
+TinyBERT,sub_model_4_c6bf7913,415.149682,1.386475,Preparation
+TinyBERT,sub_model_4_c6bf7913,416.190927,1.349251,Preparation
+TinyBERT,sub_model_4_c6bf7913,417.232024,1.751793,Preparation
+TinyBERT,sub_model_4_c6bf7913,418.273050,3.016167,Preparation
+TinyBERT,sub_model_4_c6bf7913,419.314029,3.282925,Preparation
+TinyBERT,sub_model_4_c6bf7913,420.354980,4.093510,Preparation
+TinyBERT,sub_model_4_c6bf7913,421.395881,4.863941,Preparation
+TinyBERT,sub_model_4_c6bf7913,422.436663,5.597382,Preparation
+TinyBERT,sub_model_4_c6bf7913,423.477465,3.097412,Preparation
+TinyBERT,sub_model_4_c6bf7913,424.519198,0.721252,Preparation
+TinyBERT,sub_model_4_c6bf7913,425.560135,1.779964,Preparation
+TinyBERT,sub_model_4_c6bf7913,426.601073,2.142860,Preparation
+TinyBERT,sub_model_4_c6bf7913,427.642010,3.216293,Preparation
+TinyBERT,sub_model_4_c6bf7913,428.683128,3.615440,Preparation
+TinyBERT,sub_model_4_c6bf7913,429.724064,3.973423,Preparation
+TinyBERT,sub_model_4_c6bf7913,430.765033,4.880939,Preparation
+TinyBERT,sub_model_4_c6bf7913,431.805763,6.354839,Preparation
+TinyBERT,sub_model_4_c6bf7913,432.848164,2.698818,Preparation
+TinyBERT,sub_model_4_c6bf7913,433.889117,0.728817,Preparation
+TinyBERT,sub_model_4_c6bf7913,434.930602,1.490383,Preparation
+TinyBERT,sub_model_4_c6bf7913,435.971970,1.326786,Preparation
+TinyBERT,sub_model_4_c6bf7913,437.012906,2.595543,Preparation
+TinyBERT,sub_model_4_c6bf7913,438.053742,3.168861,Preparation
+TinyBERT,sub_model_4_c6bf7913,439.094784,4.013870,Preparation
+TinyBERT,sub_model_4_c6bf7913,440.136168,4.740231,Preparation
+TinyBERT,sub_model_4_c6bf7913,441.176873,5.863731,Preparation
+TinyBERT,sub_model_4_c6bf7913,442.217570,3.951023,Preparation
+TinyBERT,sub_model_4_c6bf7913,443.258487,1.162380,Preparation
+TinyBERT,sub_model_4_c6bf7913,444.299449,1.381741,Preparation
+TinyBERT,sub_model_4_c6bf7913,445.340512,1.781845,Preparation
+TinyBERT,sub_model_4_c6bf7913,446.381357,3.045769,Preparation
+TinyBERT,sub_model_4_c6bf7913,447.422374,3.302654,Preparation
+TinyBERT,sub_model_4_c6bf7913,448.463353,4.006210,Preparation
+TinyBERT,sub_model_4_c6bf7913,449.504174,4.877720,Preparation
+TinyBERT,sub_model_4_c6bf7913,450.544990,5.604210,Preparation
+TinyBERT,sub_model_4_c6bf7913,451.585846,3.060898,Preparation
+TinyBERT,sub_model_4_c6bf7913,452.626751,0.733994,Preparation
+TinyBERT,sub_model_4_c6bf7913,453.667724,1.799191,Preparation
+TinyBERT,sub_model_4_c6bf7913,454.708711,2.162861,Preparation
+TinyBERT,sub_model_4_c6bf7913,455.749849,3.090393,Preparation
+TinyBERT,sub_model_4_c6bf7913,456.790741,3.633461,Preparation
+TinyBERT,sub_model_4_c6bf7913,457.831733,3.975967,Preparation
+TinyBERT,sub_model_4_c6bf7913,458.872681,4.889530,Preparation
+TinyBERT,sub_model_4_c6bf7913,459.913650,6.374065,Preparation
+TinyBERT,sub_model_4_c6bf7913,460.954658,2.719604,Preparation
+TinyBERT,sub_model_4_c6bf7913,461.995585,0.729839,Preparation
+TinyBERT,sub_model_4_c6bf7913,463.036335,1.511444,Preparation
+TinyBERT,sub_model_4_c6bf7913,464.077182,1.346012,Preparation
+TinyBERT,sub_model_4_c6bf7913,465.117838,2.611267,Preparation
+TinyBERT,sub_model_4_c6bf7913,466.158875,3.181709,Preparation
+TinyBERT,sub_model_4_c6bf7913,467.199822,4.023361,Preparation
+TinyBERT,sub_model_4_c6bf7913,468.240767,4.752811,Preparation
+TinyBERT,sub_model_4_c6bf7913,469.283350,5.883125,Preparation
+TinyBERT,sub_model_4_c6bf7913,470.325824,3.885513,Preparation
+TinyBERT,sub_model_4_c6bf7913,471.368178,1.083275,Preparation
+TinyBERT,sub_model_4_c6bf7913,472.409065,1.402351,Preparation
+TinyBERT,sub_model_4_c6bf7913,473.450005,1.801548,Preparation
+TinyBERT,sub_model_4_c6bf7913,474.491002,3.061405,Preparation
+TinyBERT,sub_model_4_c6bf7913,475.531977,3.327221,Preparation
+TinyBERT,sub_model_4_c6bf7913,476.573796,3.862381,Preparation
+TinyBERT,sub_model_4_c6bf7913,477.616144,4.915462,Preparation
+TinyBERT,sub_model_4_c6bf7913,478.658656,5.642109,Preparation
+TinyBERT,sub_model_4_c6bf7913,479.699424,2.883911,Preparation
+TinyBERT,sub_model_4_c6bf7913,480.740295,0.772015,Preparation
+TinyBERT,sub_model_4_c6bf7913,481.781342,1.838604,Preparation
+TinyBERT,sub_model_4_c6bf7913,482.822282,2.204571,Preparation
+TinyBERT,sub_model_4_c6bf7913,483.864376,2.750492,Preparation
+TinyBERT,sub_model_4_c6bf7913,484.906800,3.682644,Preparation
+TinyBERT,sub_model_4_c6bf7913,485.949168,3.978817,Preparation
+TinyBERT,sub_model_4_c6bf7913,486.991781,4.950481,Preparation
+TinyBERT,sub_model_4_c6bf7913,488.034696,6.062656,Preparation
+TinyBERT,sub_model_4_c6bf7913,489.077364,2.795166,Preparation
+TinyBERT,sub_model_4_c6bf7913,490.119806,0.808666,Preparation
+TinyBERT,sub_model_4_c6bf7913,491.160577,1.447659,Preparation
+TinyBERT,sub_model_4_c6bf7913,492.201314,1.381458,Preparation
+TinyBERT,sub_model_4_c6bf7913,493.242346,2.669739,Preparation
+TinyBERT,sub_model_4_c6bf7913,494.283277,3.272827,Preparation
+TinyBERT,sub_model_4_c6bf7913,495.324037,4.093597,Preparation
+TinyBERT,sub_model_4_c6bf7913,496.364833,4.796307,Preparation
+TinyBERT,sub_model_4_c6bf7913,497.405684,5.878006,Preparation
+TinyBERT,sub_model_4_c6bf7913,498.446583,4.290390,Preparation
+TinyBERT,sub_model_4_c6bf7913,499.489014,1.300007,Preparation
+TinyBERT,sub_model_4_c6bf7913,500.530039,1.366924,Preparation
+TinyBERT,sub_model_4_c6bf7913,501.570900,1.769318,Preparation
+TinyBERT,sub_model_4_c6bf7913,502.611619,3.075249,Preparation
+TinyBERT,sub_model_4_c6bf7913,503.652567,3.357883,Preparation
+TinyBERT,sub_model_4_c6bf7913,504.693499,3.866222,Preparation
+TinyBERT,sub_model_4_c6bf7913,505.734482,4.714569,Preparation
+TinyBERT,sub_model_4_c6bf7913,506.775189,5.708088,Preparation
+TinyBERT,sub_model_4_c6bf7913,507.815958,2.471886,Preparation
+TinyBERT,sub_model_4_c6bf7913,508.856796,0.829903,Preparation
+TinyBERT,sub_model_4_c6bf7913,509.897788,1.892574,Preparation
+TinyBERT,sub_model_4_c6bf7913,510.938770,2.256847,Preparation
+TinyBERT,sub_model_4_c6bf7913,511.979742,2.736977,Preparation
+TinyBERT,sub_model_4_c6bf7913,513.021926,3.749802,Preparation
+TinyBERT,sub_model_4_c6bf7913,514.062744,4.019341,Preparation
+TinyBERT,sub_model_4_c6bf7913,515.103559,5.008572,Preparation
+TinyBERT,sub_model_4_c6bf7913,516.144383,5.698486,Preparation
+TinyBERT,sub_model_4_c6bf7913,517.185142,2.843494,Preparation
+TinyBERT,sub_model_4_c6bf7913,518.225938,0.611923,Preparation
+TinyBERT,sub_model_4_c6bf7913,519.253543,0.551754,Preparation
+TinyBERT,sub_model_4_c6bf7913,520.295801,1.000305,Preparation
+TinyBERT,sub_model_4_c6bf7913,521.336656,1.705235,Preparation
+TinyBERT,sub_model_4_c6bf7913,522.377505,2.401482,Preparation
+TinyBERT,sub_model_4_c6bf7913,523.418371,2.562237,Preparation
+TinyBERT,sub_model_4_c6bf7913,524.459416,3.487541,Preparation
+TinyBERT,sub_model_4_c6bf7913,525.500354,3.928501,Preparation
+TinyBERT,sub_model_4_c6bf7913,526.541351,4.933372,Preparation
+TinyBERT,sub_model_4_c6bf7913,527.582439,5.425495,Preparation
+TinyBERT,sub_model_4_c6bf7913,528.623385,2.749653,Preparation
+TinyBERT,sub_model_4_c6bf7913,529.664407,0.555401,Preparation
+TinyBERT,sub_model_4_c6bf7913,530.705161,1.701931,Key generation
+TinyBERT,sub_model_4_c6bf7913,531.745872,3.363777,Key generation
+TinyBERT,sub_model_4_c6bf7913,532.786691,4.481632,Key generation
+TinyBERT,sub_model_4_c6bf7913,533.827526,4.920414,Key generation
+TinyBERT,sub_model_4_c6bf7913,534.868402,5.433384,Key generation
+TinyBERT,sub_model_4_c6bf7913,535.909242,6.309410,Key generation
+TinyBERT,sub_model_4_c6bf7913,536.950181,6.754387,Key generation
+TinyBERT,sub_model_4_c6bf7913,537.991271,7.808140,Key generation
+TinyBERT,sub_model_4_c6bf7913,539.033832,7.918129,Key generation
+TinyBERT,sub_model_4_c6bf7913,540.074653,8.360786,Key generation
+TinyBERT,sub_model_4_c6bf7913,541.115441,8.530514,Key generation
+TinyBERT,sub_model_4_c6bf7913,542.157587,8.427715,Key generation
+TinyBERT,sub_model_4_c6bf7913,543.198543,8.932106,Key generation
+TinyBERT,sub_model_4_c6bf7913,544.239594,5.190262,Key generation
+TinyBERT,sub_model_4_c6bf7913,545.280551,5.266026,Key generation
+TinyBERT,sub_model_4_c6bf7913,546.321435,5.552010,Key generation
+TinyBERT,sub_model_4_c6bf7913,547.362345,6.273167,Key generation
+TinyBERT,sub_model_4_c6bf7913,548.403202,6.471039,Key generation
+TinyBERT,sub_model_4_c6bf7913,549.446974,7.586353,Key generation
+TinyBERT,sub_model_4_c6bf7913,550.487797,8.049278,Key generation
+TinyBERT,sub_model_4_c6bf7913,551.528665,9.012611,Key generation
+TinyBERT,sub_model_4_c6bf7913,552.569600,9.076302,Key generation
+TinyBERT,sub_model_4_c6bf7913,553.610569,9.276203,Key generation
+TinyBERT,sub_model_4_c6bf7913,554.651500,9.382023,Key generation
+TinyBERT,sub_model_4_c6bf7913,555.692598,9.700897,Key generation
+TinyBERT,sub_model_4_c6bf7913,556.733286,9.985664,Key generation
+TinyBERT,sub_model_4_c6bf7913,557.774020,10.664394,Key generation
+TinyBERT,sub_model_4_c6bf7913,558.814761,6.721992,Key generation
+TinyBERT,sub_model_4_c6bf7913,559.855716,4.721203,Key generation
+TinyBERT,sub_model_4_c6bf7913,560.896584,3.961842,Key generation
+TinyBERT,sub_model_4_c6bf7913,561.937335,5.488708,Key generation
+TinyBERT,sub_model_4_c6bf7913,562.979165,6.888020,Key generation
+TinyBERT,sub_model_4_c6bf7913,564.058165,6.888020,Key generation
+TinyBERT,sub_model_4_c6bf7913,565.134164,6.888020,Key generation
+TinyBERT,sub_model_4_c6bf7913,566.170159,6.888020,Key generation
+TinyBERT,sub_model_4_c6bf7913,567.243065,6.797440,Key generation
+TinyBERT,sub_model_4_c6bf7913,568.273175,6.888020,Key generation
+TinyBERT,sub_model_4_c6bf7913,569.339157,6.888020,Key generation
+TinyBERT,sub_model_4_c6bf7913,570.398065,2.312641,Key generation
+TinyBERT,sub_model_4_c6bf7913,571.425550,1.385735,Key generation
+TinyBERT,sub_model_4_c6bf7913,572.453007,3.123928,Key generation
+TinyBERT,sub_model_4_c6bf7913,573.495242,4.002842,Key generation
+TinyBERT,sub_model_4_c6bf7913,574.537601,4.467972,Key generation
+TinyBERT,sub_model_4_c6bf7913,575.579820,5.830482,Key generation
+TinyBERT,sub_model_4_c6bf7913,576.622215,6.219959,Key generation
+TinyBERT,sub_model_4_c6bf7913,577.664541,6.958714,Key generation
+TinyBERT,sub_model_4_c6bf7913,578.706709,7.416210,Key generation
+TinyBERT,sub_model_4_c6bf7913,579.747328,7.918041,Key generation
+TinyBERT,sub_model_4_c6bf7913,580.788045,7.939690,Key generation
+TinyBERT,sub_model_4_c6bf7913,581.830328,8.008530,Key generation
+TinyBERT,sub_model_4_c6bf7913,582.871147,8.409309,Key generation
+TinyBERT,sub_model_4_c6bf7913,583.911716,9.333435,Key generation
+TinyBERT,sub_model_4_c6bf7913,584.952410,5.736908,Key generation
+TinyBERT,sub_model_4_c6bf7913,585.994924,5.290211,Key generation
+TinyBERT,sub_model_4_c6bf7913,587.035500,5.526516,Key generation
+TinyBERT,sub_model_4_c6bf7913,588.076209,5.881783,Key generation
+TinyBERT,sub_model_4_c6bf7913,589.116644,6.806091,Key generation
+TinyBERT,sub_model_4_c6bf7913,590.157320,7.428749,Key generation
+TinyBERT,sub_model_4_c6bf7913,591.198222,8.314915,Key generation
+TinyBERT,sub_model_4_c6bf7913,592.238701,8.724522,Key generation
+TinyBERT,sub_model_4_c6bf7913,593.279370,9.666512,Key generation
+TinyBERT,sub_model_4_c6bf7913,594.319913,9.252129,Key generation
+TinyBERT,sub_model_4_c6bf7913,595.362025,9.891464,Key generation
+TinyBERT,sub_model_4_c6bf7913,596.404132,10.508820,Key generation
+TinyBERT,sub_model_4_c6bf7913,597.446303,10.048641,Key generation
+TinyBERT,sub_model_4_c6bf7913,598.488390,10.325146,Key generation
+TinyBERT,sub_model_4_c6bf7913,599.528890,6.421562,Key generation
+TinyBERT,sub_model_4_c6bf7913,600.571291,5.313049,Key generation
+TinyBERT,sub_model_4_c6bf7913,601.613661,3.669212,Key generation
+TinyBERT,sub_model_4_c6bf7913,602.656143,4.263062,Key generation
+TinyBERT,sub_model_4_c6bf7913,603.696894,4.513069,Key generation
+TinyBERT,sub_model_4_c6bf7913,604.738505,4.646172,Key generation
+TinyBERT,sub_model_4_c6bf7913,605.780617,4.950584,Key generation
+TinyBERT,sub_model_4_c6bf7913,606.814973,5.786522,Key generation
+TinyBERT,sub_model_4_c6bf7913,607.843176,6.013088,Key generation
+TinyBERT,sub_model_4_c6bf7913,608.884162,6.174263,Key generation
+TinyBERT,sub_model_4_c6bf7913,609.924505,6.513092,Key generation
+TinyBERT,sub_model_4_c6bf7913,610.955875,6.513092,Key generation
+TinyBERT,sub_model_4_c6bf7913,611.998166,7.013092,Key generation
+TinyBERT,sub_model_4_c6bf7913,613.040948,7.013092,Key generation
+TinyBERT,sub_model_4_c6bf7913,614.083743,7.513096,Key generation
+TinyBERT,sub_model_4_c6bf7913,615.113309,7.513096,Key generation
+TinyBERT,sub_model_4_c6bf7913,616.156143,8.013096,Key generation
+TinyBERT,sub_model_4_c6bf7913,617.199244,8.013096,Key generation
+TinyBERT,sub_model_4_c6bf7913,618.242277,8.358170,Key generation
+TinyBERT,sub_model_4_c6bf7913,619.283863,8.513100,Key generation
+TinyBERT,sub_model_4_c6bf7913,620.327044,8.306442,Key generation
+TinyBERT,sub_model_4_c6bf7913,621.355057,9.013100,Key generation
+TinyBERT,sub_model_4_c6bf7913,622.398607,9.013100,Key generation
+TinyBERT,sub_model_4_c6bf7913,623.441668,9.513107,Key generation
+TinyBERT,sub_model_4_c6bf7913,624.474461,9.513107,Key generation
+TinyBERT,sub_model_4_c6bf7913,625.502190,10.013107,Key generation
+TinyBERT,sub_model_4_c6bf7913,626.542881,10.013107,Key generation
+TinyBERT,sub_model_4_c6bf7913,627.583505,10.492710,Key generation
+TinyBERT,sub_model_4_c6bf7913,628.624072,10.513115,Key generation
+TinyBERT,sub_model_4_c6bf7913,629.664966,10.721458,Key generation
+TinyBERT,sub_model_4_c6bf7913,630.705606,11.013115,Key generation
+TinyBERT,sub_model_4_c6bf7913,631.746263,11.149464,Key generation
+TinyBERT,sub_model_4_c6bf7913,632.787040,11.513119,Key generation
+TinyBERT,sub_model_4_c6bf7913,633.827604,11.513119,Key generation
+TinyBERT,sub_model_4_c6bf7913,634.868662,12.013119,Key generation
+TinyBERT,sub_model_4_c6bf7913,635.909688,12.013119,Key generation
+TinyBERT,sub_model_4_c6bf7913,636.952159,12.513134,Key generation
+TinyBERT,sub_model_4_c6bf7913,637.992024,12.513134,Key generation
+TinyBERT,sub_model_4_c6bf7913,639.034564,13.013134,Key generation
+TinyBERT,sub_model_4_c6bf7913,640.077182,13.013134,Key generation
+TinyBERT,sub_model_4_c6bf7913,641.119725,13.378468,Key generation
+TinyBERT,sub_model_4_c6bf7913,642.160870,13.513138,Key generation
+TinyBERT,sub_model_4_c6bf7913,643.202040,13.418655,Key generation
+TinyBERT,sub_model_4_c6bf7913,644.243531,15.069988,Key generation
+TinyBERT,sub_model_4_c6bf7913,645.284691,16.708084,Key generation
+TinyBERT,sub_model_4_c6bf7913,646.325709,18.483696,Key generation
+TinyBERT,sub_model_4_c6bf7913,647.363437,19.051861,Key generation
+TinyBERT,sub_model_4_c6bf7913,648.404885,20.779446,Key generation
+TinyBERT,sub_model_4_c6bf7913,649.445949,22.523216,Key generation
+TinyBERT,sub_model_4_c6bf7913,650.487187,24.318233,Key generation
+TinyBERT,sub_model_4_c6bf7913,651.528173,26.113079,Key generation
+TinyBERT,sub_model_4_c6bf7913,652.569238,27.903656,Key generation
+TinyBERT,sub_model_4_c6bf7913,653.610249,39.284828,Key generation
+TinyBERT,sub_model_4_c6bf7913,654.651251,39.284828,Key generation
+TinyBERT,sub_model_4_c6bf7913,655.692327,43.315590,Key generation
+TinyBERT,sub_model_4_c6bf7913,656.736162,44.842884,Key generation
+TinyBERT,sub_model_4_c6bf7913,657.816937,44.842899,Key generation
+TinyBERT,sub_model_4_c6bf7913,658.856160,44.645115,Key generation
+TinyBERT,sub_model_4_c6bf7913,659.884448,32.690098,Key generation
+TinyBERT,sub_model_4_c6bf7913,660.912143,25.436405,Key generation
+TinyBERT,sub_model_4_c6bf7913,661.943394,26.248901,Key generation
+TinyBERT,sub_model_4_c6bf7913,662.971348,26.248901,Key generation
+TinyBERT,sub_model_4_c6bf7913,664.012273,26.748905,Key generation
+TinyBERT,sub_model_4_c6bf7913,665.061639,26.748905,Key generation
+TinyBERT,sub_model_4_c6bf7913,666.102690,26.420708,Key generation
+TinyBERT,sub_model_4_c6bf7913,667.145036,27.248905,Key generation
+TinyBERT,sub_model_4_c6bf7913,668.186175,27.248905,Key generation
+TinyBERT,sub_model_4_c6bf7913,669.227215,27.748909,Key generation
+TinyBERT,sub_model_4_c6bf7913,670.255200,27.748909,Key generation
+TinyBERT,sub_model_4_c6bf7913,671.296357,28.075863,Key generation
+TinyBERT,sub_model_4_c6bf7913,672.337425,28.248909,Key generation
+TinyBERT,sub_model_4_c6bf7913,673.378407,28.434780,Key generation
+TinyBERT,sub_model_4_c6bf7913,674.419468,28.748913,Key generation
+TinyBERT,sub_model_4_c6bf7913,675.462215,28.569351,Key generation
+TinyBERT,sub_model_4_c6bf7913,676.503313,28.500710,Proving
+TinyBERT,sub_model_4_c6bf7913,677.544409,29.567760,Proving
+TinyBERT,sub_model_4_c6bf7913,678.585551,31.427437,Proving
+TinyBERT,sub_model_4_c6bf7913,679.626421,32.847813,Proving
+TinyBERT,sub_model_4_c6bf7913,680.667473,32.754498,Proving
+TinyBERT,sub_model_4_c6bf7913,681.708489,34.553486,Proving
+TinyBERT,sub_model_4_c6bf7913,682.749493,34.799664,Proving
+TinyBERT,sub_model_4_c6bf7913,683.790514,35.361023,Proving
+TinyBERT,sub_model_4_c6bf7913,684.831498,35.803478,Proving
+TinyBERT,sub_model_4_c6bf7913,685.872468,36.695152,Proving
+TinyBERT,sub_model_4_c6bf7913,686.913550,36.528217,Proving
+TinyBERT,sub_model_4_c6bf7913,687.954617,37.163258,Proving
+TinyBERT,sub_model_4_c6bf7913,688.995633,37.814125,Proving
+TinyBERT,sub_model_4_c6bf7913,690.036640,37.685783,Proving
+TinyBERT,sub_model_4_c6bf7913,691.077789,37.149063,Proving
+TinyBERT,sub_model_4_c6bf7913,692.118654,33.743549,Proving
+TinyBERT,sub_model_4_c6bf7913,693.159804,34.394920,Proving
+TinyBERT,sub_model_4_c6bf7913,694.200789,34.377472,Proving
+TinyBERT,sub_model_4_c6bf7913,695.236389,35.725876,Proving
+TinyBERT,sub_model_4_c6bf7913,696.277481,36.044472,Proving
+TinyBERT,sub_model_4_c6bf7913,697.318380,36.586525,Proving
+TinyBERT,sub_model_4_c6bf7913,698.359197,37.145454,Proving
+TinyBERT,sub_model_4_c6bf7913,699.400110,37.818169,Proving
+TinyBERT,sub_model_4_c6bf7913,700.441063,37.865391,Proving
+TinyBERT,sub_model_4_c6bf7913,701.482288,38.857231,Proving
+TinyBERT,sub_model_4_c6bf7913,702.523797,38.644142,Proving
+TinyBERT,sub_model_4_c6bf7913,703.565402,38.759560,Proving
+TinyBERT,sub_model_4_c6bf7913,704.608735,39.502396,Proving
+TinyBERT,sub_model_4_c6bf7913,705.650425,37.220364,Proving
+TinyBERT,sub_model_4_c6bf7913,706.691901,34.184807,Proving
+TinyBERT,sub_model_4_c6bf7913,707.733492,33.186424,Proving
+TinyBERT,sub_model_4_c6bf7913,708.775041,33.549519,Proving
+TinyBERT,sub_model_4_c6bf7913,709.819169,30.889381,Proving
+TinyBERT,sub_model_4_c6bf7913,710.871154,30.889381,Proving
+TinyBERT,sub_model_4_c6bf7913,711.927125,29.956753,Proving
+TinyBERT,sub_model_4_c6bf7913,712.955026,30.178062,Proving
+TinyBERT,sub_model_4_c6bf7913,713.983114,30.207359,Proving
+TinyBERT,sub_model_4_c6bf7913,715.023878,30.215168,Proving
+TinyBERT,sub_model_4_c6bf7913,716.064808,30.410141,Proving
+TinyBERT,sub_model_4_c6bf7913,717.101070,30.312592,Proving
+TinyBERT,sub_model_4_c6bf7913,718.129354,30.553070,Proving
+TinyBERT,sub_model_4_c6bf7913,719.157513,30.562836,Proving
+TinyBERT,sub_model_4_c6bf7913,720.198695,30.582367,Proving
+TinyBERT,sub_model_4_c6bf7913,721.239735,30.564095,Proving
+TinyBERT,sub_model_4_c6bf7913,722.280788,30.660145,Proving
+TinyBERT,sub_model_4_c6bf7913,723.323461,30.918461,Proving
+TinyBERT,sub_model_4_c6bf7913,724.372876,31.100410,Proving
+TinyBERT,sub_model_4_c6bf7913,725.400644,31.918465,Proving
+TinyBERT,sub_model_4_c6bf7913,726.428468,31.918465,Proving
+TinyBERT,sub_model_4_c6bf7913,727.456544,32.418468,Proving
+TinyBERT,sub_model_4_c6bf7913,728.486241,32.418468,Proving
+TinyBERT,sub_model_4_c6bf7913,729.527315,31.810802,Proving
+TinyBERT,sub_model_4_c6bf7913,730.568612,31.918465,Proving
+TinyBERT,sub_model_4_c6bf7913,731.609810,33.043472,Proving
+TinyBERT,sub_model_4_c6bf7913,732.650864,33.043472,Proving
+TinyBERT,sub_model_4_c6bf7913,733.691891,33.445374,Proving
+TinyBERT,sub_model_4_c6bf7913,734.732969,33.543476,Proving
+TinyBERT,sub_model_4_c6bf7913,735.775462,33.074722,Proving
+TinyBERT,sub_model_4_c6bf7913,736.818170,33.043472,Proving
+TinyBERT,sub_model_4_c6bf7913,737.860298,34.168480,Proving
+TinyBERT,sub_model_4_c6bf7913,738.901377,34.168480,Proving
+TinyBERT,sub_model_4_c6bf7913,739.942714,34.519630,Proving
+TinyBERT,sub_model_4_c6bf7913,740.984369,34.668484,Proving
+TinyBERT,sub_model_4_c6bf7913,742.026420,34.297813,Proving
+TinyBERT,sub_model_4_c6bf7913,743.067810,34.414341,Proving
+TinyBERT,sub_model_4_c6bf7913,744.108989,34.355988,Proving
+TinyBERT,sub_model_4_c6bf7913,745.149154,34.199635,Proving
+TinyBERT,sub_model_4_c6bf7913,746.190243,34.293484,Proving
+TinyBERT,sub_model_4_c6bf7913,747.234886,34.168480,Proving
+TinyBERT,sub_model_4_c6bf7913,748.269166,33.918472,Proving
+TinyBERT,sub_model_4_c6bf7913,749.314582,33.855972,Proving
+TinyBERT,sub_model_4_c6bf7913,750.342469,33.793468,Proving
+TinyBERT,sub_model_4_c6bf7913,751.370411,33.793468,Proving
+TinyBERT,sub_model_4_c6bf7913,752.398434,33.850571,Proving
+TinyBERT,sub_model_4_c6bf7913,753.439545,34.793472,Proving
+TinyBERT,sub_model_4_c6bf7913,754.480615,34.793472,Proving
+TinyBERT,sub_model_4_c6bf7913,755.521719,35.275318,Proving
+TinyBERT,sub_model_4_c6bf7913,756.562852,35.293476,Proving
+TinyBERT,sub_model_4_c6bf7913,757.590612,35.596489,Proving
+TinyBERT,sub_model_4_c6bf7913,758.618377,35.793476,Proving
+TinyBERT,sub_model_4_c6bf7913,759.646181,35.941772,Proving
+TinyBERT,sub_model_4_c6bf7913,760.673837,36.293480,Proving
+TinyBERT,sub_model_4_c6bf7913,761.701634,35.856068,Proving
+TinyBERT,sub_model_4_c6bf7913,762.729445,36.793480,Proving
+TinyBERT,sub_model_4_c6bf7913,763.771834,36.793480,Proving
+TinyBERT,sub_model_4_c6bf7913,764.814427,37.293484,Proving
+TinyBERT,sub_model_4_c6bf7913,765.842509,37.293484,Proving
+TinyBERT,sub_model_4_c6bf7913,766.870277,37.793484,Proving
+TinyBERT,sub_model_4_c6bf7913,767.897983,37.793484,Proving
+TinyBERT,sub_model_4_c6bf7913,768.925771,38.274036,Proving
+TinyBERT,sub_model_4_c6bf7913,769.953543,38.293488,Proving
+TinyBERT,sub_model_4_c6bf7913,770.995925,38.708958,Proving
+TinyBERT,sub_model_4_c6bf7913,772.038392,38.793488,Proving
+TinyBERT,sub_model_4_c6bf7913,773.080955,39.019100,Proving
+TinyBERT,sub_model_4_c6bf7913,774.123756,39.293491,Proving
+TinyBERT,sub_model_4_c6bf7913,775.166235,39.058403,Proving
+TinyBERT,sub_model_4_c6bf7913,776.204752,39.793491,Proving
+TinyBERT,sub_model_4_c6bf7913,777.246987,39.793491,Proving
+TinyBERT,sub_model_4_c6bf7913,778.288109,40.293495,Proving
+TinyBERT,sub_model_4_c6bf7913,779.330347,40.293495,Proving
+TinyBERT,sub_model_4_c6bf7913,780.372996,40.793495,Proving
+TinyBERT,sub_model_4_c6bf7913,781.415457,40.793495,Proving
+TinyBERT,sub_model_4_c6bf7913,782.458202,41.293499,Proving
+TinyBERT,sub_model_4_c6bf7913,783.523631,41.293499,Proving
+TinyBERT,sub_model_4_c6bf7913,784.565898,41.793499,Proving
+TinyBERT,sub_model_4_c6bf7913,785.606929,41.793499,Proving
+TinyBERT,sub_model_4_c6bf7913,786.648721,42.205250,Proving
+TinyBERT,sub_model_4_c6bf7913,787.691141,42.293503,Proving
+TinyBERT,sub_model_4_c6bf7913,788.718895,42.732243,Proving
+TinyBERT,sub_model_4_c6bf7913,789.746678,42.793503,Proving
+TinyBERT,sub_model_4_c6bf7913,790.775474,42.994579,Proving
+TinyBERT,sub_model_4_c6bf7913,791.818128,43.293507,Proving
+TinyBERT,sub_model_4_c6bf7913,792.860580,43.224190,Proving
+TinyBERT,sub_model_4_c6bf7913,793.903225,43.793507,Proving
+TinyBERT,sub_model_4_c6bf7913,794.944244,43.793507,Proving
+TinyBERT,sub_model_4_c6bf7913,795.985478,44.293510,Proving
+TinyBERT,sub_model_4_c6bf7913,797.019715,44.293510,Proving
+TinyBERT,sub_model_4_c6bf7913,798.065149,44.793510,Proving
+TinyBERT,sub_model_4_c6bf7913,799.124955,44.793510,Proving
+TinyBERT,sub_model_4_c6bf7913,800.160321,44.795143,Proving
+TinyBERT,sub_model_4_c6bf7913,801.188881,44.885445,Proving
+TinyBERT,sub_model_4_c6bf7913,802.216958,44.976994,Proving
+TinyBERT,sub_model_4_c6bf7913,803.259569,45.068546,Proving
+TinyBERT,sub_model_4_c6bf7913,804.302009,45.159943,Proving
+TinyBERT,sub_model_4_c6bf7913,805.343054,45.251350,Proving
+TinyBERT,sub_model_4_c6bf7913,806.384317,45.342766,Proving
+TinyBERT,sub_model_4_c6bf7913,807.425401,45.434208,Proving
+TinyBERT,sub_model_4_c6bf7913,808.466462,45.525681,Proving
+TinyBERT,sub_model_4_c6bf7913,809.507426,45.617107,Proving
+TinyBERT,sub_model_4_c6bf7913,810.548454,45.708546,Proving
+TinyBERT,sub_model_4_c6bf7913,811.589475,45.848045,Proving
+TinyBERT,sub_model_4_c6bf7913,812.630760,46.616135,Proving
+TinyBERT,sub_model_4_c6bf7913,813.671697,47.043518,Proving
+TinyBERT,sub_model_4_c6bf7913,814.712698,47.043518,Proving
+TinyBERT,sub_model_4_c6bf7913,815.753686,47.080074,Proving
+TinyBERT,sub_model_4_c6bf7913,816.794635,46.894543,Proving
+TinyBERT,sub_model_4_c6bf7913,817.835619,46.986099,Proving
+TinyBERT,sub_model_4_c6bf7913,818.876846,47.076580,Proving
+TinyBERT,sub_model_4_c6bf7913,819.917983,47.167103,Proving
+TinyBERT,sub_model_4_c6bf7913,820.959217,47.257645,Proving
+TinyBERT,sub_model_4_c6bf7913,822.000346,47.347893,Proving
+TinyBERT,sub_model_4_c6bf7913,823.041574,47.437786,Proving
+TinyBERT,sub_model_4_c6bf7913,824.082624,47.527809,Proving
+TinyBERT,sub_model_4_c6bf7913,825.123588,47.618504,Proving
+TinyBERT,sub_model_4_c6bf7913,826.164707,47.708389,Proving
+TinyBERT,sub_model_4_c6bf7913,827.205662,47.798332,Proving
+TinyBERT,sub_model_4_c6bf7913,828.246667,48.128292,Proving
+TinyBERT,sub_model_4_c6bf7913,829.289812,48.888294,Proving
+TinyBERT,sub_model_4_c6bf7913,830.331069,49.105877,Proving
+TinyBERT,sub_model_4_c6bf7913,831.372171,48.041096,Proving
+TinyBERT,sub_model_4_c6bf7913,832.413981,49.540039,Proving
+TinyBERT,sub_model_4_c6bf7913,833.455198,50.105877,Proving
+TinyBERT,sub_model_4_c6bf7913,834.496073,50.105877,Proving
+TinyBERT,sub_model_4_c6bf7913,835.537195,50.385818,Proving
+TinyBERT,sub_model_4_c6bf7913,836.578175,50.605881,Proving
+TinyBERT,sub_model_4_c6bf7913,837.619308,50.782516,Proving
+TinyBERT,sub_model_4_c6bf7913,838.659964,51.105888,Proving
+TinyBERT,sub_model_4_c6bf7913,839.700991,51.186905,Proving
+TinyBERT,sub_model_4_c6bf7913,840.741996,51.605892,Proving
+TinyBERT,sub_model_4_c6bf7913,841.783745,51.235943,Proving
+TinyBERT,sub_model_4_c6bf7913,842.824859,49.705788,Proving
+TinyBERT,sub_model_4_c6bf7913,843.867260,50.105885,Proving
+TinyBERT,sub_model_4_c6bf7913,844.908254,50.135670,Proving
+TinyBERT,sub_model_4_c6bf7913,845.949256,50.605888,Proving
+TinyBERT,sub_model_4_c6bf7913,846.991946,50.605888,Proving
+TinyBERT,sub_model_4_c6bf7913,848.033219,51.105888,Proving
+TinyBERT,sub_model_4_c6bf7913,849.075888,51.105888,Proving
+TinyBERT,sub_model_4_c6bf7913,850.121166,51.605892,Proving
+TinyBERT,sub_model_4_c6bf7913,851.171338,51.605892,Proving
+TinyBERT,sub_model_4_c6bf7913,852.198877,50.751842,Proving
+TinyBERT,sub_model_4_c6bf7913,853.226451,48.355877,Proving
+TinyBERT,sub_model_4_c6bf7913,854.254205,38.310406,Proving
+TinyBERT,sub_model_4_c6bf7913,855.296567,37.605896,Proving
+TinyBERT,sub_model_4_c6bf7913,856.332245,37.605896,Proving
+TinyBERT,sub_model_4_c6bf7913,857.374474,38.105900,Proving
+TinyBERT,sub_model_4_c6bf7913,858.416704,38.105900,Proving
+TinyBERT,sub_model_4_c6bf7913,859.458934,35.533039,Proving
+TinyBERT,sub_model_4_c6bf7913,860.502160,34.543533,Proving
+TinyBERT,sub_model_4_c6bf7913,861.580170,34.543533,Proving
+TinyBERT,sub_model_4_c6bf7913,862.645364,33.945473,Proving
+TinyBERT,sub_model_4_c6bf7913,863.673184,34.902412,Proving
+TinyBERT,sub_model_4_c6bf7913,864.719176,31.168591,Proving
+TinyBERT,sub_model_4_c6bf7913,865.773393,33.617386,Proving
+TinyBERT,sub_model_4_c6bf7913,866.807157,31.168583,Proving

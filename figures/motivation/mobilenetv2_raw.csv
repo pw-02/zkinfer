@@ -1,0 +1,669 @@
+model,job_id,elapsed_s,memory_gib,stage
+MobileNetV2,sub_model_96_20e68a2d,0.000163,0.159279,Preparation
+MobileNetV2,sub_model_96_20e68a2d,1.028587,0.198841,Preparation
+MobileNetV2,sub_model_96_20e68a2d,2.060624,0.288246,Preparation
+MobileNetV2,sub_model_96_20e68a2d,3.100310,0.278175,Preparation
+MobileNetV2,sub_model_96_20e68a2d,4.141908,0.244843,Preparation
+MobileNetV2,sub_model_96_20e68a2d,5.173947,0.327244,Preparation
+MobileNetV2,sub_model_96_20e68a2d,6.206812,0.325066,Preparation
+MobileNetV2,sub_model_96_20e68a2d,7.255000,0.373020,Preparation
+MobileNetV2,sub_model_96_20e68a2d,8.296504,0.386547,Preparation
+MobileNetV2,sub_model_96_20e68a2d,9.328793,0.367775,Preparation
+MobileNetV2,sub_model_96_20e68a2d,10.363008,0.346989,Preparation
+MobileNetV2,sub_model_96_20e68a2d,11.397420,0.373398,Preparation
+MobileNetV2,sub_model_96_20e68a2d,12.430835,0.429485,Preparation
+MobileNetV2,sub_model_96_20e68a2d,13.472027,0.462105,Preparation
+MobileNetV2,sub_model_96_20e68a2d,14.504335,0.401768,Preparation
+MobileNetV2,sub_model_96_20e68a2d,15.535986,0.454536,Preparation
+MobileNetV2,sub_model_96_20e68a2d,16.575690,0.501266,Preparation
+MobileNetV2,sub_model_96_20e68a2d,17.618785,0.485577,Preparation
+MobileNetV2,sub_model_96_20e68a2d,18.651109,0.545975,Preparation
+MobileNetV2,sub_model_96_20e68a2d,19.684817,0.527042,Preparation
+MobileNetV2,sub_model_96_20e68a2d,20.725159,0.546574,Preparation
+MobileNetV2,sub_model_96_20e68a2d,21.761704,0.571316,Preparation
+MobileNetV2,sub_model_96_20e68a2d,22.802275,0.580837,Preparation
+MobileNetV2,sub_model_96_20e68a2d,23.837777,0.579182,Preparation
+MobileNetV2,sub_model_96_20e68a2d,24.870652,0.594009,Preparation
+MobileNetV2,sub_model_96_20e68a2d,25.910257,0.640049,Preparation
+MobileNetV2,sub_model_96_20e68a2d,26.945852,0.644550,Preparation
+MobileNetV2,sub_model_96_20e68a2d,27.980656,0.602451,Preparation
+MobileNetV2,sub_model_96_20e68a2d,29.013512,0.609653,Preparation
+MobileNetV2,sub_model_96_20e68a2d,30.047487,0.688057,Preparation
+MobileNetV2,sub_model_96_20e68a2d,31.091656,0.720554,Preparation
+MobileNetV2,sub_model_96_20e68a2d,32.126277,0.700710,Preparation
+MobileNetV2,sub_model_96_20e68a2d,33.165326,0.731365,Preparation
+MobileNetV2,sub_model_96_20e68a2d,34.199380,0.732140,Preparation
+MobileNetV2,sub_model_96_20e68a2d,35.237794,0.732357,Preparation
+MobileNetV2,sub_model_96_20e68a2d,36.283869,0.776466,Preparation
+MobileNetV2,sub_model_96_20e68a2d,37.316944,0.753216,Preparation
+MobileNetV2,sub_model_96_20e68a2d,38.352214,0.785866,Preparation
+MobileNetV2,sub_model_96_20e68a2d,39.390987,0.802689,Preparation
+MobileNetV2,sub_model_96_20e68a2d,40.436224,0.822178,Preparation
+MobileNetV2,sub_model_96_20e68a2d,41.469852,0.821350,Preparation
+MobileNetV2,sub_model_96_20e68a2d,42.505555,0.832516,Preparation
+MobileNetV2,sub_model_96_20e68a2d,43.538796,0.856678,Preparation
+MobileNetV2,sub_model_96_20e68a2d,44.575082,0.872166,Preparation
+MobileNetV2,sub_model_96_20e68a2d,45.622368,0.889244,Preparation
+MobileNetV2,sub_model_96_20e68a2d,46.655924,0.918991,Preparation
+MobileNetV2,sub_model_96_20e68a2d,47.689102,0.814472,Preparation
+MobileNetV2,sub_model_96_20e68a2d,48.722170,1.254326,Key generation
+MobileNetV2,sub_model_96_20e68a2d,49.759282,1.964436,Key generation
+MobileNetV2,sub_model_96_20e68a2d,50.791001,3.775890,Key generation
+MobileNetV2,sub_model_96_20e68a2d,51.822697,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,52.862463,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,53.901255,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,54.940590,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,55.979658,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,57.019484,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,58.058924,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,59.098572,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,60.137098,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,61.177580,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,62.215047,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,63.254407,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,64.293048,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,65.332964,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,66.373086,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,67.413168,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,68.453230,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,69.492979,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,70.532904,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,71.573271,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,72.613321,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,73.653504,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,74.693231,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,75.732559,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,76.773103,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,77.812438,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,78.851901,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,79.892055,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,80.931519,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,81.971262,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,83.010518,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,84.049449,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,85.091302,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,86.130932,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,87.171351,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,88.210843,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,89.251061,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,90.290927,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,91.330901,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,92.370795,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,93.409704,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,94.450530,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,95.488244,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,96.527509,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,97.567414,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,98.608283,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,99.648320,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,100.687074,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,101.726881,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,102.765938,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,103.805418,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,104.845509,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,105.884663,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,106.924926,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,107.965556,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,109.005024,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,110.043953,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,111.083541,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,112.123091,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,113.162555,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,114.202819,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,115.243409,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,116.283802,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,117.330568,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,118.370700,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,119.411253,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,120.451201,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,121.491891,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,122.531567,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,123.570659,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,124.610078,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,125.649506,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,126.688295,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,127.727623,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,128.767168,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,129.806016,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,130.846127,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,131.886034,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,132.925566,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,133.964571,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,135.005163,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,136.045398,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,137.085154,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,138.124900,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,139.164510,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,140.207138,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,141.246793,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,142.289909,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,143.331341,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,144.371684,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,145.411885,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,146.451905,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,147.492310,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,148.532922,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,149.572201,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,150.612104,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,151.651902,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,152.692222,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,153.731643,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,154.771024,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,155.812798,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,156.852871,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,157.892403,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,158.932108,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,159.972335,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,161.013402,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,162.054947,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,163.096654,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,164.138518,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,165.178815,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,166.219279,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,167.260228,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,168.300636,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,169.341134,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,170.383314,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,171.424409,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,172.463263,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,173.502181,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,174.541932,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,175.576910,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,176.616465,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,177.656656,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,178.697791,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,179.738806,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,180.779271,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,181.820520,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,182.860395,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,183.912774,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,184.953108,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,185.994983,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,187.034100,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,188.074146,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,189.114580,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,190.153750,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,191.192337,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,192.231339,4.001888,Key generation
+MobileNetV2,sub_model_96_20e68a2d,193.263808,5.243011,Key generation
+MobileNetV2,sub_model_96_20e68a2d,194.296834,7.158768,Key generation
+MobileNetV2,sub_model_96_20e68a2d,195.329230,8.726814,Key generation
+MobileNetV2,sub_model_96_20e68a2d,196.361688,9.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,197.445800,9.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,198.490782,9.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,199.576922,9.514500,Key generation
+MobileNetV2,sub_model_96_20e68a2d,200.609935,9.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,201.642973,9.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,202.728806,9.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,203.803787,9.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,204.880270,5.514591,Key generation
+MobileNetV2,sub_model_96_20e68a2d,205.912521,4.016907,Key generation
+MobileNetV2,sub_model_96_20e68a2d,206.943844,3.819260,Key generation
+MobileNetV2,sub_model_96_20e68a2d,207.975288,3.159821,Key generation
+MobileNetV2,sub_model_96_20e68a2d,209.007047,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,210.048560,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,211.087966,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,212.132295,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,213.170893,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,214.209857,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,215.248894,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,216.288212,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,217.327559,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,218.369707,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,219.410114,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,220.450048,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,221.488019,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,222.527750,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,223.566632,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,224.606507,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,225.646821,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,226.687074,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,227.726653,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,228.766507,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,229.808328,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,230.847871,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,231.887124,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,232.925982,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,233.965258,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,235.006847,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,236.046895,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,237.086964,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,238.127063,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,239.166803,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,240.205572,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,241.245782,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,242.286031,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,243.326471,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,244.367134,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,245.407873,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,246.449756,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,247.490811,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,248.530018,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,249.570926,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,250.613673,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,251.653749,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,252.689882,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,253.729324,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,254.768526,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,255.807548,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,256.847311,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,257.886791,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,258.925706,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,259.965079,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,261.004921,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,262.045153,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,263.084704,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,264.124395,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,265.164305,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,266.204438,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,267.244543,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,268.290050,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,269.329899,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,270.369661,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,271.409448,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,272.449896,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,273.490405,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,274.530301,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,275.571137,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,276.611392,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,277.651494,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,278.691176,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,279.731685,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,280.770590,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,281.810493,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,282.850245,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,283.889968,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,284.930432,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,285.970439,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,287.010422,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,288.050293,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,289.089260,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,290.129546,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,291.168475,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,292.208031,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,293.247428,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,294.287071,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,295.331245,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,296.370483,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,297.408490,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,298.447684,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,299.487290,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,300.527462,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,301.567505,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,302.607367,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,303.646604,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,304.685147,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,305.723647,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,306.762800,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,307.802084,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,308.842169,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,309.883278,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,310.923196,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,311.963615,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,313.003522,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,314.042857,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,315.082475,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,316.122813,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,317.162365,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,318.201938,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,319.241127,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,320.280431,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,321.320166,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,322.359429,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,323.398830,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,324.438395,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,325.478086,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,326.516980,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,327.556374,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,328.596111,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,329.636484,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,330.675146,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,331.714925,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,332.755788,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,333.792623,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,334.833062,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,335.872480,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,336.913229,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,337.953693,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,338.996353,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,340.035539,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,341.075053,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,342.113648,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,343.153069,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,344.192604,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,345.232516,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,346.272358,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,347.311340,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,348.351704,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,349.391247,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,350.430423,4.256817,Key generation
+MobileNetV2,sub_model_96_20e68a2d,351.469806,5.242306,Key generation
+MobileNetV2,sub_model_96_20e68a2d,352.501910,6.372936,Key generation
+MobileNetV2,sub_model_96_20e68a2d,353.538482,6.631855,Key generation
+MobileNetV2,sub_model_96_20e68a2d,354.575649,6.881859,Key generation
+MobileNetV2,sub_model_96_20e68a2d,355.615363,7.131863,Key generation
+MobileNetV2,sub_model_96_20e68a2d,356.653510,7.349236,Key generation
+MobileNetV2,sub_model_96_20e68a2d,357.685804,7.545757,Key generation
+MobileNetV2,sub_model_96_20e68a2d,358.719184,7.808838,Key generation
+MobileNetV2,sub_model_96_20e68a2d,359.751425,8.756874,Key generation
+MobileNetV2,sub_model_96_20e68a2d,360.783609,8.756874,Key generation
+MobileNetV2,sub_model_96_20e68a2d,361.815820,8.983620,Key generation
+MobileNetV2,sub_model_96_20e68a2d,362.848454,9.256878,Key generation
+MobileNetV2,sub_model_96_20e68a2d,363.881530,9.039925,Key generation
+MobileNetV2,sub_model_96_20e68a2d,364.914407,9.756878,Key generation
+MobileNetV2,sub_model_96_20e68a2d,365.946830,9.756878,Key generation
+MobileNetV2,sub_model_96_20e68a2d,366.980799,10.256882,Key generation
+MobileNetV2,sub_model_96_20e68a2d,368.028060,10.256882,Key generation
+MobileNetV2,sub_model_96_20e68a2d,369.060391,10.756882,Key generation
+MobileNetV2,sub_model_96_20e68a2d,370.092653,10.756882,Key generation
+MobileNetV2,sub_model_96_20e68a2d,371.125364,11.010403,Key generation
+MobileNetV2,sub_model_96_20e68a2d,372.158336,11.256886,Key generation
+MobileNetV2,sub_model_96_20e68a2d,373.190603,10.896320,Key generation
+MobileNetV2,sub_model_96_20e68a2d,374.223085,11.756886,Key generation
+MobileNetV2,sub_model_96_20e68a2d,375.255574,11.756886,Key generation
+MobileNetV2,sub_model_96_20e68a2d,376.288504,12.256889,Key generation
+MobileNetV2,sub_model_96_20e68a2d,377.328617,12.256889,Key generation
+MobileNetV2,sub_model_96_20e68a2d,378.361568,12.756889,Key generation
+MobileNetV2,sub_model_96_20e68a2d,379.395325,12.756889,Key generation
+MobileNetV2,sub_model_96_20e68a2d,380.428415,13.110519,Key generation
+MobileNetV2,sub_model_96_20e68a2d,381.462496,13.256893,Key generation
+MobileNetV2,sub_model_96_20e68a2d,382.494759,13.180244,Key generation
+MobileNetV2,sub_model_96_20e68a2d,383.527011,13.756893,Key generation
+MobileNetV2,sub_model_96_20e68a2d,384.559178,13.756893,Key generation
+MobileNetV2,sub_model_96_20e68a2d,385.592317,14.256897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,386.624880,14.256897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,387.657070,14.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,388.690390,14.756897,Key generation
+MobileNetV2,sub_model_96_20e68a2d,389.722998,15.130653,Key generation
+MobileNetV2,sub_model_96_20e68a2d,390.755282,15.256901,Key generation
+MobileNetV2,sub_model_96_20e68a2d,391.787673,15.090916,Key generation
+MobileNetV2,sub_model_96_20e68a2d,392.819800,16.470871,Key generation
+MobileNetV2,sub_model_96_20e68a2d,393.851803,17.498035,Key generation
+MobileNetV2,sub_model_96_20e68a2d,394.898536,18.641621,Key generation
+MobileNetV2,sub_model_96_20e68a2d,395.948524,19.961685,Key generation
+MobileNetV2,sub_model_96_20e68a2d,396.997790,22.724983,Key generation
+MobileNetV2,sub_model_96_20e68a2d,398.084801,20.690533,Key generation
+MobileNetV2,sub_model_96_20e68a2d,399.132514,22.058025,Key generation
+MobileNetV2,sub_model_96_20e68a2d,400.175019,23.351681,Key generation
+MobileNetV2,sub_model_96_20e68a2d,401.224203,24.691479,Key generation
+MobileNetV2,sub_model_96_20e68a2d,402.271428,26.032810,Key generation
+MobileNetV2,sub_model_96_20e68a2d,403.321707,28.778557,Key generation
+MobileNetV2,sub_model_96_20e68a2d,404.373656,34.099983,Key generation
+MobileNetV2,sub_model_96_20e68a2d,405.406176,34.099983,Key generation
+MobileNetV2,sub_model_96_20e68a2d,406.438990,34.613266,Key generation
+MobileNetV2,sub_model_96_20e68a2d,407.472791,37.626564,Key generation
+MobileNetV2,sub_model_96_20e68a2d,408.565793,36.126556,Key generation
+MobileNetV2,sub_model_96_20e68a2d,409.599861,36.126556,Key generation
+MobileNetV2,sub_model_96_20e68a2d,410.633558,27.516857,Key generation
+MobileNetV2,sub_model_96_20e68a2d,411.666353,23.520382,Key generation
+MobileNetV2,sub_model_96_20e68a2d,412.699160,24.188908,Key generation
+MobileNetV2,sub_model_96_20e68a2d,413.732578,24.188908,Key generation
+MobileNetV2,sub_model_96_20e68a2d,414.765028,24.470360,Key generation
+MobileNetV2,sub_model_96_20e68a2d,415.797805,24.688911,Key generation
+MobileNetV2,sub_model_96_20e68a2d,416.829815,24.234161,Key generation
+MobileNetV2,sub_model_96_20e68a2d,417.862709,24.550293,Key generation
+MobileNetV2,sub_model_96_20e68a2d,418.895097,25.188972,Key generation
+MobileNetV2,sub_model_96_20e68a2d,419.928946,25.188972,Key generation
+MobileNetV2,sub_model_96_20e68a2d,420.962303,25.592270,Key generation
+MobileNetV2,sub_model_96_20e68a2d,421.995364,25.688976,Key generation
+MobileNetV2,sub_model_96_20e68a2d,423.030006,25.438976,Key generation
+MobileNetV2,sub_model_96_20e68a2d,424.062653,26.068665,Key generation
+MobileNetV2,sub_model_96_20e68a2d,425.095165,26.188976,Key generation
+MobileNetV2,sub_model_96_20e68a2d,426.127771,26.188976,Key generation
+MobileNetV2,sub_model_96_20e68a2d,427.160382,26.514828,Key generation
+MobileNetV2,sub_model_96_20e68a2d,428.193046,26.688980,Key generation
+MobileNetV2,sub_model_96_20e68a2d,429.226445,26.575470,Key generation
+MobileNetV2,sub_model_96_20e68a2d,430.258808,26.558968,Proving
+MobileNetV2,sub_model_96_20e68a2d,431.291645,26.715916,Proving
+MobileNetV2,sub_model_96_20e68a2d,432.325016,28.050003,Proving
+MobileNetV2,sub_model_96_20e68a2d,433.357873,29.459442,Proving
+MobileNetV2,sub_model_96_20e68a2d,434.390025,30.746929,Proving
+MobileNetV2,sub_model_96_20e68a2d,435.422265,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,436.463254,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,437.504475,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,438.544376,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,439.584548,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,440.626554,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,441.667095,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,442.709267,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,443.748855,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,444.790595,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,445.831129,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,446.872325,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,447.913970,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,448.954911,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,449.995305,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,451.035854,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,452.075550,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,453.115826,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,454.156791,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,455.196903,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,456.236183,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,457.277495,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,458.319431,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,459.359953,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,460.399793,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,461.440707,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,462.481366,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,463.522655,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,464.562855,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,465.605801,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,466.647435,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,467.687611,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,468.728948,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,469.769130,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,470.809906,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,471.850457,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,472.891285,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,473.931930,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,474.973843,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,476.013592,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,477.053650,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,478.095245,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,479.144318,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,480.181430,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,481.222755,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,482.263237,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,483.298777,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,484.339330,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,485.379422,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,486.420264,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,487.460269,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,488.499616,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,489.547271,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,490.590090,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,491.630868,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,492.668959,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,493.710584,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,494.752347,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,495.793153,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,496.837388,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,497.881282,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,498.923389,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,499.963900,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,501.005916,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,502.046611,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,503.088787,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,504.129651,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,505.170347,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,506.210754,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,507.250701,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,508.293788,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,509.334756,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,510.375241,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,511.416510,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,512.454825,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,513.493785,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,514.532635,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,515.573368,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,516.613292,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,517.651809,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,518.688950,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,519.726221,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,520.764435,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,521.802615,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,522.841560,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,523.880515,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,524.918829,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,525.957067,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,526.997773,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,528.036538,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,529.075541,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,530.114379,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,531.153827,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,532.190785,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,533.229667,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,534.265935,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,535.305248,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,536.344114,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,537.383522,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,538.422425,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,539.460788,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,540.501133,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,541.539945,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,542.579224,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,543.618202,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,544.659346,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,545.700595,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,546.741989,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,547.782342,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,548.823519,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,549.864706,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,550.904083,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,551.946136,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,552.985139,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,554.024320,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,555.064566,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,556.104571,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,557.140916,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,558.179949,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,559.218563,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,560.256904,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,561.295906,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,562.334497,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,563.373268,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,564.412083,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,565.450892,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,566.489113,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,567.527766,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,568.567195,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,569.606310,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,570.646657,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,571.685088,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,572.724122,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,573.762465,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,574.800890,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,575.839958,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,576.878347,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,577.917675,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,578.957321,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,579.997223,31.565884,Proving
+MobileNetV2,sub_model_96_20e68a2d,581.036358,32.402794,Proving
+MobileNetV2,sub_model_96_20e68a2d,582.067923,33.306126,Proving
+MobileNetV2,sub_model_96_20e68a2d,583.099271,33.353638,Proving
+MobileNetV2,sub_model_96_20e68a2d,584.131811,33.134361,Proving
+MobileNetV2,sub_model_96_20e68a2d,585.163162,29.949783,Proving
+MobileNetV2,sub_model_96_20e68a2d,586.207425,29.820351,Proving
+MobileNetV2,sub_model_96_20e68a2d,587.239595,29.949783,Proving
+MobileNetV2,sub_model_96_20e68a2d,588.282841,29.708752,Proving
+MobileNetV2,sub_model_96_20e68a2d,589.314240,28.601173,Proving
+MobileNetV2,sub_model_96_20e68a2d,590.345799,28.680546,Proving
+MobileNetV2,sub_model_96_20e68a2d,591.377767,28.949890,Proving
+MobileNetV2,sub_model_96_20e68a2d,592.420829,28.824890,Proving
+MobileNetV2,sub_model_96_20e68a2d,593.452669,29.927452,Proving
+MobileNetV2,sub_model_96_20e68a2d,594.484387,29.949894,Proving
+MobileNetV2,sub_model_96_20e68a2d,595.516258,29.949894,Proving
+MobileNetV2,sub_model_96_20e68a2d,596.548416,30.076008,Proving
+MobileNetV2,sub_model_96_20e68a2d,597.580305,30.449898,Proving
+MobileNetV2,sub_model_96_20e68a2d,598.613863,30.355919,Proving
+MobileNetV2,sub_model_96_20e68a2d,599.647024,30.012394,Proving
+MobileNetV2,sub_model_96_20e68a2d,600.679788,30.199898,Proving
+MobileNetV2,sub_model_96_20e68a2d,601.731683,29.949894,Proving
+MobileNetV2,sub_model_96_20e68a2d,602.763345,30.276909,Proving
+MobileNetV2,sub_model_96_20e68a2d,603.794988,31.199902,Proving
+MobileNetV2,sub_model_96_20e68a2d,604.826552,31.199902,Proving
+MobileNetV2,sub_model_96_20e68a2d,605.858437,31.199902,Proving
+MobileNetV2,sub_model_96_20e68a2d,606.890317,31.650337,Proving
+MobileNetV2,sub_model_96_20e68a2d,607.921701,31.699905,Proving
+MobileNetV2,sub_model_96_20e68a2d,608.954452,31.022789,Proving
+MobileNetV2,sub_model_96_20e68a2d,609.985901,31.075253,Proving
+MobileNetV2,sub_model_96_20e68a2d,611.017779,31.449905,Proving
+MobileNetV2,sub_model_96_20e68a2d,612.105635,31.324905,Proving
+MobileNetV2,sub_model_96_20e68a2d,613.137573,32.449909,Proving
+MobileNetV2,sub_model_96_20e68a2d,614.169687,32.449909,Proving
+MobileNetV2,sub_model_96_20e68a2d,615.201450,32.821423,Proving
+MobileNetV2,sub_model_96_20e68a2d,616.232921,32.949913,Proving
+MobileNetV2,sub_model_96_20e68a2d,617.278745,32.329685,Proving
+MobileNetV2,sub_model_96_20e68a2d,618.328147,32.477039,Proving
+MobileNetV2,sub_model_96_20e68a2d,619.375807,32.449909,Proving
+MobileNetV2,sub_model_96_20e68a2d,620.407130,33.363022,Proving
+MobileNetV2,sub_model_96_20e68a2d,621.454902,33.699917,Proving
+MobileNetV2,sub_model_96_20e68a2d,622.501933,33.699917,Proving
+MobileNetV2,sub_model_96_20e68a2d,623.533400,34.100674,Proving
+MobileNetV2,sub_model_96_20e68a2d,624.564801,34.199921,Proving
+MobileNetV2,sub_model_96_20e68a2d,625.598327,33.539227,Proving
+MobileNetV2,sub_model_96_20e68a2d,626.632793,33.699917,Proving
+MobileNetV2,sub_model_96_20e68a2d,627.680781,33.574917,Proving
+MobileNetV2,sub_model_96_20e68a2d,628.713951,33.556557,Proving
+MobileNetV2,sub_model_96_20e68a2d,629.746706,33.449913,Proving
+MobileNetV2,sub_model_96_20e68a2d,630.779245,33.449913,Proving
+MobileNetV2,sub_model_96_20e68a2d,631.811649,33.449913,Proving
+MobileNetV2,sub_model_96_20e68a2d,632.844553,33.449913,Proving
+MobileNetV2,sub_model_96_20e68a2d,633.878891,33.533073,Proving
+MobileNetV2,sub_model_96_20e68a2d,634.912226,34.449917,Proving
+MobileNetV2,sub_model_96_20e68a2d,635.945352,34.449917,Proving
+MobileNetV2,sub_model_96_20e68a2d,636.977844,34.449917,Proving
+MobileNetV2,sub_model_96_20e68a2d,638.012782,34.949921,Proving
+MobileNetV2,sub_model_96_20e68a2d,639.055057,34.949921,Proving
+MobileNetV2,sub_model_96_20e68a2d,640.087860,35.266014,Proving
+MobileNetV2,sub_model_96_20e68a2d,641.120872,35.449921,Proving
+MobileNetV2,sub_model_96_20e68a2d,642.153361,35.449921,Proving
+MobileNetV2,sub_model_96_20e68a2d,643.187311,35.550205,Proving
+MobileNetV2,sub_model_96_20e68a2d,644.220614,35.949924,Proving
+MobileNetV2,sub_model_96_20e68a2d,645.253597,35.727955,Proving
+MobileNetV2,sub_model_96_20e68a2d,646.286325,36.449924,Proving
+MobileNetV2,sub_model_96_20e68a2d,647.318934,36.449924,Proving
+MobileNetV2,sub_model_96_20e68a2d,648.352815,36.449924,Proving
+MobileNetV2,sub_model_96_20e68a2d,649.385702,36.949928,Proving
+MobileNetV2,sub_model_96_20e68a2d,650.423472,36.949928,Proving
+MobileNetV2,sub_model_96_20e68a2d,651.456042,37.196438,Proving
+MobileNetV2,sub_model_96_20e68a2d,652.489929,37.449928,Proving
+MobileNetV2,sub_model_96_20e68a2d,653.521582,37.449928,Proving
+MobileNetV2,sub_model_96_20e68a2d,654.553092,37.486908,Proving
+MobileNetV2,sub_model_96_20e68a2d,655.587603,37.949932,Proving
+MobileNetV2,sub_model_96_20e68a2d,656.621869,37.949932,Proving
+MobileNetV2,sub_model_96_20e68a2d,657.653699,38.449932,Proving
+MobileNetV2,sub_model_96_20e68a2d,658.686552,38.449932,Proving
+MobileNetV2,sub_model_96_20e68a2d,659.718338,38.449932,Proving
+MobileNetV2,sub_model_96_20e68a2d,660.750282,38.949936,Proving
+MobileNetV2,sub_model_96_20e68a2d,661.780764,38.949936,Proving
+MobileNetV2,sub_model_96_20e68a2d,662.829231,39.449936,Proving
+MobileNetV2,sub_model_96_20e68a2d,663.878246,39.449936,Proving
+MobileNetV2,sub_model_96_20e68a2d,664.924677,39.449936,Proving
+MobileNetV2,sub_model_96_20e68a2d,665.971393,39.741997,Proving
+MobileNetV2,sub_model_96_20e68a2d,667.019545,39.949940,Proving
+MobileNetV2,sub_model_96_20e68a2d,668.051409,39.739491,Proving
+MobileNetV2,sub_model_96_20e68a2d,669.088018,40.449940,Proving
+MobileNetV2,sub_model_96_20e68a2d,670.138240,40.449940,Proving
+MobileNetV2,sub_model_96_20e68a2d,671.187494,40.949944,Proving
+MobileNetV2,sub_model_96_20e68a2d,672.230523,40.949944,Proving
+MobileNetV2,sub_model_96_20e68a2d,673.278787,41.449944,Proving
+MobileNetV2,sub_model_96_20e68a2d,674.366785,41.449944,Proving
+MobileNetV2,sub_model_96_20e68a2d,675.444975,35.527691,Proving
+MobileNetV2,sub_model_96_20e68a2d,676.476355,34.450039,Proving
+MobileNetV2,sub_model_96_20e68a2d,677.507868,34.549702,Proving
+MobileNetV2,sub_model_96_20e68a2d,678.539913,34.950043,Proving
+MobileNetV2,sub_model_96_20e68a2d,679.588774,34.513771,Proving
+MobileNetV2,sub_model_96_20e68a2d,680.623900,34.450050,Proving
+MobileNetV2,sub_model_96_20e68a2d,681.673796,34.450050,Proving
+MobileNetV2,sub_model_96_20e68a2d,682.743914,34.439556,Proving
+MobileNetV2,sub_model_96_20e68a2d,683.777604,34.450050,Proving
+MobileNetV2,sub_model_96_20e68a2d,684.809925,34.077396,Proving
+MobileNetV2,sub_model_96_20e68a2d,685.842606,33.008354,Proving
+MobileNetV2,sub_model_96_20e68a2d,686.874343,35.465328,Proving
+MobileNetV2,sub_model_96_20e68a2d,687.908591,31.004723,Proving
+MobileNetV2,sub_model_96_20e68a2d,688.942790,30.200031,Proving
+MobileNetV2,sub_model_96_20e68a2d,690.029494,35.611347,Proving
+MobileNetV2,sub_model_96_20e68a2d,691.062823,30.121273,Proving
+MobileNetV2,sub_model_96_20e68a2d,692.096780,30.200024,Proving
+MobileNetV2,sub_model_96_20e68a2d,693.173166,27.228020,Proving

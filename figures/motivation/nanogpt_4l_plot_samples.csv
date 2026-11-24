@@ -1,0 +1,61 @@
+model,job_id,elapsed_s,memory_gib,stage
+NanoGPT (4L),sub_model_149_207a7887,0.000168,0.130150,Preparation
+NanoGPT (4L),sub_model_149_207a7887,1.028884,0.173378,Preparation
+NanoGPT (4L),sub_model_149_207a7887,2.068723,0.206703,Preparation
+NanoGPT (4L),sub_model_149_207a7887,3.105863,0.232288,Preparation
+NanoGPT (4L),sub_model_149_207a7887,4.141706,0.258476,Preparation
+NanoGPT (4L),sub_model_149_207a7887,5.183513,0.289097,Preparation
+NanoGPT (4L),sub_model_149_207a7887,6.218912,0.313553,Preparation
+NanoGPT (4L),sub_model_149_207a7887,7.255607,0.337841,Preparation
+NanoGPT (4L),sub_model_149_207a7887,8.292999,0.361855,Preparation
+NanoGPT (4L),sub_model_149_207a7887,9.335796,0.387203,Preparation
+NanoGPT (4L),sub_model_149_207a7887,10.372251,0.405106,Preparation
+NanoGPT (4L),sub_model_149_207a7887,11.406445,0.441895,Preparation
+NanoGPT (4L),sub_model_149_207a7887,12.448031,0.489017,Key generation
+NanoGPT (4L),sub_model_149_207a7887,13.481690,0.489323,Key generation
+NanoGPT (4L),sub_model_149_207a7887,14.521278,0.489323,Key generation
+NanoGPT (4L),sub_model_149_207a7887,15.561284,0.491619,Key generation
+NanoGPT (4L),sub_model_149_207a7887,16.600969,0.602474,Key generation
+NanoGPT (4L),sub_model_149_207a7887,17.634232,0.532433,Key generation
+NanoGPT (4L),sub_model_149_207a7887,18.671260,0.491299,Key generation
+NanoGPT (4L),sub_model_149_207a7887,19.710416,0.491299,Key generation
+NanoGPT (4L),sub_model_149_207a7887,20.749650,0.491299,Key generation
+NanoGPT (4L),sub_model_149_207a7887,21.788969,0.491299,Key generation
+NanoGPT (4L),sub_model_149_207a7887,22.827594,0.766182,Key generation
+NanoGPT (4L),sub_model_149_207a7887,23.859765,0.992764,Key generation
+NanoGPT (4L),sub_model_149_207a7887,24.900435,1.211525,Key generation
+NanoGPT (4L),sub_model_149_207a7887,25.932933,1.430290,Key generation
+NanoGPT (4L),sub_model_149_207a7887,26.965305,1.649052,Key generation
+NanoGPT (4L),sub_model_149_207a7887,27.997739,1.896587,Key generation
+NanoGPT (4L),sub_model_149_207a7887,29.030453,2.358490,Key generation
+NanoGPT (4L),sub_model_149_207a7887,30.066045,3.073090,Key generation
+NanoGPT (4L),sub_model_149_207a7887,31.098682,3.173595,Proving
+NanoGPT (4L),sub_model_149_207a7887,32.131193,3.353294,Proving
+NanoGPT (4L),sub_model_149_207a7887,33.167149,3.353294,Proving
+NanoGPT (4L),sub_model_149_207a7887,34.208110,3.353294,Proving
+NanoGPT (4L),sub_model_149_207a7887,35.248452,3.353294,Proving
+NanoGPT (4L),sub_model_149_207a7887,36.289435,3.439850,Proving
+NanoGPT (4L),sub_model_149_207a7887,37.328324,3.439972,Proving
+NanoGPT (4L),sub_model_149_207a7887,38.363999,3.647984,Proving
+NanoGPT (4L),sub_model_149_207a7887,39.396307,3.705620,Proving
+NanoGPT (4L),sub_model_149_207a7887,40.429615,3.705620,Proving
+NanoGPT (4L),sub_model_149_207a7887,41.462404,3.768124,Proving
+NanoGPT (4L),sub_model_149_207a7887,42.494443,3.986889,Proving
+NanoGPT (4L),sub_model_149_207a7887,43.527327,4.205650,Proving
+NanoGPT (4L),sub_model_149_207a7887,44.559289,4.364052,Proving
+NanoGPT (4L),sub_model_149_207a7887,45.591270,4.429012,Proving
+NanoGPT (4L),sub_model_149_207a7887,46.624447,4.486576,Proving
+NanoGPT (4L),sub_model_149_207a7887,47.656709,4.665672,Proving
+NanoGPT (4L),sub_model_149_207a7887,48.689122,4.817112,Proving
+NanoGPT (4L),sub_model_149_207a7887,49.721423,4.991306,Proving
+NanoGPT (4L),sub_model_149_207a7887,50.753613,5.127666,Proving
+NanoGPT (4L),sub_model_149_207a7887,51.785923,5.303158,Proving
+NanoGPT (4L),sub_model_149_207a7887,52.818842,5.506886,Proving
+NanoGPT (4L),sub_model_149_207a7887,53.851342,5.653397,Proving
+NanoGPT (4L),sub_model_149_207a7887,54.884207,5.598385,Proving
+NanoGPT (4L),sub_model_149_207a7887,55.916614,5.660889,Proving
+NanoGPT (4L),sub_model_149_207a7887,56.948837,5.598385,Proving
+NanoGPT (4L),sub_model_149_207a7887,57.982695,5.699955,Proving
+NanoGPT (4L),sub_model_149_207a7887,59.021605,5.637451,Proving
+NanoGPT (4L),sub_model_149_207a7887,60.053751,4.512432,Proving
+NanoGPT (4L),sub_model_149_207a7887,61.088045,3.885284,Proving

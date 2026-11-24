@@ -1,0 +1,4 @@
+model,job_id,peak_memory_gib,total_duration_s,preparation_duration_s,key_generation_duration_s,proving_duration_s,raw_sample_count,plot_sample_count
+TinyBERT,sub_model_4_c6bf7913,51.605892,867.671036,529.840752,146.152244,191.678040,834,834
+MobileNetV2,sub_model_96_20e68a2d,41.449944,693.681012,48.161030,381.648842,263.871140,668,668
+NanoGPT (4L),sub_model_149_207a7887,5.699955,61.238359,12.324220,18.571240,30.342898,60,60

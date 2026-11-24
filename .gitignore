@@ -9,14 +9,7 @@ tmp
 logs
 _ezkl_tmp
 srs
-_ezkl_model_stats_tmp
-_tmp
-ezkl_settings_report.csv
-experiments/results
 onnx_graphs
-results
-figures
-transfer_only
 e2e_runs
 _backup
 experiments/microbench_outputs

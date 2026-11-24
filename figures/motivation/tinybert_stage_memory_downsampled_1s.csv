@@ -1,0 +1,835 @@
+model,job_id,elapsed_s,memory_gib,stage,sampling
+TinyBERT,sub_model_4_c6bf7913,0.000000,0.151695,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,1.000000,0.769821,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,2.000000,1.564987,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,3.000000,2.059971,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,4.000000,2.458065,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,5.000000,3.457027,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,6.000000,3.698643,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,7.000000,4.668015,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,8.000000,5.330776,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,9.000000,2.430473,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,10.000000,0.433464,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,11.000000,0.663532,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,12.000000,1.421654,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,13.000000,1.785172,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,14.000000,3.091812,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,15.000000,3.352734,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,16.000000,3.754101,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,17.000000,4.507523,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,18.000000,5.968357,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,19.000000,2.287907,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,20.000000,0.803089,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,21.000000,1.705437,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,22.000000,2.173637,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,23.000000,2.606041,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,24.000000,3.360344,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,25.000000,3.761711,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,26.000000,4.603802,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,27.000000,6.064838,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,29.000000,2.386539,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,30.000000,1.117252,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,31.000000,1.829605,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,32.000000,2.519482,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,33.000000,2.644054,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,34.000000,3.625244,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,35.000000,4.219006,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,36.000000,5.245495,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,37.000000,5.639912,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,38.000000,3.038517,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,39.000000,0.790363,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,40.000000,1.277248,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,41.000000,1.675369,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,42.000000,2.935848,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,43.000000,3.328960,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,44.000000,3.785118,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,45.000000,4.350773,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,46.000000,5.803341,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,47.000000,2.129398,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,48.000000,0.650288,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,49.000000,1.679367,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,50.000000,2.031765,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,51.000000,2.548981,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,52.000000,3.385307,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,54.000000,3.785118,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,55.000000,4.409309,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,56.000000,5.861935,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,57.000000,2.174702,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,58.000000,0.925655,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,59.000000,1.852768,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,60.000000,2.318558,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,61.000000,2.751301,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,62.000000,3.755436,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,63.000000,4.008232,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,64.000000,5.000305,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,65.000000,5.571930,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,66.000000,2.804245,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,67.000000,0.773094,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,68.000000,0.983898,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,69.000000,1.375271,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,70.000000,2.619698,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,71.000000,3.185318,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,72.000000,4.004917,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,73.000000,4.716515,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,74.000000,5.839161,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,75.000000,3.760334,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,76.000000,1.006924,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,77.000000,1.330742,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,78.000000,1.716797,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,80.000000,2.973717,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,81.000000,3.210880,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,82.000000,4.042740,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,83.000000,4.766872,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,84.000000,5.491608,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,85.000000,3.313221,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,86.000000,0.618294,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,87.000000,1.655388,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,88.000000,2.012310,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,89.000000,3.326393,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,90.000000,3.508911,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,91.000000,3.910278,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,92.000000,4.680756,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,93.000000,6.146057,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,94.000000,2.493484,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,95.000000,0.561001,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,96.000000,1.287849,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,97.000000,1.115398,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,98.000000,2.813026,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,99.000000,2.941803,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,100.000000,3.792564,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,101.000000,4.498032,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,102.000000,5.609093,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,103.000000,5.093639,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,105.000000,2.066387,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,106.000000,1.133804,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,107.000000,1.532036,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,108.000000,2.799736,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,109.000000,3.047283,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,110.000000,3.878899,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,111.000000,4.614174,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,112.000000,5.747410,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,113.000000,4.199802,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,114.000000,1.422955,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,115.000000,1.517132,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,116.000000,1.887989,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,117.000000,3.197666,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,118.000000,3.579239,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,119.000000,3.918106,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,120.000000,4.613823,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,121.000000,6.084637,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,122.000000,2.432041,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,123.000000,0.527462,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,124.000000,1.205009,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,125.000000,1.029991,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,126.000000,2.734634,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,127.000000,2.863518,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,128.000000,3.724400,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,129.000000,4.450020,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,131.000000,5.552757,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,132.000000,5.485878,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,133.000000,2.513165,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,134.000000,1.078655,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,135.000000,1.481754,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,136.000000,2.752949,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,137.000000,3.000946,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,138.000000,3.862019,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,139.000000,4.597530,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,140.000000,5.728130,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,141.000000,4.461639,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,142.000000,1.664814,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,143.000000,1.471859,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,144.000000,1.873062,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,145.000000,3.147827,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,146.000000,3.529449,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,147.000000,3.923481,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,148.000000,4.551956,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,149.000000,6.021137,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,150.000000,2.360443,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,151.000000,0.522621,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,152.000000,1.169338,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,153.000000,1.257664,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,154.000000,2.676071,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,155.000000,2.796635,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,157.000000,3.667618,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,158.000000,4.395279,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,159.000000,5.492611,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,160.000000,5.830711,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,161.000000,3.025055,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,162.000000,1.120869,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,163.000000,1.395767,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,164.000000,2.671814,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,165.000000,2.920750,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,166.000000,3.793438,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,167.000000,4.527851,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,168.000000,5.650230,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,169.000000,5.003635,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,170.000000,2.087368,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,171.000000,1.403477,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,172.000000,1.803890,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,173.000000,3.072639,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,174.000000,3.473312,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,175.000000,3.939087,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,176.000000,4.486210,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,177.000000,5.956341,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,178.000000,2.330902,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,179.000000,0.534595,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,180.000000,1.213490,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,182.000000,1.767239,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,183.000000,2.610569,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,184.000000,2.708561,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,185.000000,3.558136,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,186.000000,4.230907,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,187.000000,5.195816,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,188.000000,5.496090,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,189.000000,2.762329,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,190.000000,1.224579,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,191.000000,1.776928,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,192.000000,2.638702,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,193.000000,2.697800,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,194.000000,3.558136,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,195.000000,3.992981,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,196.000000,4.939999,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,197.000000,5.854195,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,198.000000,2.528877,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,199.000000,1.245457,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,200.000000,1.893364,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,201.000000,2.633694,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,202.000000,2.734550,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,203.000000,3.674572,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,204.000000,4.272015,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,205.000000,5.225811,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,206.000000,5.612526,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,208.000000,2.837429,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,209.000000,0.812878,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,210.000000,1.279537,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,211.000000,1.364700,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,212.000000,2.657631,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,213.000000,3.276386,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,214.000000,4.012653,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,215.000000,4.830376,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,216.000000,5.541153,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,217.000000,3.237259,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,218.000000,0.674896,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,219.000000,1.471260,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,220.000000,1.779636,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,221.000000,3.075890,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,222.000000,3.327156,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,223.000000,3.828865,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,224.000000,4.364021,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,225.000000,5.699997,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,226.000000,2.324009,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,227.000000,0.824993,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,228.000000,1.887119,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,229.000000,2.245506,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,230.000000,2.744438,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,231.000000,3.789825,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,232.000000,4.057514,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,234.000000,5.061062,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,235.000000,5.615677,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,236.000000,2.881237,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,237.000000,0.758324,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,238.000000,1.104588,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,239.000000,1.507946,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,240.000000,2.803230,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,241.000000,3.330276,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,242.000000,3.831985,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,243.000000,4.680332,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,244.000000,5.649769,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,245.000000,2.705536,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,246.000000,0.653431,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,247.000000,1.590778,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,248.000000,1.951595,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,249.000000,3.276455,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,250.000000,3.363724,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,251.000000,3.831985,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,252.000000,4.392529,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,253.000000,5.852535,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,254.000000,2.185795,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,255.000000,0.964428,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,256.000000,1.899635,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,257.000000,2.375950,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,258.000000,2.826603,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,260.000000,3.680843,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,261.000000,4.125973,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,262.000000,5.140182,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,263.000000,5.618797,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,264.000000,2.961937,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,265.000000,0.685501,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,266.000000,1.153580,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,267.000000,1.549526,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,268.000000,2.801815,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,269.000000,3.333923,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,270.000000,3.837418,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,271.000000,4.833740,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,272.000000,5.634487,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,273.000000,2.867401,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,274.000000,0.746666,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,275.000000,1.550785,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,276.000000,1.912163,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,277.000000,3.224991,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,278.000000,3.375015,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,279.000000,3.837418,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,280.000000,4.372574,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,281.000000,5.796577,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,282.000000,2.140316,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,283.000000,0.900665,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,285.000000,1.905067,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,286.000000,2.272514,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,287.000000,2.725880,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,288.000000,3.728844,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,289.000000,4.000538,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,290.000000,4.997051,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,291.000000,5.624229,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,292.000000,2.836693,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,293.000000,0.864334,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,294.000000,1.055195,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,295.000000,1.458302,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,296.000000,2.723415,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,297.000000,3.300854,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,298.000000,3.963291,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,299.000000,4.855946,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,300.000000,5.577339,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,301.000000,3.169636,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,302.000000,0.695587,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,303.000000,1.493454,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,304.000000,1.854103,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,305.000000,3.158497,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,306.000000,3.347874,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,307.000000,3.843689,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,308.000000,4.378841,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,309.000000,5.712605,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,311.000000,2.410290,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,312.000000,0.822617,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,313.000000,1.883106,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,314.000000,2.234737,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,315.000000,2.694645,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,316.000000,3.674129,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,317.000000,3.960125,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,318.000000,4.920341,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,319.000000,6.185844,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,320.000000,2.745453,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,321.000000,0.667797,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,322.000000,1.402458,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,323.000000,1.228924,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,324.000000,2.923023,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,325.000000,3.061321,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,326.000000,3.902409,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,327.000000,4.625145,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,328.000000,5.742935,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,329.000000,4.651352,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,330.000000,1.778652,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,331.000000,1.245167,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,332.000000,1.632748,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,333.000000,2.894562,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,334.000000,3.140102,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,336.000000,3.984936,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,337.000000,4.717468,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,338.000000,5.852211,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,339.000000,3.948082,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,340.000000,1.188622,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,341.000000,1.616657,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,342.000000,1.981705,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,343.000000,3.296284,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,344.000000,3.563847,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,345.000000,3.965214,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,346.000000,4.704468,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,347.000000,6.174885,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,348.000000,2.512726,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,349.000000,0.622932,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,350.000000,1.335304,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,351.000000,1.160183,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,352.000000,2.850452,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,353.000000,2.958954,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,354.000000,3.816109,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,355.000000,4.534058,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,356.000000,5.641594,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,357.000000,5.263763,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,358.000000,2.336502,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,359.000000,1.087009,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,361.000000,1.481071,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,362.000000,2.776085,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,363.000000,3.069141,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,364.000000,3.923336,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,365.000000,4.639534,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,366.000000,5.763363,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,367.000000,4.504890,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,368.000000,1.784115,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,369.000000,1.511795,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,370.000000,1.914368,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,371.000000,3.213051,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,372.000000,3.610390,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,373.000000,3.968788,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,374.000000,4.663841,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,375.000000,6.132927,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,376.000000,2.489857,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,377.000000,0.571571,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,378.000000,1.283089,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,379.000000,1.107185,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,380.000000,2.817726,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,381.000000,2.991405,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,382.000000,3.847733,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,383.000000,4.575127,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,384.000000,5.687012,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,385.000000,4.999302,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,387.000000,2.005894,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,388.000000,1.212578,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,389.000000,1.618523,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,390.000000,2.902443,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,391.000000,3.174686,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,392.000000,4.026264,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,393.000000,4.763981,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,394.000000,5.899437,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,395.000000,3.790092,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,396.000000,0.978550,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,397.000000,1.662369,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,398.000000,2.026585,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,399.000000,3.365063,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,400.000000,3.570381,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,401.000000,3.971748,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,402.000000,4.809647,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,403.000000,6.278133,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,404.000000,2.636375,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,405.000000,0.677963,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,406.000000,1.444790,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,407.000000,1.275898,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,408.000000,2.631851,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,409.000000,3.155293,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,410.000000,3.998653,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,412.000000,4.725174,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,413.000000,5.851337,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,414.000000,4.022194,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,415.000000,1.386475,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,416.000000,1.349251,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,417.000000,1.751793,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,418.000000,3.016167,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,419.000000,3.282925,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,420.000000,4.093510,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,421.000000,4.863941,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,422.000000,5.597382,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,423.000000,3.097412,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,424.000000,0.721252,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,425.000000,1.779964,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,426.000000,2.142860,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,427.000000,3.216293,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,428.000000,3.615440,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,429.000000,3.973423,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,430.000000,4.880939,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,431.000000,6.354839,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,432.000000,2.698818,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,433.000000,0.728817,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,434.000000,1.490383,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,435.000000,1.326786,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,437.000000,2.595543,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,438.000000,3.168861,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,439.000000,4.013870,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,440.000000,4.740231,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,441.000000,5.863731,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,442.000000,3.951023,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,443.000000,1.162380,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,444.000000,1.381741,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,445.000000,1.781845,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,446.000000,3.045769,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,447.000000,3.302654,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,448.000000,4.006210,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,449.000000,4.877720,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,450.000000,5.604210,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,451.000000,3.060898,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,452.000000,0.733994,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,453.000000,1.799191,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,454.000000,2.162861,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,455.000000,3.090393,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,456.000000,3.633461,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,457.000000,3.975967,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,458.000000,4.889530,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,459.000000,6.374065,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,460.000000,2.719604,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,461.000000,0.729839,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,463.000000,1.511444,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,464.000000,1.346012,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,465.000000,2.611267,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,466.000000,3.181709,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,467.000000,4.023361,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,468.000000,4.752811,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,469.000000,5.883125,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,470.000000,3.885513,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,471.000000,1.083275,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,472.000000,1.402351,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,473.000000,1.801548,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,474.000000,3.061405,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,475.000000,3.327221,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,476.000000,3.862381,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,477.000000,4.915462,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,478.000000,5.642109,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,479.000000,2.883911,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,480.000000,0.772015,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,481.000000,1.838604,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,482.000000,2.204571,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,483.000000,2.750492,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,484.000000,3.682644,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,485.000000,3.978817,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,486.000000,4.950481,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,488.000000,6.062656,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,489.000000,2.795166,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,490.000000,0.808666,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,491.000000,1.447659,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,492.000000,1.381458,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,493.000000,2.669739,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,494.000000,3.272827,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,495.000000,4.093597,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,496.000000,4.796307,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,497.000000,5.878006,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,498.000000,4.290390,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,499.000000,1.300007,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,500.000000,1.366924,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,501.000000,1.769318,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,502.000000,3.075249,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,503.000000,3.357883,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,504.000000,3.866222,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,505.000000,4.714569,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,506.000000,5.708088,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,507.000000,2.471886,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,508.000000,0.829903,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,509.000000,1.892574,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,510.000000,2.256847,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,511.000000,2.736977,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,513.000000,3.749802,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,514.000000,4.019341,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,515.000000,5.008572,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,516.000000,5.698486,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,517.000000,2.843494,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,518.000000,0.611923,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,519.000000,0.551754,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,520.000000,1.000305,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,521.000000,1.705235,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,522.000000,2.401482,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,523.000000,2.562237,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,524.000000,3.487541,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,525.000000,3.928501,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,526.000000,4.933372,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,527.000000,5.425495,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,528.000000,2.749653,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,529.000000,0.555401,Preparation,1s max
+TinyBERT,sub_model_4_c6bf7913,530.000000,1.701931,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,531.000000,3.363777,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,532.000000,4.481632,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,533.000000,4.920414,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,534.000000,5.433384,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,535.000000,6.309410,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,536.000000,6.754387,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,537.000000,7.808140,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,539.000000,7.918129,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,540.000000,8.360786,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,541.000000,8.530514,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,542.000000,8.427715,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,543.000000,8.932106,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,544.000000,5.190262,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,545.000000,5.266026,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,546.000000,5.552010,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,547.000000,6.273167,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,548.000000,6.471039,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,549.000000,7.586353,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,550.000000,8.049278,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,551.000000,9.012611,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,552.000000,9.076302,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,553.000000,9.276203,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,554.000000,9.382023,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,555.000000,9.700897,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,556.000000,9.985664,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,557.000000,10.664394,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,558.000000,6.721992,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,559.000000,4.721203,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,560.000000,3.961842,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,561.000000,5.488708,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,562.000000,6.888020,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,564.000000,6.888020,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,565.000000,6.888020,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,566.000000,6.888020,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,567.000000,6.797440,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,568.000000,6.888020,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,569.000000,6.888020,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,570.000000,2.312641,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,571.000000,1.385735,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,572.000000,3.123928,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,573.000000,4.002842,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,574.000000,4.467972,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,575.000000,5.830482,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,576.000000,6.219959,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,577.000000,6.958714,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,578.000000,7.416210,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,579.000000,7.918041,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,580.000000,7.939690,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,581.000000,8.008530,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,582.000000,8.409309,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,583.000000,9.333435,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,584.000000,5.736908,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,585.000000,5.290211,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,587.000000,5.526516,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,588.000000,5.881783,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,589.000000,6.806091,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,590.000000,7.428749,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,591.000000,8.314915,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,592.000000,8.724522,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,593.000000,9.666512,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,594.000000,9.252129,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,595.000000,9.891464,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,596.000000,10.508820,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,597.000000,10.048641,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,598.000000,10.325146,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,599.000000,6.421562,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,600.000000,5.313049,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,601.000000,3.669212,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,602.000000,4.263062,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,603.000000,4.513069,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,604.000000,4.646172,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,605.000000,4.950584,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,606.000000,5.786522,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,607.000000,6.013088,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,608.000000,6.174263,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,609.000000,6.513092,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,610.000000,6.513092,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,611.000000,7.013092,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,613.000000,7.013092,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,614.000000,7.513096,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,615.000000,7.513096,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,616.000000,8.013096,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,617.000000,8.013096,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,618.000000,8.358170,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,619.000000,8.513100,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,620.000000,8.306442,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,621.000000,9.013100,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,622.000000,9.013100,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,623.000000,9.513107,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,624.000000,9.513107,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,625.000000,10.013107,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,626.000000,10.013107,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,627.000000,10.492710,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,628.000000,10.513115,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,629.000000,10.721458,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,630.000000,11.013115,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,631.000000,11.149464,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,632.000000,11.513119,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,633.000000,11.513119,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,634.000000,12.013119,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,635.000000,12.013119,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,636.000000,12.513134,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,637.000000,12.513134,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,639.000000,13.013134,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,640.000000,13.013134,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,641.000000,13.378468,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,642.000000,13.513138,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,643.000000,13.418655,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,644.000000,15.069988,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,645.000000,16.708084,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,646.000000,18.483696,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,647.000000,19.051861,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,648.000000,20.779446,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,649.000000,22.523216,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,650.000000,24.318233,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,651.000000,26.113079,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,652.000000,27.903656,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,653.000000,39.284828,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,654.000000,39.284828,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,655.000000,43.315590,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,656.000000,44.842884,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,657.000000,44.842899,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,658.000000,44.645115,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,659.000000,32.690098,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,660.000000,25.436405,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,661.000000,26.248901,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,662.000000,26.248901,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,664.000000,26.748905,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,665.000000,26.748905,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,666.000000,26.420708,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,667.000000,27.248905,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,668.000000,27.248905,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,669.000000,27.748909,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,670.000000,27.748909,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,671.000000,28.075863,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,672.000000,28.248909,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,673.000000,28.434780,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,674.000000,28.748913,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,675.000000,28.569351,Key generation,1s max
+TinyBERT,sub_model_4_c6bf7913,676.000000,28.500710,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,677.000000,29.567760,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,678.000000,31.427437,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,679.000000,32.847813,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,680.000000,32.754498,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,681.000000,34.553486,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,682.000000,34.799664,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,683.000000,35.361023,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,684.000000,35.803478,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,685.000000,36.695152,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,686.000000,36.528217,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,687.000000,37.163258,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,688.000000,37.814125,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,690.000000,37.685783,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,691.000000,37.149063,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,692.000000,33.743549,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,693.000000,34.394920,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,694.000000,34.377472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,695.000000,35.725876,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,696.000000,36.044472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,697.000000,36.586525,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,698.000000,37.145454,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,699.000000,37.818169,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,700.000000,37.865391,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,701.000000,38.857231,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,702.000000,38.644142,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,703.000000,38.759560,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,704.000000,39.502396,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,705.000000,37.220364,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,706.000000,34.184807,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,707.000000,33.186424,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,708.000000,33.549519,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,709.000000,30.889381,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,710.000000,30.889381,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,711.000000,29.956753,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,712.000000,30.178062,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,713.000000,30.207359,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,715.000000,30.215168,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,716.000000,30.410141,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,717.000000,30.312592,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,718.000000,30.553070,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,719.000000,30.562836,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,720.000000,30.582367,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,721.000000,30.564095,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,722.000000,30.660145,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,723.000000,30.918461,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,724.000000,31.100410,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,725.000000,31.918465,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,726.000000,31.918465,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,727.000000,32.418468,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,728.000000,32.418468,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,729.000000,31.810802,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,730.000000,31.918465,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,731.000000,33.043472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,732.000000,33.043472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,733.000000,33.445374,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,734.000000,33.543476,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,735.000000,33.074722,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,736.000000,33.043472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,737.000000,34.168480,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,738.000000,34.168480,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,739.000000,34.519630,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,740.000000,34.668484,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,742.000000,34.297813,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,743.000000,34.414341,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,744.000000,34.355988,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,745.000000,34.199635,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,746.000000,34.293484,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,747.000000,34.168480,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,748.000000,33.918472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,749.000000,33.855972,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,750.000000,33.793468,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,751.000000,33.793468,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,752.000000,33.850571,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,753.000000,34.793472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,754.000000,34.793472,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,755.000000,35.275318,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,756.000000,35.293476,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,757.000000,35.596489,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,758.000000,35.793476,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,759.000000,35.941772,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,760.000000,36.293480,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,761.000000,35.856068,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,762.000000,36.793480,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,763.000000,36.793480,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,764.000000,37.293484,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,765.000000,37.293484,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,766.000000,37.793484,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,767.000000,37.793484,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,768.000000,38.274036,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,769.000000,38.293488,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,770.000000,38.708958,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,772.000000,38.793488,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,773.000000,39.019100,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,774.000000,39.293491,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,775.000000,39.058403,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,776.000000,39.793491,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,777.000000,39.793491,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,778.000000,40.293495,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,779.000000,40.293495,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,780.000000,40.793495,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,781.000000,40.793495,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,782.000000,41.293499,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,783.000000,41.293499,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,784.000000,41.793499,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,785.000000,41.793499,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,786.000000,42.205250,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,787.000000,42.293503,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,788.000000,42.732243,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,789.000000,42.793503,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,790.000000,42.994579,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,791.000000,43.293507,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,792.000000,43.224190,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,793.000000,43.793507,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,794.000000,43.793507,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,795.000000,44.293510,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,797.000000,44.293510,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,798.000000,44.793510,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,799.000000,44.793510,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,800.000000,44.795143,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,801.000000,44.885445,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,802.000000,44.976994,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,803.000000,45.068546,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,804.000000,45.159943,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,805.000000,45.251350,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,806.000000,45.342766,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,807.000000,45.434208,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,808.000000,45.525681,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,809.000000,45.617107,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,810.000000,45.708546,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,811.000000,45.848045,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,812.000000,46.616135,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,813.000000,47.043518,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,814.000000,47.043518,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,815.000000,47.080074,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,816.000000,46.894543,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,817.000000,46.986099,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,818.000000,47.076580,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,819.000000,47.167103,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,820.000000,47.257645,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,822.000000,47.347893,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,823.000000,47.437786,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,824.000000,47.527809,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,825.000000,47.618504,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,826.000000,47.708389,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,827.000000,47.798332,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,828.000000,48.128292,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,829.000000,48.888294,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,830.000000,49.105877,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,831.000000,48.041096,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,832.000000,49.540039,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,833.000000,50.105877,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,834.000000,50.105877,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,835.000000,50.385818,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,836.000000,50.605881,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,837.000000,50.782516,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,838.000000,51.105888,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,839.000000,51.186905,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,840.000000,51.605892,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,841.000000,51.235943,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,842.000000,49.705788,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,843.000000,50.105885,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,844.000000,50.135670,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,845.000000,50.605888,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,846.000000,50.605888,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,848.000000,51.105888,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,849.000000,51.105888,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,850.000000,51.605892,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,851.000000,51.605892,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,852.000000,50.751842,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,853.000000,48.355877,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,854.000000,38.310406,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,855.000000,37.605896,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,856.000000,37.605896,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,857.000000,38.105900,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,858.000000,38.105900,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,859.000000,35.533039,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,860.000000,34.543533,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,861.000000,34.543533,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,862.000000,33.945473,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,863.000000,34.902412,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,864.000000,31.168591,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,865.000000,33.617386,Proving,1s max
+TinyBERT,sub_model_4_c6bf7913,866.000000,31.168583,Proving,1s max
