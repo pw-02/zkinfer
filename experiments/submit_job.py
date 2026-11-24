@@ -64,7 +64,7 @@ def wait_for_request(
         time.sleep(max(0.1, poll_interval_sec))
 
 
-@hydra.main(config_path="./config", config_name="config", version_base=None)
+@hydra.main(config_path="./config", config_name="runtime_experiment", version_base=None)
 def main(cfg: DictConfig) -> None:
     logger = setup_logger()
     target = f"{cfg.launch.coordinator_host}:{cfg.launch.coordinator_port}"
