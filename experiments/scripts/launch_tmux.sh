@@ -6,7 +6,8 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT_DIR"
 # The experiment YAML is the single user-facing configuration for this launcher.
 # Positional arguments and existing environment overrides remain supported.
-eval "$(python experiments/scripts/launcher_config.py)"
+LAUNCH_SETTINGS="$(python experiments/scripts/launcher_config.py)"
+eval "$LAUNCH_SETTINGS"
 WORKLOAD="${1:-$CFG_WORKLOAD}"
 COORDINATOR_HOST="${2:-$CFG_HOST}"
 COORDINATOR_PORT="${3:-$CFG_PORT}"
@@ -84,7 +85,7 @@ cd ${ROOT_DIR} && \
 source \$(conda info --base)/etc/profile.d/conda.sh && \
 conda activate ${CONDA_ENV} && \
 export PYTHONPATH=${ROOT_DIR}:\${PYTHONPATH:-} && \
-export ZKINFER_KEEP_PROOF_ARTIFACTS=${KEEP_PROOF_ARTIFACTS} && \\
+export ZKINFER_KEEP_PROOF_ARTIFACTS=${KEEP_PROOF_ARTIFACTS} && \
 export ZKINFER_PROFILING_MODE=${ZKINFER_PROFILING_MODE}"
 
 RUNTIME_CFG="\
@@ -153,7 +154,8 @@ tmux send-keys -t "$SESSION:submit" \
     +workload=${WORKLOAD} \
     launch.coordinator_host=${COORDINATOR_HOST} \
     launch.coordinator_port=${COORDINATOR_PORT} \
-    2>&1 | tee ${LOGS_DIR}/submit.tmux.log" C-m
+    2>&1 | tee ${LOGS_DIR}/submit.tmux.log; \
+    if [ \${PIPESTATUS[0]} -eq 0 ]; then python -m zkinfer.profiling.collect_reports ${RUN_DIR}; fi" C-m
 
 echo "Started tmux session: ${SESSION}"
 echo "Run directory: ${RUN_DIR}"
