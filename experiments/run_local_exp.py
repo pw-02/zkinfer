@@ -21,6 +21,8 @@ from pathlib import Path
 from typing import List, Optional
 
 import hydra
+import argparse
+import uuid
 from omegaconf import DictConfig, OmegaConf
 
 from zkinfer.client.api import ZKInferenceClient
@@ -160,6 +162,7 @@ def make_env(cfg: DictConfig) -> dict:
     env["ZKINFER_KEEP_PROOF_ARTIFACTS"] = (
         "true" if bool(cfg.output.keep_proof_artifacts) else "false"
     )
+    env["ZKINFER_PROFILING_MODE"] = str(cfg.profiling.mode)
     return env
 
 
@@ -171,9 +174,11 @@ def common_overrides(cfg: DictConfig) -> List[str]:
         f"coordinator.port={cfg.launch.coordinator_port}",
         f"coordinator.runs_dir={requests_dir}",
         f"coordinator.logs_dir={logs_dir}",
+        f"coordinator.state_db_path={Path(str(cfg.paths.runs_dir)) / 'coordinator_state.sqlite3'}",
         f"coordinator.scheduling_policy={cfg.coordinator.scheduling_policy}",
         f"node.runs_dir={requests_dir}",
         f"node.logs_dir={logs_dir}",
+        f"node.runtime_state_dir={cfg.node.get('runtime_state_dir', 'storage/node/runtime')}",
         f"node.local_cache.path={cfg.storage.local_cache.path}",
         f"node.local_cache.max_gb={cfg.storage.local_cache.max_gb}",
         f"storage.request_data.path={cfg.storage.request_data.path}",
@@ -366,13 +371,13 @@ def cleanup_request_store(
         )
 
 
-@hydra.main(config_path="./config", config_name="config", version_base=None)
-def main(cfg: DictConfig) -> None:
+def run(cfg: DictConfig) -> None:
     active_log = ActiveRunLog()
     logger = setup_logger(active_log)
     group = ProcessGroup(logger)
     env = make_env(cfg)
     submitted_request_ids: List[str] = []
+    successful = False
 
     try:
         group.add(
@@ -433,8 +438,9 @@ def main(cfg: DictConfig) -> None:
         if failures:
             for name, error in failures:
                 logger.warning("FAILED %s: %s", name, error)
-        else:
-            logger.info("All workloads completed")
+            raise RuntimeError("One or more workloads failed")
+        successful = True
+        logger.info("All workloads completed")
     finally:
         active_log.close()
         group.stop_all()
@@ -443,7 +449,42 @@ def main(cfg: DictConfig) -> None:
             int(cfg.launch.coordinator_port),
             10,
         )
-        cleanup_request_store(cfg, logger, submitted_request_ids)
+        if successful:
+            from zkinfer.profiling.collect_reports import collect
+            collect(Path(str(cfg.paths.runs_dir)))
+            cleanup_request_store(cfg, logger, submitted_request_ids)
+            root = Path(str(cfg.paths.runs_dir)).resolve() / "storage"
+            if not cfg.output.get("keep_cache", True) and (root / "cache").exists():
+                shutil.rmtree(root / "cache")
+            if (root / "runtime").exists():
+                shutil.rmtree(root / "runtime")
+        else:
+            logger.warning("Run failed or was interrupted; retaining diagnostic storage")
+
+
+@hydra.main(config_path="./config", config_name="runtime_experiment", version_base=None)
+def advanced_main(cfg: DictConfig) -> None:
+    run(cfg)
+
+
+def main():
+    # Preserve existing Hydra overrides for advanced scripts.
+    if any("=" in arg for arg in sys.argv[1:]):
+        advanced_main()
+        return
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default="experiments/config/config.yaml")
+    parser.add_argument("--workload")
+    args = parser.parse_args()
+    from experiments.scripts.launcher_config import load_config
+    run_dir = Path("experiments/runs") / (time.strftime("%Y-%m-%d_%H-%M-%S") + "_" + uuid.uuid4().hex[:8])
+    user, cfg = load_config(args.config, workload=args.workload, run_dir=run_dir)
+    run_dir.mkdir(parents=True, exist_ok=False)
+    (run_dir / "config").mkdir()
+    OmegaConf.save(user, run_dir / "config" / "experiment.yaml")
+    OmegaConf.save(cfg, run_dir / "config" / "effective.yaml", resolve=True)
+    print(f"Run directory: {run_dir}", flush=True)
+    run(cfg)
 
 
 if __name__ == "__main__":
