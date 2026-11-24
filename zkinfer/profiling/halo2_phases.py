@@ -69,6 +69,8 @@ def phase_rows(resource_path, transition_path):
 
     with open(transition_path, newline="", encoding="utf-8") as f:
         for event in csv.DictReader(f):
+            if event.get("source", "halo2") != "halo2":
+                continue
             stage = event["stage"]
             if not stage.startswith("PROVING::"):
                 continue
@@ -91,16 +93,21 @@ def phase_rows(resource_path, transition_path):
     return sorted(rows, key=lambda row: row["start_unix_us"])
 
 
-def write_phase_report(directory):
+def write_phase_report(directory, *, retain=True):
     directory = Path(directory)
     transitions = directory / "halo2_stage_transitions.csv"
     if not transitions.is_file():
+        transitions = directory / "execution_trace.csv"
+    if not transitions.is_file():
         return {"halo2_phase_trace_available": False}
     rows = phase_rows(directory / "resource_usage.csv", transitions)
-    with (directory / "halo2_phase_resources.csv").open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=FIELDS)
-        writer.writeheader()
-        writer.writerows(rows)
+    if retain:
+        with (directory / "halo2_phase_resources.csv").open("w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=FIELDS)
+            writer.writeheader()
+            writer.writerows(rows)
+    if not rows:
+        return {"halo2_phase_trace_available": False}
     complete = [r for r in rows if r["status"] == "complete"]
     return {
         "halo2_phase_trace_available": True,
