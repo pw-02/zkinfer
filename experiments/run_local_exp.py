@@ -11,6 +11,7 @@ from __future__ import annotations
 import logging
 import os
 import shutil
+import signal
 import socket
 import subprocess
 import sys
@@ -112,19 +113,22 @@ class ManagedProcess:
     def returncode(self) -> Optional[int]:
         return None if self.proc is None else self.proc.poll()
 
-    def stop(self, timeout_sec: int = 5) -> None:
+    def stop(self, timeout_sec: int = 30) -> bool:
         if self.proc is None:
-            return
+            return True
+        graceful = True
         if self.proc.poll() is None:
             self.logger.info("Stopping %s", self.name)
-            self.proc.terminate()
+            self.proc.send_signal(signal.SIGINT)
             try:
                 self.proc.wait(timeout=timeout_sec)
             except subprocess.TimeoutExpired:
+                graceful = False
                 self.proc.kill()
                 self.proc.wait(timeout=timeout_sec)
         if self.tee_thread is not None:
             self.tee_thread.join(timeout=timeout_sec)
+        return graceful
 
 
 class ProcessGroup:
@@ -136,9 +140,11 @@ class ProcessGroup:
         self.processes.append(process)
         process.start()
 
-    def stop_all(self) -> None:
+    def stop_all(self) -> bool:
+        graceful = True
         for process in reversed(self.processes):
-            process.stop()
+            graceful = process.stop() and graceful
+        return graceful
 
     def raise_if_any_failed(self) -> None:
         failed = [
@@ -443,13 +449,13 @@ def run(cfg: DictConfig) -> None:
         logger.info("All workloads completed")
     finally:
         active_log.close()
-        group.stop_all()
+        stopped_cleanly = group.stop_all()
         wait_for_port_closed(
             cfg.launch.coordinator_host,
             int(cfg.launch.coordinator_port),
             10,
         )
-        if successful:
+        if successful and stopped_cleanly:
             from zkinfer.profiling.collect_reports import collect
             collect(Path(str(cfg.paths.runs_dir)))
             cleanup_request_store(cfg, logger, submitted_request_ids)
@@ -459,7 +465,7 @@ def run(cfg: DictConfig) -> None:
             if (root / "runtime").exists():
                 shutil.rmtree(root / "runtime")
         else:
-            logger.warning("Run failed or was interrupted; retaining diagnostic storage")
+            logger.warning("Run failed, was interrupted, or required forced shutdown; retaining diagnostic storage")
 
 
 @hydra.main(config_path="./config", config_name="runtime_experiment", version_base=None)
