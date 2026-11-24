@@ -256,6 +256,7 @@ class ProverTaskRunner:
             status_file,
         )
 
+        result = None
         try:
             proof_stages = self._build_proof_stages(task, status_file)
             if os.environ.get("ZKINFER_PROFILING_MODE", "research") == "debug":
@@ -276,9 +277,31 @@ class ProverTaskRunner:
             if task.stage_admission_enabled and task.admission_mode == "whole_job":
                 proof_stages._update_status("WAITING_FOR_WHOLE_JOB")
             with proof_stages.admission.hold_job() as job_info:
-                return self._run_admitted(task, resource_usage_file, proof_stages, job_info)
+                result = self._run_admitted(task, resource_usage_file, proof_stages, job_info)
+                return result
         finally:
             self._stop_process(resource_proc)
+            if result is not None:
+                self._compact_successful_artifacts(task.output_dir)
+
+    def _compact_successful_artifacts(self, directory: str) -> None:
+        """Remove redundant artifacts only after successful publication and logger shutdown."""
+        if os.environ.get("ZKINFER_PROFILING_MODE", "research") == "debug":
+            return
+        root = Path(directory)
+        try:
+            if not (root / "circuit_features.json").is_file():
+                return
+            events = write_execution_trace(root)
+            if not events or not (root / "execution_trace.csv").is_file():
+                return
+            for name in ("stage_transitions.csv", "fused_stage_transitions.csv",
+                         "halo2_stage_transitions.csv", "halo2_circuit.csv",
+                         "halo2_phase_resources.csv", "admission_profile_before.json",
+                         "status.txt"):
+                (root / name).unlink(missing_ok=True)
+        except Exception as exc:
+            self.logger.warning("Failed to compact profiling artifacts: %s", exc)
 
     def _run_admitted(
         self, task: LocalProverTask, resource_usage_file: str,
@@ -465,7 +488,7 @@ class ProverTaskRunner:
         except Exception as exc:
             self.logger.warning("Failed to consolidate execution trace: %s", exc)
         try:
-            phase_metrics = write_phase_report(task.output_dir)
+            phase_metrics = write_phase_report(task.output_dir, retain=os.environ.get("ZKINFER_PROFILING_MODE", "research") == "debug")
         except Exception as exc:
             self.logger.warning("Failed to correlate Halo2 phases: %s", exc)
             phase_metrics = {"halo2_phase_trace_error": str(exc)}
