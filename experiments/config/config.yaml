@@ -3,6 +3,11 @@ defaults:
   - override hydra/hydra_logging: disabled
   - override hydra/job_logging: disabled
 
+# User-facing configuration for local experiments and launch_tmux.sh.
+# zkinfer/config/config.yaml supplies standalone runtime defaults.
+profiling:
+  mode: research # basic | research | debug
+
 suite:
   workloads:
     - nano_gpt_4_layers_64_embd #mnist_gan
@@ -33,7 +38,7 @@ node:
 
   # Sampling interval for resource_usage.csv. Stage-transition timestamps are
   # recorded separately and do not depend on this interval.
-  resource_sampling_interval_sec: 1.0
+  resource_sampling_interval_sec: 0.1
 
   stage_admission:
     mode: stage # stage | whole_job; enabled controls both modes
