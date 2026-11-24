@@ -17,6 +17,12 @@ def unix_us(value):
 def write_execution_trace(directory):
     directory = Path(directory)
     events = []
+    target = directory / "execution_trace.csv"
+    if not any((directory / name).is_file() for name in ("stage_transitions.csv", "fused_stage_transitions.csv", "halo2_stage_transitions.csv")):
+        if target.is_file():
+            with target.open(newline="", encoding="utf-8") as f:
+                return list(csv.DictReader(f))
+        return events
     # Runtime already imports fused EZKL events; retain their provenance in a
     # separate stream rather than pretending all records are disjoint intervals.
     for filename, source in [
@@ -46,8 +52,10 @@ def write_execution_trace(directory):
         (r["timestamp_unix_us"], r["stage"]) in fused)]
     events.sort(key=lambda r: r["timestamp_unix_us"])
     if events:
-        with (directory / "execution_trace.csv").open("w", newline="", encoding="utf-8") as f:
+        temporary = target.with_suffix(".csv.tmp")
+        with temporary.open("w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=FIELDS)
             writer.writeheader()
             writer.writerows(events)
+        temporary.replace(target)
     return events
