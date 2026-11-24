@@ -154,7 +154,9 @@ def _read_setup_key(job_dir: Path, report_row: Dict[str, Any]) -> str:
     value = report_row.get("setup_key")
     if value is not None and str(value).strip() and str(value).lower() != "nan":
         return str(value)
-    path = job_dir / "admission_profile_before.json"
+    path = job_dir / "circuit_features.json"
+    if not path.is_file():
+        path = job_dir / "admission_profile_before.json"
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
         return str(payload.get("setup_key") or "")
@@ -195,6 +197,7 @@ def _artifact_validation(job_dir: Path) -> Dict[str, Any]:
     request_id, job_id, workload = _job_identity(job_dir)
     names = [
         "resource_usage.csv",
+        "execution_trace.csv",
         "stage_transitions.csv",
         "halo2_stage_transitions.csv",
         "halo2_prover_cpu.csv",
@@ -210,7 +213,7 @@ def _artifact_validation(job_dir: Path) -> Dict[str, Any]:
     for name in names:
         result[f"has_{name.replace('.', '_')}"] = (job_dir / name).exists()
     result["complete_for_stage_analysis"] = bool(
-        result["has_resource_usage_csv"] and result["has_stage_transitions_csv"]
+        result["has_resource_usage_csv"] and (result["has_stage_transitions_csv"] or result["has_execution_trace_csv"])
     )
     return result
 
