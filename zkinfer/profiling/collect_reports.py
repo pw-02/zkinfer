@@ -4,7 +4,7 @@ import csv
 from pathlib import Path
 
 from zkinfer.profiling.execution_trace import write_execution_trace
-from zkinfer.profiling.halo2_phases import FIELDS, write_phase_report
+from zkinfer.profiling.halo2_phases import FIELDS, phase_rows
 
 
 def collect(root):
@@ -18,14 +18,14 @@ def collect(root):
         writer.writeheader()
         for resource in sorted(root.rglob("resource_usage.csv")):
             directory = resource.parent
-            if not (directory / "halo2_stage_transitions.csv").is_file():
+            trace = directory / "execution_trace.csv"
+            if not trace.is_file():
+                write_execution_trace(directory)
+            if not trace.is_file():
                 continue
-            write_execution_trace(directory)
-            write_phase_report(directory)
-            with (directory / "halo2_phase_resources.csv").open(newline="", encoding="utf-8") as source:
-                for row in csv.DictReader(source):
-                    writer.writerow({"job_directory": str(directory.relative_to(root)), **row})
-                    count += 1
+            for row in phase_rows(resource, trace):
+                writer.writerow({"job_directory": str(directory.relative_to(root)), **row})
+                count += 1
     return output, count
 
 
