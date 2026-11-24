@@ -2,12 +2,18 @@
 
 set -euo pipefail
 
-WORKLOAD="${1:-bert}"
-COORDINATOR_HOST="${2:-127.0.0.1}"
-COORDINATOR_PORT="${3:-50051}"
-STAGE_ADMISSION="${4:-false}"
-MAX_CONCURRENT_JOBS="${MAX_CONCURRENT_JOBS:-1}"
-KEEP_PROOF_ARTIFACTS="${KEEP_PROOF_ARTIFACTS:-true}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT_DIR"
+# The experiment YAML is the single user-facing configuration for this launcher.
+# Positional arguments and existing environment overrides remain supported.
+eval "$(python experiments/scripts/launcher_config.py)"
+WORKLOAD="${1:-$CFG_WORKLOAD}"
+COORDINATOR_HOST="${2:-$CFG_HOST}"
+COORDINATOR_PORT="${3:-$CFG_PORT}"
+STAGE_ADMISSION="${4:-$CFG_ADMISSION}"
+MAX_CONCURRENT_JOBS="${MAX_CONCURRENT_JOBS:-$CFG_MAX_JOBS}"
+KEEP_PROOF_ARTIFACTS="${KEEP_PROOF_ARTIFACTS:-$CFG_KEEP_PROOFS}"
+ZKINFER_PROFILING_MODE="${ZKINFER_PROFILING_MODE:-$CFG_PROFILING_MODE}"
 
 if [[ "$STAGE_ADMISSION" != "true" && "$STAGE_ADMISSION" != "false" ]]; then
     echo "Error: stage admission must be true or false."
@@ -24,19 +30,18 @@ fi
 
 SESSION="${TMUX_SESSION:-zkexp}"
 CONDA_ENV="${CONDA_ENV:-zk}"
-ROOT_DIR="$(pwd)"
 ADMISSION_TAG="admission-${STAGE_ADMISSION}"
 
 RUN_ID="$(date +%Y-%m-%d_%H-%M-%S)_${WORKLOAD}_${ADMISSION_TAG}"
-RUN_DIR="${ROOT_DIR}/experiments/runs/${RUN_ID}"
+RUN_DIR="${CFG_RUNS_DIR}/${RUN_ID}"
 REQUESTS_DIR="${RUN_DIR}/requests"
 LOGS_DIR="${RUN_DIR}/logs"
 CONFIG_DIR="${RUN_DIR}/config"
 STATE_DB="${RUN_DIR}/coordinator_state.sqlite3"
 
-REQUEST_DATA_DIR="${ROOT_DIR}/storage/requests"
-REUSABLE_SETUP_DIR="${ROOT_DIR}/storage/setup"
-LOCAL_CACHE_DIR="${ROOT_DIR}/storage/node/cache"
+REQUEST_DATA_DIR="$CFG_REQUEST_DATA"
+REUSABLE_SETUP_DIR="$CFG_SETUP"
+LOCAL_CACHE_DIR="$CFG_CACHE"
 NODE_RUNTIME_DIR="${ROOT_DIR}/storage/node/runtime"
 
 mkdir -p \
@@ -55,6 +60,9 @@ coordinator_port=${COORDINATOR_PORT}
 stage_admission=${STAGE_ADMISSION}
 max_concurrent_jobs=${MAX_CONCURRENT_JOBS}
 keep_proof_artifacts=${KEEP_PROOF_ARTIFACTS}
+profiling_mode=${ZKINFER_PROFILING_MODE}
+sampling_interval_sec=${CFG_SAMPLING}
+scheduling_policy=${CFG_POLICY}
 state_db=${STATE_DB}
 request_data=${REQUEST_DATA_DIR}
 reusable_setup=${REUSABLE_SETUP_DIR}
@@ -76,10 +84,12 @@ cd ${ROOT_DIR} && \
 source \$(conda info --base)/etc/profile.d/conda.sh && \
 conda activate ${CONDA_ENV} && \
 export PYTHONPATH=${ROOT_DIR}:\${PYTHONPATH:-} && \
-export ZKINFER_KEEP_PROOF_ARTIFACTS=${KEEP_PROOF_ARTIFACTS}"
+export ZKINFER_KEEP_PROOF_ARTIFACTS=${KEEP_PROOF_ARTIFACTS} && \\
+export ZKINFER_PROFILING_MODE=${ZKINFER_PROFILING_MODE}"
 
 RUNTIME_CFG="\
 coordinator.host=${COORDINATOR_HOST} \
+coordinator.scheduling_policy=${CFG_POLICY} \
 coordinator.port=${COORDINATOR_PORT} \
 coordinator.runs_dir=${REQUESTS_DIR} \
 coordinator.logs_dir=${LOGS_DIR} \
@@ -87,12 +97,20 @@ coordinator.state_db_path=${STATE_DB} \
 node.runs_dir=${REQUESTS_DIR} \
 node.logs_dir=${LOGS_DIR} \
 node.local_cache.path=${LOCAL_CACHE_DIR} \
+node.local_cache.max_gb=${CFG_CACHE_GB} \
+node.resource_sampling_interval_sec=${CFG_SAMPLING} \
 node.runtime_state_dir=${NODE_RUNTIME_DIR} \
 node.max_concurrent_jobs=${MAX_CONCURRENT_JOBS} \
 node.stage_admission.enabled=${STAGE_ADMISSION} \
+node.stage_admission.mode=${CFG_ADMISSION_MODE} \
+node.stage_admission.memory_safety_reserve_gb=${CFG_RESERVE} \
+node.stage_admission.history_percentile=${CFG_PERCENTILE} \
 storage.backend=filesystem \
 storage.request_data.path=${REQUEST_DATA_DIR} \
-storage.reusable_setup.path=${REUSABLE_SETUP_DIR}"
+storage.reusable_setup.path=${REUSABLE_SETUP_DIR} \
+ storage.reusable_setup.enabled=${CFG_REUSE} \
+ storage.resource_profiles.enabled=${CFG_PROFILES} \
+ storage.resource_profiles.path=${CFG_PROFILE_PATH}"
 
 tmux new-session -d -s "$SESSION" -n "coordinator"
 tmux send-keys -t "$SESSION:coordinator" \
