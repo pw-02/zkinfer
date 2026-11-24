@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import csv
-import json
 import os
 from pathlib import Path
 from typing import Dict, Iterable
@@ -107,10 +106,6 @@ def write_transfer_overhead_report(out_dir: str) -> Dict[str, float | int]:
     report = aggregate_transfer_overhead(rows)
 
     os.makedirs(out_dir, exist_ok=True)
-    json_path = Path(out_dir) / "transfer_overhead_report.json"
-    with open(json_path, "w", encoding="utf-8") as file:
-        json.dump(report, file, indent=4)
-
     csv_path = Path(out_dir) / "transfer_overhead_report.csv"
     with open(csv_path, "w", encoding="utf-8", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=list(report.keys()))
