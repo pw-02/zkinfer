@@ -2,6 +2,7 @@ from __future__ import annotations
 from zkinfer.profiling.run_metadata import save_process_metadata, copy_run_metadata
 
 import logging
+import copy
 import threading
 import time
 import uuid
@@ -12,7 +13,7 @@ from typing import Dict, Optional
 
 from zkinfer.config.runtime import RuntimeConfig
 from zkinfer.profiling.overhead import write_transfer_overhead_report
-from zkinfer.profiling.reports import write_job_report, write_request_report
+from zkinfer.profiling.reports import write_job_report, write_request_report, write_failed_attempt_report
 from zkinfer.runtime.models import (
     ArtifactRef,
     InferenceRequest,
@@ -351,6 +352,14 @@ class Coordinator:
             job.artifact_manifest_ref = artifact_manifest_ref
 
             if job.job_status == JobStatus.FAILED:
+                parent = self.active_requests.get(job.inference_request_id)
+                if parent:
+                    attempt = copy.copy(job)
+                    attempt.error_message = message
+                    try:
+                        write_failed_attempt_report(attempt, perf_metrics, parent.reports_dir)
+                    except Exception:
+                        self.logger.exception("Failed to write attempt report")
                 should_retry = self._handle_failed_job_locked(job, message)
                 if should_retry:
                     self._record_node_heartbeat_locked(
