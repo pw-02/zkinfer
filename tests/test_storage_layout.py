@@ -15,6 +15,7 @@ from hydra import compose, initialize_config_dir
 
 import zkinfer.proto.zkservice_pb2 as pb
 from experiments.run_local_exp import cleanup_request_store, common_overrides
+from experiments.scripts.launcher_config import load_config
 from tests.test_serving_reliability import runtime_config
 from zkinfer.config.runtime import build_runtime_config
 from zkinfer.runtime.models import InferenceRequest
@@ -202,12 +203,13 @@ class StorageConfigurationTests(unittest.TestCase):
             self.assertTrue(other.exists())
 
     def test_experiment_overrides_use_current_runtime_keys(self):
-        cfg = OmegaConf.load(Path(__file__).parents[1] / "experiments/config/config.yaml")
+        _, cfg = load_config(Path(__file__).parents[1] / "experiments/config/config.yaml")
+        cfg.storage.reusable_setup.enabled = False
         overrides = common_overrides(cfg)
-        self.assertIn("storage.reusable_setup.path=storage/setup", overrides)
+        self.assertIn("storage.reusable_setup.path=storage/cache", overrides)
         self.assertIn("storage.request_data.path=storage/requests", overrides)
         self.assertIn("storage.reusable_setup.enabled=false", overrides)
-        self.assertIn("coordinator.scheduling_policy=lpt", overrides)
+        self.assertIn("coordinator.scheduling_policy=resource_aware", overrides)
         with initialize_config_dir(config_dir=str(Path(__file__).parents[1] / "zkinfer/config"), version_base=None):
             resolved = compose(config_name="config", overrides=overrides)
         runtime = build_runtime_config(resolved)
