@@ -310,6 +310,9 @@ class EZKLProofStages:
             self.ezkl_settings_dict = self._load_settings()
             return True, s3_read_time, 0.0
 
+        if self.prepared_witness_path:
+            raise RuntimeError("Prepared settings are missing; refusing independent recalibration")
+
         def generate_settings_only() -> None:
             self.ezkl.gen_settings(
                 self.onnx_model_path,
@@ -396,6 +399,9 @@ class EZKLProofStages:
         )
         if used_cache:
             return True, s3_read_time, 0.0
+
+        if self.prepared_witness_path:
+            raise RuntimeError("Prepared circuit is missing; refusing independent compilation")
 
         self.ezkl.compile_circuit(
             self.onnx_model_path,

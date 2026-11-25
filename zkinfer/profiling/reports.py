@@ -173,6 +173,7 @@ def write_request_report(request, out_dir: str = "reports") -> Dict[str, Any]:
         "upfront_witness_time(s)": request.preparation_metrics.get("upfront_witness_time_s", 0.0),
         "upfront_witness_bytes": request.preparation_metrics.get("upfront_witness_bytes", 0),
         "upfront_compiled_bytes": request.preparation_metrics.get("upfront_compiled_bytes", 0),
+        "coordinator_process_max_rss_kib": request.preparation_metrics.get("coordinator_process_max_rss_kib", 0),
         "upfront_setup_cache_hits": request.preparation_metrics.get("upfront_setup_cache_hit", 0),
         "upfront_rescaled_inputs": request.preparation_metrics.get("upfront_rescaled_inputs", 0),
         "agg_prepared_witness_load_time(s)": _safe_sum(job_data, "ezkl_load_prepared_witness_time(s)"),

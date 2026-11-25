@@ -8,6 +8,7 @@ trust.
 from __future__ import annotations
 
 import hashlib
+import importlib
 import json
 import math
 import os
@@ -250,7 +251,20 @@ def _run_setup(ezkl, model: Path, calibration: Path, directory: Path, candidate:
     return settings, compiled, calibration_s, compilation_s
 
 
-def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate):
+def _backend_identity(ezkl) -> dict:
+    identity = {"version": str(getattr(ezkl, "__version__", "unknown"))}
+    if getattr(ezkl, "__name__", None) == "ezkl":
+        try:
+            native = importlib.import_module("ezkl.ezkl")
+        except ImportError:
+            native = ezkl
+        binary = getattr(native, "__file__", None)
+        if binary and Path(binary).is_file():
+            identity["module_sha256"] = file_digest(binary)
+    return identity
+
+
+def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, backend_identity):
     """Publish a complete setup atomically; never reuse a partial setup."""
     if cache_root is None:
         settings, compiled, cal_s, comp_s = _run_setup(
@@ -263,7 +277,7 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate):
     identity = {
         "version": PREPARATION_VERSION,
         "model": file_digest(model),
-        "ezkl_version": str(getattr(ezkl, "__version__", "unknown")),
+        "ezkl": backend_identity,
         "candidate_scale": candidate,
         "visibility": ["public", "public", "fixed"],
     }
@@ -307,6 +321,7 @@ def prepare_partitions(
     if ezkl_module is None:
         import ezkl as ezkl_module
     checked_scale(max_propagated_scale)
+    backend_identity = _backend_identity(ezkl_module) if cache_root is not None else {}
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
     partitions = list(partitions)
@@ -360,14 +375,16 @@ def prepare_partitions(
         start_setup = time.perf_counter()
         try:
             setup = _prepare_setup(
-                ezkl_module, model, calibration, directory / "setup", cache_root, candidate
+                ezkl_module, model, calibration, directory / "setup", cache_root, candidate,
+                backend_identity,
             )
         except Exception as exc:
             if candidate is None or not allow_rescale:
                 raise
             reason = f"restricted calibration/compilation failed: {exc}"
             setup = _prepare_setup(
-                ezkl_module, model, calibration, directory / "fallback_setup", cache_root, None
+                ezkl_module, model, calibration, directory / "fallback_setup", cache_root, None,
+                backend_identity,
             )
             candidate = None
         settings_path, compiled_path, cal_s, comp_s, cache_hit = setup
@@ -399,7 +416,7 @@ def prepare_partitions(
             raise ValueError(f"Witness interface mismatch for {name}")
         for spec, actual, expected in zip(inputs, witness["inputs"], exact_inputs):
             spec.check_size(len(actual))
-            if spec.name in producers and actual != expected:
+            if spec.name in producers and [encode_felt(decode_felt(v)) for v in actual] != expected:
                 raise ValueError(f"EZKL changed raw boundary input {spec.name}")
         for spec, scale, values in zip(outputs, output_scales, witness["outputs"]):
             spec.check_size(len(values))
@@ -443,7 +460,7 @@ def public_tensors(proof: dict, settings: dict, input_specs, output_specs):
     if len(shapes) != len(specs):
         raise ValueError("Unexpected EZKL public instance layout")
     instances = proof["instances"]
-    if len(instances) != 1:
+    if not isinstance(instances, list) or len(instances) != 1 or not isinstance(instances[0], list):
         raise ValueError("Expected exactly one public instance column")
     values = instances[0]
     offset = 0

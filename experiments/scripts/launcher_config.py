@@ -91,6 +91,7 @@ def _apply_execution(cfg: DictConfig, user: DictConfig) -> None:
     cfg.coordinator.max_propagated_scale = user.partitioning.get("max_propagated_scale", 16)
     cfg.coordinator.allow_boundary_rescale = user.partitioning.get("allow_boundary_rescale", True)
     cfg.verification.enabled = cfg.coordinator.witness_preparation == "upfront"
+    cfg.verification.trusted_vk_manifest = user.get("verification", {}).get("trusted_vk_manifest", None)
 
 
 def _apply_scheduling(cfg: DictConfig, user: DictConfig) -> None:

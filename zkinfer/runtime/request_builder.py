@@ -57,6 +57,7 @@ class RequestBuilder:
             if transfer_only or shared_storage.backend != "filesystem" or setup_store.backend != "filesystem":
                 raise ValueError("Upfront preparation requires filesystem proving storage")
             from zkinfer.backends.ezkl.preparation import prepare_partitions
+            import resource
             started = time.perf_counter()
             prepared = prepare_partitions(
                 materialized_partitions,
@@ -67,6 +68,9 @@ class RequestBuilder:
             )
             metrics = request.preparation_metrics
             metrics["upfront_preparation_time(s)"] = time.perf_counter() - started
+            # Linux process-wide RSS high-water mark; not a per-request peak
+            # when requests overlap or previous requests used more memory.
+            metrics["coordinator_process_max_rss_kib"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
             for field in ("setup_time_s", "calibration_time_s", "compilation_time_s", "witness_time_s",
                           "witness_bytes", "compiled_bytes", "rescaled_inputs", "setup_cache_hit"):
                 metrics[f"upfront_{field}"] = sum(part.metrics[field] for part in prepared.values())
