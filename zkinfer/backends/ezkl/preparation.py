@@ -308,8 +308,12 @@ def prepare_partitions(
     max_propagated_scale: int = 16,
     allow_rescale: bool = True,
     ezkl_module=None,
+    on_prepared=None,
 ) -> dict[str, PreparedPartition]:
-    """Prepare witnesses in dependency order, then let callers schedule freely.
+    """Prepare witnesses in dependency order and optionally publish each ready partition.
+
+    The callback runs after the witness and its boundary outputs are validated.
+    The returned mapping remains available for batch callers.
 
     Single compatible incoming scales are propagated using restricted
     calibration. Mixed/large scales or a failed restricted calibration can
@@ -442,6 +446,8 @@ def prepare_partitions(
                 "compiled_bytes": compiled_path.stat().st_size,
             },
         )
+        if on_prepared is not None:
+            on_prepared(prepared[name])
     return prepared
 
 

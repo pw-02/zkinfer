@@ -24,6 +24,8 @@ class LauncherConfigTests(unittest.TestCase):
         self.assertEqual(list(self.cfg.suite.workloads), ["bert"])
         self.assertEqual(self.cfg.coordinator.witness_preparation, "upfront")
         self.assertTrue(self.cfg.verification.enabled)
+        self.assertEqual(self.cfg.coordinator.preparation_dispatch, "streaming")
+        self.assertTrue(self.cfg.coordinator.preparation_cache_enabled)
         self.user.partitioning.enabled = True
         self.user.partitioning.size = 4
         self.user.cache.setup = False
@@ -32,7 +34,7 @@ class LauncherConfigTests(unittest.TestCase):
         self.user.scheduling.max_concurrent_jobs = 1
         self.assertEqual(
             make_run_name(self.user, now=self.now, suffix="abcd"),
-            "2026-11-25_12-30-00_bert_p4_setup-off_c1_fifo_noadm_exact_abcd",
+            "2026-11-25_12-30-00_bert_p4_setup-off_c1_fifo_noadm_exact_streaming_prep-on_abcd",
         )
 
     def test_monolithic_and_auto(self):

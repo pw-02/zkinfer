@@ -241,7 +241,10 @@ class CoordinatorStateStore:
             "simplify_model": request.simplify_model,
             "input_shapes": request.input_shapes,
             "request_id": request.request_id,
-            "preparation_metrics": request.preparation_metrics,
+            "preparation_metrics": dict(request.preparation_metrics),
+            "preparation_complete": request.preparation_complete,
+            "expected_job_count": request.expected_job_count,
+            "preparation_error": request.preparation_error,
             "created_time": _dt_to_str(request.created_time),
             "queued_time": _dt_to_str(request.queued_time),
             "started_time": _dt_to_str(request.started_time),
@@ -267,6 +270,9 @@ class CoordinatorStateStore:
         )
         request.request_id = data["request_id"]
         request.preparation_metrics = data.get("preparation_metrics", {})
+        request.preparation_complete = data.get("preparation_complete", True)
+        request.expected_job_count = data.get("expected_job_count")
+        request.preparation_error = data.get("preparation_error")
         request.created_time = _dt_from_str(data.get("created_time")) or datetime.now(timezone.utc)
         request.queued_time = _dt_from_str(data.get("queued_time"))
         request.started_time = _dt_from_str(data.get("started_time"))

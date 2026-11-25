@@ -24,6 +24,8 @@ coordinator:
   witness_preparation: upfront # independent | upfront
   max_propagated_scale: 0
   allow_boundary_rescale: true
+  preparation_dispatch: batch # batch | streaming
+  preparation_cache_enabled: null # null inherits reusable_setup.enabled
 
 node:
   # One NodeSupervisor runs per physical machine/cloud instance.

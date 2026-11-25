@@ -3,7 +3,7 @@ import os
 import time
 from pathlib import Path
 from dataclasses import asdict
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 from zkinfer.config.runtime import SetupStoreConfig
 from zkinfer.runtime.data_plane import ArtifactRef
@@ -33,11 +33,13 @@ class RequestBuilder:
     def __init__(
         self, logger: logging.Logger, witness_preparation: str = "independent",
         max_propagated_scale: int = 16, allow_boundary_rescale: bool = True,
+        preparation_cache_enabled: bool | None = None,
     ):
         self.logger = logger
         self.witness_preparation = witness_preparation
         self.max_propagated_scale = max_propagated_scale
         self.allow_boundary_rescale = allow_boundary_rescale
+        self.preparation_cache_enabled = preparation_cache_enabled
 
     def build_jobs(
         self,
@@ -46,46 +48,24 @@ class RequestBuilder:
         setup_store: SetupStoreConfig,
         max_retries: int,
         transfer_only: bool = False,
+        *,
+        on_job_ready: Callable[[ProofJob], None] | None = None,
+        on_plan: Callable[[int], None] | None = None,
     ) -> List[ProofJob]:
         # transfer_only is retained only for compatibility with historical tests
         # and stored runtime state. New configuration cannot enable it.
-        materialized_partitions = self._load_or_split_model(request)
+        materialized_partitions = list(self._load_or_split_model(request))
+        if not materialized_partitions:
+            raise ValueError("Request contains no partitions")
+        if on_plan is not None:
+            on_plan(len(materialized_partitions))
         jobs: List[ProofJob] = []
-        prepared = {}
-        request.preparation_metrics["witness_preparation_mode"] = self.witness_preparation
-        if self.witness_preparation == "upfront":
-            if transfer_only or shared_storage.backend != "filesystem" or setup_store.backend != "filesystem":
-                raise ValueError("Upfront preparation requires filesystem proving storage")
-            from zkinfer.backends.ezkl.preparation import prepare_partitions
-            import resource
-            started = time.perf_counter()
-            prepared = prepare_partitions(
-                materialized_partitions,
-                Path(shared_storage.requests_root) / request.request_id / "prepared",
-                cache_root=(Path(shared_storage.setup_root) / "_prepared_v1" if setup_store.enabled else None),
-                max_propagated_scale=self.max_propagated_scale,
-                allow_rescale=self.allow_boundary_rescale,
-            )
-            metrics = request.preparation_metrics
-            metrics["upfront_preparation_time(s)"] = time.perf_counter() - started
-            # Linux process-wide RSS high-water mark; not a per-request peak
-            # when requests overlap or previous requests used more memory.
-            metrics["coordinator_process_max_rss_kib"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-            for field in ("setup_time_s", "calibration_time_s", "compilation_time_s", "witness_time_s",
-                          "witness_bytes", "compiled_bytes", "rescaled_inputs", "setup_cache_hit"):
-                metrics[f"upfront_{field}"] = sum(part.metrics[field] for part in prepared.values())
-            metrics["upfront_partition_count"] = len(prepared)
-            if request.reports_dir:
-                from zkinfer.backends.ezkl.preparation import write_json
-                write_json(Path(request.reports_dir) / "witness_preparation.json",
-                           {name: part.metrics for name, part in prepared.items()})
-
         total_model_store_time = 0.0
         total_input_store_time = 0.0
 
-        for index, partition in enumerate(materialized_partitions):
+        def materialize_job(index, partition, prepared_part=None):
+            nonlocal total_model_store_time, total_input_store_time
             model_write_time = 0.0
-            prepared_part = prepared.get(partition.name)
             identity = dict(EZKL_SETUP_IDENTITY)
             if prepared_part is not None:
                 identity.update(prepared_part.artifact_identity())
@@ -172,6 +152,57 @@ class RequestBuilder:
                 model_hash=partition.sub_hash,
             )
             jobs.append(job)
+            if on_job_ready is not None:
+                on_job_ready(job)
+
+        prepared = {}
+        cache_enabled = (setup_store.enabled if self.preparation_cache_enabled is None
+                         else self.preparation_cache_enabled)
+        request.preparation_metrics["preparation_cache_enabled"] = cache_enabled
+        request.preparation_metrics["preparation_dispatch"] = "streaming" if on_job_ready else "batch"
+        request.preparation_metrics["witness_preparation_mode"] = self.witness_preparation
+        if self.witness_preparation == "upfront":
+            if transfer_only or shared_storage.backend != "filesystem" or setup_store.backend != "filesystem":
+                raise ValueError("Upfront preparation requires filesystem proving storage")
+            from zkinfer.backends.ezkl.preparation import prepare_partitions
+            import resource
+            started = time.perf_counter()
+            publication_s = 0.0
+            by_name = {part.name: (index, part) for index, part in enumerate(materialized_partitions)}
+
+            def publish_prepared(part):
+                nonlocal publication_s
+                index, partition = by_name[part.name]
+                publish_started = time.perf_counter()
+                materialize_job(index, partition, part)
+                publication_s += time.perf_counter() - publish_started
+
+            prepared = prepare_partitions(
+                materialized_partitions,
+                Path(shared_storage.requests_root) / request.request_id / "prepared",
+                cache_root=(Path(shared_storage.setup_root) / "_prepared_v1" if cache_enabled else None),
+                max_propagated_scale=self.max_propagated_scale,
+                allow_rescale=self.allow_boundary_rescale,
+                on_prepared=publish_prepared if on_job_ready else None,
+            )
+            metrics = request.preparation_metrics
+            metrics["preparation_wall_time(s)"] = time.perf_counter() - started
+            metrics["upfront_preparation_time(s)"] = max(0.0, metrics["preparation_wall_time(s)"] - publication_s)
+            # Linux process-wide RSS high-water mark; not a per-request peak
+            # when requests overlap or previous requests used more memory.
+            metrics["coordinator_process_max_rss_kib"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            for field in ("setup_time_s", "calibration_time_s", "compilation_time_s", "witness_time_s",
+                          "witness_bytes", "compiled_bytes", "rescaled_inputs", "setup_cache_hit"):
+                metrics[f"upfront_{field}"] = sum(part.metrics[field] for part in prepared.values())
+            metrics["upfront_partition_count"] = len(prepared)
+            if request.reports_dir:
+                from zkinfer.backends.ezkl.preparation import write_json
+                write_json(Path(request.reports_dir) / "witness_preparation.json",
+                           {name: part.metrics for name, part in prepared.items()})
+
+        if not (self.witness_preparation == "upfront" and on_job_ready is not None):
+            for index, partition in enumerate(materialized_partitions):
+                materialize_job(index, partition, prepared.get(partition.name))
 
         request.preparation_metrics["artifact_model_store_time(s)"] = total_model_store_time
         request.preparation_metrics["artifact_input_store_time(s)"] = total_input_store_time

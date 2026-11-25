@@ -122,6 +122,10 @@ class InferenceRequest:
     request_id: str = field(init=False)
     proof_jobs: List[ProofJob] = field(default_factory=list)
     preparation_metrics: Dict = field(default_factory=dict)
+    # Streaming requests are open until every planned job has been published.
+    preparation_complete: bool = True
+    expected_job_count: Optional[int] = None
+    preparation_error: Optional[str] = None
     created_time: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     queued_time: Optional[datetime] = None
     started_time: Optional[datetime] = None
@@ -139,7 +143,10 @@ class InferenceRequest:
         self.request_id = f"req_{uuid.uuid4().hex[:12]}"
 
     def all_jobs_finished(self) -> bool:
-        return all(job.job_status in {JobStatus.COMPLETED, JobStatus.FAILED} for job in self.proof_jobs)
+        return (self.preparation_complete
+                and (self.preparation_error is not None or self.expected_job_count is None
+                     or len(self.proof_jobs) == self.expected_job_count)
+                and all(job.job_status in {JobStatus.COMPLETED, JobStatus.FAILED} for job in self.proof_jobs))
 
     def any_job_failed(self) -> bool:
         return any(job.job_status == JobStatus.FAILED for job in self.proof_jobs)

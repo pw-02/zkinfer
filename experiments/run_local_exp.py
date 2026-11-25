@@ -187,6 +187,11 @@ def common_overrides(cfg: DictConfig) -> List[str]:
         f"coordinator.state_db_path={Path(str(cfg.paths.runs_dir)) / 'coordinator_state.sqlite3'}",
         f"coordinator.scheduling_policy={cfg.coordinator.scheduling_policy}",
         f"coordinator.witness_preparation={cfg.coordinator.get('witness_preparation', 'upfront')}",
+        f"coordinator.preparation_dispatch={cfg.coordinator.get('preparation_dispatch', 'batch')}",
+        "coordinator.preparation_cache_enabled=" + (
+            "null" if cfg.coordinator.get("preparation_cache_enabled") is None
+            else str(cfg.coordinator.preparation_cache_enabled).lower()
+        ),
         f"coordinator.max_propagated_scale={cfg.coordinator.get('max_propagated_scale', 16)}",
         f"coordinator.allow_boundary_rescale={str(bool(cfg.coordinator.get('allow_boundary_rescale', True))).lower()}",
         f"verification.enabled={str(bool(cfg.get('verification', {}).get('enabled', True))).lower()}",

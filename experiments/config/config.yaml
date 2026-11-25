@@ -12,6 +12,10 @@ partitioning:
   max_propagated_scale: 0
   allow_boundary_rescale: true
 
+preparation:
+  cache_enabled: true # Reuse calibrated settings and compiled circuits independently of key caching.
+  dispatch: streaming # batch | streaming
+
 scheduling:
   policy: resource_aware # fifo | lpt | cache_aware | resource_aware
   max_concurrent_jobs: 1 # 1 = isolated; null = admission-controlled concurrency.
@@ -19,7 +23,7 @@ scheduling:
   memory_reserve_gib: 8 # RAM reserved for the OS and other processes.
 
 cache:
-  setup: true # false = regenerate circuit and keys for every job.
+  setup: true # false = regenerate proving/verification keys for every job.
   profiles: true # false = do not reuse profiles from previous experiments.
 
 profiling:

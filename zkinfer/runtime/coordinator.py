@@ -83,7 +83,9 @@ class Coordinator:
             witness_preparation=getattr(runtime_config.coordinator, "witness_preparation", "independent"),
             max_propagated_scale=getattr(runtime_config.coordinator, "max_propagated_scale", 16),
             allow_boundary_rescale=getattr(runtime_config.coordinator, "allow_boundary_rescale", True),
+            preparation_cache_enabled=getattr(runtime_config.coordinator, "preparation_cache_enabled", None),
         )
+        self.preparation_dispatch = getattr(runtime_config.coordinator, "preparation_dispatch", "batch")
         if self.request_builder.witness_preparation == "upfront" and not self.verifier:
             raise ValueError("Upfront witness preparation requires an enabled verifier")
         self.lock = threading.RLock()
@@ -110,6 +112,17 @@ class Coordinator:
         recovered = self.state_store.load_active_state()
         for request, jobs in recovered:
             self.active_requests[request.request_id] = request
+            if not request.preparation_complete:
+                # Preparation is not resumable: never accept an incomplete proof graph.
+                request.preparation_error = "Coordinator restarted during preparation"
+                request.preparation_complete = True
+                for job in jobs:
+                    if job.job_status in {JobStatus.PREPARING, JobStatus.QUEUED, JobStatus.IN_PROGRESS}:
+                        job.job_status = JobStatus.FAILED
+                        job.error_message = request.preparation_error
+                        job.completed_time = datetime.now(timezone.utc)
+                        self.state_store.save_job(job)
+                self.state_store.save_request(request)
             for job in jobs:
                 if job.job_status == JobStatus.IN_PROGRESS:
                     job.job_status = JobStatus.QUEUED
@@ -154,14 +167,17 @@ class Coordinator:
         )
         request.request_status = RequestStatus.PREPARING
         self._create_request_dirs(request)
-        request.proof_jobs = self.request_builder.build_jobs(
-            request=request,
-            shared_storage=self.shared_storage,
-            setup_store=self.setup_store,
-            max_retries=self.max_retries,
-        )
         request.preparation_metrics["scheduler_policy"] = self.scheduler_policy
-        self._enqueue_request(request)
+        if self.preparation_dispatch == "streaming":
+            self._prepare_streaming_request(request)
+        else:
+            request.proof_jobs = self.request_builder.build_jobs(
+                request=request,
+                shared_storage=self.shared_storage,
+                setup_store=self.setup_store,
+                max_retries=self.max_retries,
+            )
+            self._enqueue_request(request)
         self.logger.info(
             "Submitted request %s with %d jobs | scheduler=%s | run_dir=%s",
             request.request_id,
@@ -170,6 +186,63 @@ class Coordinator:
             request.run_dir,
         )
         return request.request_id
+
+    def _prepare_streaming_request(self, request: InferenceRequest) -> None:
+        """Publish ready jobs under the scheduler lock; seal before verification."""
+        request.preparation_complete = False
+        request.preparation_metrics["preparation_dispatch"] = "streaming"
+        started = time.perf_counter()
+        with self.lock:
+            self.active_requests[request.request_id] = request
+            if self.state_store:
+                self.state_store.save_request(request)
+
+        def register_plan(count: int) -> None:
+            with self.lock:
+                request.expected_job_count = count
+                if self.state_store:
+                    self.state_store.save_request(request)
+
+        def publish(job: ProofJob) -> None:
+            with self.lock:
+                if request.preparation_complete:
+                    raise RuntimeError("Cannot publish to a sealed request")
+                if request.expected_job_count is None or len(request.proof_jobs) >= request.expected_job_count:
+                    raise RuntimeError("Published more jobs than planned")
+                job.job_status = JobStatus.QUEUED
+                if self.state_store:
+                    self.state_store.save_job(job)
+                request.proof_jobs.append(job)
+                if request.queued_time is None:
+                    request.queued_time = datetime.now(timezone.utc)
+                    request.request_status = RequestStatus.QUEUED
+                    request.preparation_metrics["first_job_ready_time(s)"] = time.perf_counter() - started
+                if self.state_store:
+                    self.state_store.save_request(request)
+                    self.state_store.append_event("job_ready", request_id=request.request_id, job_id=job.job_id)
+                self.scheduler.add_jobs([job])
+
+        try:
+            self.request_builder.build_jobs(
+                request=request, shared_storage=self.shared_storage,
+                setup_store=self.setup_store, max_retries=self.max_retries,
+                on_job_ready=publish, on_plan=register_plan,
+            )
+            if not request.expected_job_count or len(request.proof_jobs) != request.expected_job_count:
+                raise RuntimeError("Preparation did not publish every planned job")
+        except Exception as exc:
+            # Drain already published jobs, but never verify or accept a partial graph.
+            self.logger.exception("Preparation failed for request %s", request.request_id)
+            request.preparation_error = str(exc) or type(exc).__name__
+        finally:
+            with self.lock:
+                request.preparation_metrics["all_jobs_ready_time(s)"] = time.perf_counter() - started
+                request.preparation_complete = True
+                if self.state_store:
+                    self.state_store.save_request(request)
+                    self.state_store.append_event("preparation_finished", request_id=request.request_id,
+                                                  payload={"error": request.preparation_error})
+            self._schedule_request_finalization(request.request_id)
 
     def _create_request_dirs(self, request: InferenceRequest) -> None:
         run_dir = self.runs_dir / request.request_id
@@ -201,7 +274,7 @@ class Coordinator:
                 "scheduler": self.scheduler_policy,
                 "status": request.request_status.value.lower(),
                 "message": request.error_message or "",
-                "total_jobs": len(jobs),
+                "total_jobs": request.expected_job_count if request.expected_job_count is not None else len(jobs),
                 "queued_jobs": sum(1 for job in jobs if job.job_status == JobStatus.QUEUED),
                 "in_progress_jobs": sum(
                     1 for job in jobs if job.job_status == JobStatus.IN_PROGRESS
@@ -596,7 +669,7 @@ class Coordinator:
                 return
 
             self.finalizing_requests.add(request_id)
-            if request.any_job_failed():
+            if request.preparation_error is not None or request.any_job_failed():
                 request.request_status = RequestStatus.IN_PROGRESS
             elif self.verifier:
                 request.request_status = RequestStatus.VERIFYING
@@ -644,7 +717,10 @@ class Coordinator:
                 return
 
         verification_report: Optional[Dict] = None
-        if parent_request.any_job_failed():
+        if parent_request.preparation_error is not None:
+            final_status = RequestStatus.FAILED
+            error_message = f"Preparation failed: {parent_request.preparation_error}"
+        elif parent_request.any_job_failed():
             failed_count = sum(
                 1
                 for job in parent_request.proof_jobs

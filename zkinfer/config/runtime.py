@@ -16,6 +16,8 @@ class CoordinatorConfig:
     witness_preparation: str = "independent"
     max_propagated_scale: int = 0
     allow_boundary_rescale: bool = True
+    preparation_dispatch: str = "batch"
+    preparation_cache_enabled: Optional[bool] = None
 
 
 @dataclass(frozen=True)
@@ -299,6 +301,14 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
         node_cache_dir.mkdir(parents=True, exist_ok=True)
         node_runtime_state_dir.mkdir(parents=True, exist_ok=True)
 
+    preparation_dispatch = str(cfg.coordinator.get("preparation_dispatch", "batch"))
+    if preparation_dispatch not in {"batch", "streaming"}:
+        raise ValueError("coordinator.preparation_dispatch must be batch or streaming")
+    preparation_cache_enabled = cfg.coordinator.get("preparation_cache_enabled", None)
+    if preparation_cache_enabled is not None and type(preparation_cache_enabled) is not bool:
+        raise ValueError("coordinator.preparation_cache_enabled must be boolean or null")
+    if preparation_dispatch == "streaming" and int(cfg.coordinator.grpc_thread_pool_size) < 2:
+        raise ValueError("Streaming preparation requires at least two gRPC threads")
     witness_preparation = str(cfg.coordinator.get("witness_preparation", "upfront"))
     if witness_preparation not in {"independent", "upfront"}:
         raise ValueError("coordinator.witness_preparation must be independent or upfront")
@@ -322,6 +332,8 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             witness_preparation=witness_preparation,
             max_propagated_scale=scale_cap,
             allow_boundary_rescale=bool(cfg.coordinator.get("allow_boundary_rescale", True)),
+            preparation_dispatch=preparation_dispatch,
+            preparation_cache_enabled=preparation_cache_enabled,
         ),
         node=NodeConfig(
             node_id=cfg.node.node_id,

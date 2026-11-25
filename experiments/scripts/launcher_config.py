@@ -60,6 +60,10 @@ def _validate(user: DictConfig) -> None:
         raise ValueError("partitioning.max_propagated_scale must be in [0, 62]")
     _boolean(user.partitioning.get("allow_boundary_rescale", True),
              "partitioning.allow_boundary_rescale")
+    preparation = user.get("preparation", {})
+    _choice(preparation.get("dispatch", "batch"), "preparation.dispatch", ("batch", "streaming"))
+    if preparation.get("cache_enabled") is not None:
+        _boolean(preparation["cache_enabled"], "preparation.cache_enabled")
     _choice(user.scheduling.policy, "scheduling.policy", SCHEDULERS)
     _choice(user.scheduling.memory_admission, "scheduling.memory_admission", ADMISSION_MODES)
     cap = user.scheduling.max_concurrent_jobs
@@ -90,6 +94,9 @@ def _apply_execution(cfg: DictConfig, user: DictConfig) -> None:
     cfg.coordinator.witness_preparation = user.partitioning.get("witness_preparation", "upfront")
     cfg.coordinator.max_propagated_scale = user.partitioning.get("max_propagated_scale", 0)
     cfg.coordinator.allow_boundary_rescale = user.partitioning.get("allow_boundary_rescale", True)
+    preparation = user.get("preparation", {})
+    cfg.coordinator.preparation_dispatch = preparation.get("dispatch", "batch")
+    cfg.coordinator.preparation_cache_enabled = preparation.get("cache_enabled", None)
     cfg.verification.enabled = cfg.coordinator.witness_preparation == "upfront"
     cfg.verification.trusted_vk_manifest = user.get("verification", {}).get("trusted_vk_manifest", None)
 
@@ -170,6 +177,10 @@ def make_run_name(
         timestamp, user.workload, partition, setup, concurrency,
         policy, admission,
         *(() if user.partitioning.get("witness_preparation", "upfront") == "independent" else ("exact",)),
+        *(() if "preparation" not in user else (
+            user.preparation.get("dispatch", "batch"),
+            "prep-on" if user.preparation.get("cache_enabled", user.cache.setup) else "prep-off",
+        )),
         unique,
     ))
 
