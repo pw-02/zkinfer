@@ -35,20 +35,11 @@ class NodeResources:
     memory_available_gb: float = 0.0
     cpu_total_cores: float = 0.0
     cpu_available_cores: float = 0.0
-    cache_limit_gb: float = 0.0
-    cache_used_gb: float = 0.0
     active_job_ids: Sequence[str] = field(default_factory=tuple)
-    cached_setup_keys: Sequence[str] = field(default_factory=tuple)
 
     @property
     def active_job_count(self) -> int:
         return len(self.active_job_ids or [])
-
-    @property
-    def cache_available_gb(self) -> float:
-        if self.cache_limit_gb <= 0:
-            return float("inf")
-        return max(0.0, self.cache_limit_gb - self.cache_used_gb)
 
 
 @dataclass

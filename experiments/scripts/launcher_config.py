@@ -160,7 +160,6 @@ def make_run_name(
     policy = {
         "fifo": "fifo",
         "lpt": "lpt",
-        "cache_aware": "cache",
         "resource_aware": "resource",
     }[user.scheduling.policy]
     unique = suffix if suffix is not None else uuid.uuid4().hex[:8]

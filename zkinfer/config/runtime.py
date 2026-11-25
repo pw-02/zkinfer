@@ -39,8 +39,6 @@ class NodeConfig:
     resource_sampling_interval_sec: float
     max_concurrent_jobs: Optional[int]
     stage_admission: StageAdmissionConfig
-    local_cache_dir: str
-    local_cache_max_bytes: int
     runtime_state_dir: str
 
 
@@ -110,10 +108,6 @@ def _resolve_path(path: str) -> Path:
     return resolved if resolved.is_absolute() else Path.cwd() / resolved
 
 
-def _gb_to_bytes(value) -> int:
-    return int(float(value or 0) * (1024**3))
-
-
 def _resolve_request_store_config(cfg: DictConfig) -> RequestStoreConfig:
     backend = str(cfg.storage.backend)
     request_path = str(cfg.storage.request_data.get("path", "storage/requests"))
@@ -142,7 +136,7 @@ def _resolve_setup_store_config(cfg: DictConfig) -> SetupStoreConfig:
     backend = str(cfg.storage.backend)
     reusable_setup = cfg.storage.reusable_setup
     enabled = bool(reusable_setup.get("enabled", False))
-    setup_path = str(reusable_setup.get("path", "storage/setup"))
+    setup_path = str(reusable_setup.get("path", "storage/cache"))
     profiles = cfg.storage.get("resource_profiles", {})
     profiles_enabled = bool(profiles.get("enabled", True))
     profiles_update = bool(profiles.get("update_history", profiles_enabled))
@@ -244,10 +238,6 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
     node_runs_dir = _resolve_path(cfg.node.runs_dir)
     node_logs_dir = _resolve_path(cfg.node.logs_dir)
 
-    node_cache_cfg = cfg.node.get("local_cache", {})
-    node_cache_dir = _resolve_path(
-        node_cache_cfg.get("path", "storage/node/cache")
-    )
     node_runtime_state_dir = _resolve_path(
         cfg.node.get("runtime_state_dir", "storage/node/runtime")
     )
@@ -349,8 +339,6 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             ),
             max_concurrent_jobs=_resolve_max_concurrent_jobs(cfg),
             stage_admission=stage_admission,
-            local_cache_dir=str(node_cache_dir),
-            local_cache_max_bytes=_gb_to_bytes(node_cache_cfg.get("max_gb", 100)),
             runtime_state_dir=str(node_runtime_state_dir),
         ),
         request_store=request_store,

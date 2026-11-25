@@ -48,9 +48,8 @@ LOGS_DIR="${CAMPAIGN_DIR}/logs"
 CONFIG_DIR="${CAMPAIGN_DIR}/config"
 STATE_DB="${CAMPAIGN_DIR}/coordinator_state.sqlite3"
 
-LOCAL_CACHE_DIR="${ROOT_DIR}/storage/node/cache"
 NODE_RUNTIME_DIR="${ROOT_DIR}/storage/node/runtime"
-mkdir -p "$REQUESTS_DIR" "$LOGS_DIR" "$CONFIG_DIR" "$LOCAL_CACHE_DIR" "$NODE_RUNTIME_DIR"
+mkdir -p "$REQUESTS_DIR" "$LOGS_DIR" "$CONFIG_DIR" "$NODE_RUNTIME_DIR"
 
 cat > "${CONFIG_DIR}/launch.txt" <<EOF
 workload=${WORKLOAD}
@@ -64,7 +63,6 @@ keep_proof_artifacts=${KEEP_PROOF_ARTIFACTS}
 state_db=${STATE_DB}
 s3_bucket=${S3_BUCKET}
 s3_prefix=${S3_PREFIX}
-local_cache=${LOCAL_CACHE_DIR}
 node_runtime_dir=${NODE_RUNTIME_DIR}
 EOF
 
@@ -92,7 +90,6 @@ coordinator.logs_dir=${LOGS_DIR} \
 coordinator.state_db_path=${STATE_DB} \
 node.runs_dir=${REQUESTS_DIR} \
 node.logs_dir=${LOGS_DIR} \
-node.local_cache.path=${LOCAL_CACHE_DIR} \
 node.runtime_state_dir=${NODE_RUNTIME_DIR} \
 node.max_concurrent_jobs=${MAX_CONCURRENT_JOBS} \
 node.stage_admission.enabled=${STAGE_ADMISSION} \
@@ -101,7 +98,7 @@ storage.s3_bucket=${S3_BUCKET} \
 storage.s3_prefix=${S3_PREFIX} \
 storage.request_data.path=requests \
 storage.reusable_setup.enabled=true \
-storage.reusable_setup.path=setup"
+storage.reusable_setup.path=cache"
 
 echo "Checking access to S3 bucket: ${S3_BUCKET}"
 if command -v aws >/dev/null 2>&1; then

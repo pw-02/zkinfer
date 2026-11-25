@@ -13,15 +13,11 @@ class JobScheduler:
     uses historical memory only to reject jobs whose predicted peak cannot fit on
     the machine at all. Once a job is leased, the node-local admission controller
     decides when memory-intensive stages may execute using live node state.
-
-    Cache locality is a preference among already feasible jobs, never a reason to
-    override a memory-safety check.
     """
 
     def __init__(self, policy: str = "fifo"):
         self.policy = (policy or "fifo").lower()
-        self.policy = {"artifact_aware": "cache_aware"}.get(self.policy, self.policy)
-        if self.policy not in {"fifo", "lpt", "resource_aware", "cache_aware"}:
+        if self.policy not in {"fifo", "lpt", "resource_aware"}:
             raise ValueError(f"Unsupported scheduling policy: {self.policy}")
         self._queue: List[ProofJob] = []
         self._request_order: deque[str] = deque()
@@ -69,21 +65,12 @@ class JobScheduler:
         if self.policy == "fifo":
             return min(candidates, key=lambda item: item[0])[0]
 
-        if self.policy == "lpt":
-            return max(
-                candidates,
-                key=lambda item: (item[1].predicted_duration_s or 0.0, -item[0]),
-            )[0]
-
-        cached = set(node.cached_setup_keys or []) if self.policy == "cache_aware" else set()
-
-        def score(item):
-            idx, job = item
-            cache_hit = 1 if job.artifact_key in cached else 0
-            duration = max(0.0, float(job.predicted_duration_s or 0.0))
-            return (cache_hit, duration, -idx)
-
-        return max(candidates, key=score)[0]
+        # Both policies prioritize duration within the selected request.
+        # Resource-aware differs in its machine-feasibility check.
+        return max(
+            candidates,
+            key=lambda item: (max(0.0, float(item[1].predicted_duration_s or 0.0)), -item[0]),
+        )[0]
 
     @staticmethod
     def _profiled_peak_memory_gb(job: ProofJob) -> float:

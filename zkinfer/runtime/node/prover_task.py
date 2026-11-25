@@ -698,33 +698,17 @@ class ProverTaskRunner:
         input_metrics = metrics.get("input", {}) or {}
         setup = metrics.get("setup", {}) or {}
         return {
-            "transfer_model_cache_hit": bool(model.get("cache_hit", False)),
-            "transfer_input_cache_hit": bool(input_metrics.get("cache_hit", False)),
             "transfer_model_bytes_downloaded": int(
                 model.get("bytes_downloaded", 0) or 0
             ),
             "transfer_input_bytes_downloaded": int(
                 input_metrics.get("bytes_downloaded", 0) or 0
             ),
-            "transfer_model_bytes_from_local_cache": int(
-                model.get("bytes_from_local_cache", 0) or 0
-            ),
-            "transfer_input_bytes_from_local_cache": int(
-                input_metrics.get("bytes_from_local_cache", 0) or 0
-            ),
             "transfer_setup_bytes_downloaded": int(
                 setup.get("bytes_downloaded", 0) or 0
             ),
-            "transfer_setup_shared_read_only": bool(setup.get("shared_read_only", False)),
-            "transfer_setup_bytes_reused_shared": int(setup.get("bytes_reused_shared", 0) or 0),
-            "transfer_setup_bytes_from_local_cache": int(
-                setup.get("bytes_from_local_cache", 0) or 0
-            ),
             "transfer_setup_restore_time(s)": float(
                 setup.get("restore_time(s)", 0.0) or 0.0
-            ),
-            "transfer_pk_decompress_time(s)": float(
-                setup.get("pk_decompress_time(s)", 0.0) or 0.0
             ),
         }
 

@@ -32,8 +32,8 @@ class ArtifactTransfer:
         if ref.sha256 and sha256_file(destination) != ref.sha256:
             raise ValueError(f"Artifact hash mismatch: {ref.uri}")
         return str(destination), {
-            "uri": ref.uri, "backend": ref.backend, "cache_hit": False,
-            "bytes_from_local_cache": 0, "bytes_downloaded": destination.stat().st_size,
+            "uri": ref.uri, "backend": ref.backend,
+            "bytes_downloaded": destination.stat().st_size,
             "materialize_time(s)": time.perf_counter() - started,
             "local_path": str(destination),
         }
@@ -44,7 +44,7 @@ class ArtifactTransfer:
         directory.mkdir(parents=True, exist_ok=True)
         files = self.KEY_FILES if prepared else self.SETUP_FILES
         metrics = {"setup_key": setup_key, "shared_setup_uri": ref.uri,
-                   "files": {}, "bytes_downloaded": 0, "bytes_from_local_cache": 0}
+                   "files": {}, "bytes_downloaded": 0}
         if not ref.is_empty and ref.backend == "filesystem":
             with partition_lock(ref.uri) as root:
                 info = metadata(root)

@@ -69,10 +69,6 @@ storage:
     update_history: true # Persist new observations independently.
     path: null
 
-  local_cache:
-    path: storage/node/cache
-    max_gb: 500
-
 output:
   # Copy proof/witness/setup artifacts into experiments/runs for debugging.
   # Traces, logs, manifests, and reports are always retained.

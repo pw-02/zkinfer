@@ -44,10 +44,6 @@ node:
   # null = no fixed cap; stage admission controls memory safety
   max_concurrent_jobs: 1
 
-  local_cache:
-    path: storage/node/cache
-    max_gb: 5000
-
   # Live stage reservations and historical admission estimates.
   runtime_state_dir: storage/node/runtime
 

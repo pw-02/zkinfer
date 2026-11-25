@@ -153,10 +153,7 @@ class ZKCoordinatorGrpcService(pb_grpc.ZKJobServiceServicer):
                 memory_available_gb=request.memory_available_gb,
                 cpu_total_cores=request.cpu_total_cores,
                 cpu_available_cores=request.cpu_available_cores,
-                cache_limit_gb=request.cache_limit_gb,
-                cache_used_gb=request.cache_used_gb,
                 active_job_ids=tuple(request.active_job_ids),
-                cached_setup_keys=tuple(request.cached_setup_keys),
             )
             job = self.coordinator.poll_node(node)
             if job is None:

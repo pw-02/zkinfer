@@ -51,16 +51,32 @@ class SharedStorage:
     def prefix_ref(self, uri: str) -> ArtifactRef:
         return ArtifactRef(self.backend, uri, s3_bucket=self.s3_bucket)
 
-    @staticmethod
-    def partition_path(model_name: str, parent_hash: str, model_bytes: bytes, operator_label: str) -> str:
-        """Stable, descriptive namespace; full hashes prevent prefix collisions."""
+    def partition_path(self, model_name: str, parent_hash: str, model_bytes: bytes, operator_label: str) -> str:
+        """Readable filesystem namespace bound to full SHA-256 identities."""
         def slug(value):
             return re.sub(r"[^a-zA-Z0-9_-]+", "_", value).strip("_- ")[:64] or "model"
         if not re.fullmatch(r"[0-9a-f]{64}", parent_hash):
             raise ValueError("Expected full SHA-256 parent identity")
         partition_hash = hashlib.sha256(model_bytes).hexdigest()
-        return os.path.join(f"{slug(model_name)}_{parent_hash}",
-                            f"{slug(operator_label)}_{partition_hash}")
+        if self.backend != "filesystem":
+            return os.path.join(f"{slug(model_name)}_{parent_hash}",
+                                f"{slug(operator_label)}_{partition_hash}")
+
+        from zkinfer.storage.partition_cache import partition_lock
+
+        parent = f"{slug(model_name)}_{parent_hash[:16]}"
+        child = f"{slug(operator_label)}_{partition_hash[:16]}"
+        # Bind the namespace before reading or publishing mutable artifacts.
+        for relative, digest in ((parent, parent_hash),
+                                 (os.path.join(parent, child), partition_hash)):
+            root = Path(self.setup_root) / relative
+            with partition_lock(root):
+                self._put_bytes(
+                    (digest + "\n").encode("ascii"),
+                    str(root / ".identity.sha256"),
+                    validate_existing=True,
+                )
+        return os.path.join(parent, child)
 
     def setup_ref(self, setup_key: str, partition_path: str | None = None) -> ArtifactRef:
         root = self.setup_root

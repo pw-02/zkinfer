@@ -273,10 +273,7 @@ class NodeSupervisor:
             memory_available_gb=reported_available_gb,
             cpu_total_cores=float(cpu_total),
             cpu_available_cores=actual_cpu_available,
-            cache_limit_gb=0.0,
-            cache_used_gb=0.0,
             active_job_ids=self.active_job_ids(),
-            cached_setup_keys=[],
         )
 
     def poll_for_job(self):
@@ -498,7 +495,6 @@ class NodeSupervisor:
 
             metrics = {
                 "node_id": self.node_id,
-                "node_cache_bytes": 0,
                 **result.metrics,
                 **self._flatten_setup_publish_metrics(setup_publish_metrics),
             }
@@ -583,7 +579,7 @@ class NodeSupervisor:
         Path(setup_dir).mkdir(parents=True, exist_ok=True)
         prepared = from_pb_artifact(lease.input).uri.endswith(".prepared.json")
         setup_metrics = {"setup_key": setup_key, "bytes_downloaded": 0,
-                         "bytes_from_local_cache": 0, "restore_time(s)": 0.0}
+                         "restore_time(s)": 0.0}
         if self.cfg.setup_store.enabled:
             setup_metrics = transfer.restore_setup(
                 from_pb_artifact(lease.setup_cache), setup_key, setup_dir, prepared
@@ -680,15 +676,6 @@ class NodeSupervisor:
             "transfer_setup_bytes_uploaded": int(metrics.get("bytes_uploaded", 0) or 0),
             "transfer_setup_publish_time(s)": float(
                 metrics.get("publish_time(s)", 0.0) or 0.0
-            ),
-            "transfer_pk_compress_time(s)": float(
-                metrics.get("pk_compress_time(s)", 0.0) or 0.0
-            ),
-            "transfer_setup_publish_eviction_count": int(
-                metrics.get("eviction_count", 0) or 0
-            ),
-            "transfer_setup_publish_evicted_bytes": int(
-                metrics.get("evicted_bytes", 0) or 0
             ),
         }
 

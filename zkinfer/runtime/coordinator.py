@@ -355,10 +355,7 @@ class Coordinator:
             "memory_available_gb": node.memory_available_gb,
             "cpu_total_cores": node.cpu_total_cores,
             "cpu_available_cores": node.cpu_available_cores,
-            "cache_limit_gb": node.cache_limit_gb,
-            "cache_used_gb": node.cache_used_gb,
             "active_job_ids": list(node.active_job_ids or []),
-            "cached_setup_keys": list(node.cached_setup_keys or []),
         }
 
     def check_for_dead_nodes(self) -> None:
