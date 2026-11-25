@@ -1,105 +1,74 @@
-# zkInfer runtime defaults
-
+# Canonical runtime defaults. Experiment YAML overrides these research settings.
 defaults:
   - _self_
-  - backend: ezkl
   - override hydra/hydra_logging: disabled
   - override hydra/job_logging: disabled
-
-resources:
-  coordinator_threads: null # Native Rayon parallelism in the coordinator.
-  prover_threads: null # Native Rayon parallelism per prover subprocess.
 
 coordinator:
   host: localhost
   port: 50051
-  grpc_thread_pool_size: 8
-  grpc_max_message_mb: 128
+  grpc_thread_pool_size: 8 # Short control-plane RPCs, not native proving threads.
   runs_dir: experiments/runs/requests
   logs_dir: logs/coordinator
-  state_store_enabled: true
   state_db_path: experiments/runs/coordinator_state.sqlite3
 
-  # Global request-fair scheduling policy for whole-job placement.
-  # Stage-level memory admission remains node-local.
-  # fifo | lpt | resource_aware
-  scheduling_policy: resource_aware
-  # upfront prepares public-linked witnesses before each job is eligible (filesystem only).
-  witness_preparation: upfront # independent | upfront
-  max_propagated_scale: 0
-  allow_boundary_rescale: true
-  # Preparation runs outside the synchronous gRPC handler pool.
-  preparation_workers: 1
-  preparation_max_pending: 8 # Waiting requests, in addition to active preparation.
-  preparation_dispatch: batch # batch | streaming
-  preparation_cache_enabled: null # null inherits reusable_setup.enabled
-
 node:
-  # One NodeSupervisor runs per physical machine/cloud instance.
-  node_id: null
+  node_id: null # Auto-detect when unset.
   runs_dir: experiments/runs/requests
   logs_dir: logs/nodes
+  runtime_state_dir: storage/node/runtime # Stage reservations and admission history.
   job_poll_interval_sec: 5
 
-  # RSS/CPU trace sampling interval. Exact stage transitions are timestamped
-  # separately and do not depend on this interval.
-  resource_sampling_interval_sec: 1.0
+partitioning:
+  enabled: true
+  size: 1 # Consecutive ONNX operators per job.
+  simplify: true
+  max_propagated_scale: 0 # Only propagate incoming fixed-point scales <= this cap.
+  allow_boundary_rescale: true # Permit deterministic, verified conversion to consumer scale.
 
-  # Optional hard whole-job concurrency cap.
-  # 1    = safe sequential default
-  # N    = fixed-concurrency baseline
-  # null = no fixed cap; stage admission controls memory safety
-  max_concurrent_jobs: 1
+preparation:
+  dispatch: streaming # batch waits for all witnesses; streaming releases ready jobs.
+  workers: 1 # Concurrent request preparations, not Rayon threads.
+  max_pending: 8 # Waiting requests; reject new submissions when full.
 
-  # Live stage reservations and historical admission estimates.
-  runtime_state_dir: storage/node/runtime
+scheduling:
+  policy: resource_aware # fifo | lpt | resource_aware
+  max_concurrent_jobs: 1 # null requires memory admission.
+  memory_admission: disabled # disabled | whole_job | stage
+  memory_reserve_gib: 8
+  history_percentile: 0.90 # Conservative stage estimate; sparse history uses maximum.
 
-  stage_admission:
-    mode: stage # stage | whole_job; enabled controls both modes
-    enabled: false
-    # RAM intentionally left unavailable to proof workloads. This fixed reserve
-    # is independent of historical predictions.
-    memory_safety_reserve_gb: 8
-    # Once enough observations exist, estimate stage memory from this percentile
-    # of historical runs. Sparse history uses the observed maximum.
-    history_percentile: 0.90
+resources:
+  coordinator_threads: null # Native Rayon pool for preparation and verification.
+  prover_threads: null # Rayon pool per prover process. null = automatic.
+
+cache:
+  path: storage/cache
+  circuits: true # Reuse compatible calibrated settings and compiled circuits.
+  keys: true # Independently reuse compatible proving and verification keys.
+
+resource_model:
+  use_history: true # Read estimates for scheduling and admission.
+  update_history: true # Persist new observations independently.
+  path: null # Default: alongside cached partition artifacts.
+
+profiling:
+  mode: research # basic | research | debug
+  sampling_interval_sec: 0.1 # RSS/CPU sampling; stage timestamps are independent.
+
+verification:
+  srs_dir: srs
+  trusted_vk_manifest: null # Optional setup identity -> trusted VK SHA-256 mapping.
+
+storage:
+  request_path: storage/requests # Shared filesystem; separate from reusable artifacts.
 
 jobs:
   max_retries: 1
 
-verification:
-  enabled: true
-  srs_dir: srs
-  require_split_chain: false
-  write_request_manifest: true
-  # Optional trusted JSON mapping setup identity -> VK SHA-256.
-  # Without this, upfront verification assumes trusted proving workers.
-  trusted_vk_manifest: null
-
 heartbeat:
   interval_sec: 15
   timeout_sec: 60
-
-storage:
-  backend: filesystem # filesystem | s3
-
-  reusable_setup:
-    # Reuse settings/circuit/PK/VK generated for the same setup identity.
-    enabled: true
-    path: storage/cache
-
-  request_data:
-    # Request-owned inputs, proofs, witnesses, and manifests.
-    path: storage/requests
-
-  resource_profiles:
-    # Independent of compiled-circuit / key reuse. Null keeps profiles alongside setup.
-    enabled: true # Read historical resource estimates.
-    update_history: true # Persist new observations independently.
-    path: null
-
-  s3_bucket: null
-  s3_prefix: zkinfer
 
 hydra:
   run:
@@ -107,7 +76,3 @@ hydra:
   sweep:
     dir: .
   output_subdir: null
-  job_logging:
-    level: DISABLE
-  hydra_logging:
-    level: DISABLE

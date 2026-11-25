@@ -12,7 +12,7 @@ from omegaconf import DictConfig, OmegaConf
 
 import zkinfer.proto.zkservice_pb2 as pb2
 import zkinfer.proto.zkservice_pb2_grpc as pb_grpc
-from zkinfer.config.runtime import build_runtime_config
+from zkinfer.config.runtime import build_runtime_config, normalize_runtime_config
 from zkinfer.runtime.coordinator import Coordinator, PreparationQueueFull
 from zkinfer.runtime.data_plane import ArtifactRef
 from zkinfer.runtime.models import NodeResources
@@ -274,6 +274,7 @@ def run_dead_node_monitor(
 
 @hydra.main(config_path="../config", config_name="config", version_base=None)
 def serve(cfg: DictConfig) -> None:
+    cfg = normalize_runtime_config(cfg)
     validate_config(cfg)
     runtime_config = build_runtime_config(cfg=cfg, process_role="coordinator")
     configure_coordinator_rayon(runtime_config.coordinator.rayon_threads)

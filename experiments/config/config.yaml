@@ -7,9 +7,9 @@ partitioning:
   enabled: true # false proves the entire model as one job.
   size: 1 # Number of consecutive ONNX operators per partition.
   simplify: true
-  # upfront: exact public linking; independent: legacy ORT inputs (unlinked).
-  witness_preparation: upfront
+  # Fixed-point scale propagation cap; 0 means positive incoming scales use local calibration.
   max_propagated_scale: 0
+  # Allow deterministic verified conversion between producer and consumer scales.
   allow_boundary_rescale: true
 
 preparation:

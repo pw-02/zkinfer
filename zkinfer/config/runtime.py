@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 
 
 @dataclass(frozen=True)
@@ -229,7 +229,61 @@ def _resolve_max_concurrent_jobs(cfg: DictConfig) -> Optional[int]:
     return max(1, int(value))
 
 
+def normalize_runtime_config(cfg: DictConfig) -> DictConfig:
+    """Translate canonical YAML into the existing internal typed-config layout.
+
+    The old layout is retained for internal programmatic fixtures, not as a
+    supported deployment configuration.
+    """
+    if "cache" not in cfg:
+        return cfg
+    mode = cfg.scheduling.memory_admission
+    if mode not in {"disabled", "whole_job", "stage"}:
+        raise ValueError("scheduling.memory_admission must be disabled, whole_job or stage")
+    if cfg.scheduling.max_concurrent_jobs is None and mode == "disabled":
+        raise ValueError("Unlimited concurrency requires memory admission")
+    return OmegaConf.merge(cfg, {
+        "coordinator": {
+            "grpc_max_message_mb": 128,
+            "state_store_enabled": True,
+            "scheduling_policy": cfg.scheduling.policy,
+            "witness_preparation": "upfront",
+            "max_propagated_scale": cfg.partitioning.max_propagated_scale,
+            "allow_boundary_rescale": cfg.partitioning.allow_boundary_rescale,
+            "preparation_dispatch": cfg.preparation.dispatch,
+            "preparation_workers": cfg.preparation.workers,
+            "preparation_max_pending": cfg.preparation.max_pending,
+            "preparation_cache_enabled": cfg.cache.circuits,
+        },
+        "node": {
+            "max_concurrent_jobs": cfg.scheduling.max_concurrent_jobs,
+            "resource_sampling_interval_sec": cfg.profiling.sampling_interval_sec,
+            "stage_admission": {
+                "enabled": mode != "disabled",
+                "mode": "stage" if mode == "disabled" else mode,
+                "memory_safety_reserve_gb": cfg.scheduling.memory_reserve_gib,
+                "history_percentile": cfg.scheduling.history_percentile,
+            },
+        },
+        "storage": {
+            "backend": "filesystem",
+            "s3_bucket": None,
+            "s3_prefix": "",
+            "request_data": {"path": cfg.storage.request_path},
+            "reusable_setup": {"enabled": cfg.cache.keys, "path": cfg.cache.path},
+            "resource_profiles": {
+                "enabled": cfg.resource_model.use_history,
+                "update_history": cfg.resource_model.update_history,
+                "path": cfg.resource_model.path,
+            },
+        },
+        "verification": {"enabled": True, "require_split_chain": False,
+                         "write_request_manifest": True},
+    })
+
+
 def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) -> RuntimeConfig:
+    cfg = normalize_runtime_config(cfg)
     if cfg.storage.backend not in {"filesystem", "s3"}:
         raise ValueError("storage.backend must be either 'filesystem' or 's3'")
     if cfg.storage.backend == "s3" and not cfg.storage.s3_bucket:

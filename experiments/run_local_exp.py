@@ -170,86 +170,36 @@ def make_env(cfg: DictConfig) -> dict:
     env["PYTHONPATH"] = f".:{existing}" if existing else "."
     env["PYTHONUNBUFFERED"] = "1"
     env["ZKINFER_KEEP_PROOF_ARTIFACTS"] = (
-        "true" if bool(cfg.output.keep_proof_artifacts) else "false"
+        "true" if bool(cfg.output.keep_proofs) else "false"
     )
     env["ZKINFER_PROFILING_MODE"] = str(cfg.profiling.mode)
     return env
 
 
 def common_overrides(cfg: DictConfig) -> List[str]:
-    requests_dir = Path(str(cfg.paths.runs_dir)) / "requests"
-    logs_dir = Path(str(cfg.paths.runs_dir)) / "logs"
-    return [
-        "resources.coordinator_threads=" + str(cfg.get("resources", {}).get("coordinator_threads") or "null"),
-        "resources.prover_threads=" + str(cfg.get("resources", {}).get("prover_threads") or "null"),
-        f"coordinator.host={cfg.launch.coordinator_host}",
-        f"coordinator.port={cfg.launch.coordinator_port}",
-        f"coordinator.runs_dir={requests_dir}",
-        f"coordinator.logs_dir={logs_dir}",
-        f"coordinator.state_db_path={Path(str(cfg.paths.runs_dir)) / 'coordinator_state.sqlite3'}",
-        f"coordinator.scheduling_policy={cfg.coordinator.scheduling_policy}",
-        f"coordinator.witness_preparation={cfg.coordinator.get('witness_preparation', 'upfront')}",
-        f"coordinator.preparation_dispatch={cfg.coordinator.get('preparation_dispatch', 'batch')}",
-        f"coordinator.preparation_workers={cfg.coordinator.get('preparation_workers', 1)}",
-        f"coordinator.preparation_max_pending={cfg.coordinator.get('preparation_max_pending', 8)}",
-        "coordinator.preparation_cache_enabled=" + (
-            "null" if cfg.coordinator.get("preparation_cache_enabled") is None
-            else str(cfg.coordinator.preparation_cache_enabled).lower()
-        ),
-        f"coordinator.max_propagated_scale={cfg.coordinator.get('max_propagated_scale', 16)}",
-        f"coordinator.allow_boundary_rescale={str(bool(cfg.coordinator.get('allow_boundary_rescale', True))).lower()}",
-        f"verification.enabled={str(bool(cfg.get('verification', {}).get('enabled', True))).lower()}",
-        "verification.trusted_vk_manifest=" + str(
-            cfg.get("verification", {}).get("trusted_vk_manifest") or "null"
-        ),
-        f"node.runs_dir={requests_dir}",
-        f"node.logs_dir={logs_dir}",
-        f"node.runtime_state_dir={cfg.node.get('runtime_state_dir', 'storage/node/runtime')}",
-        f"storage.request_data.path={cfg.storage.request_data.path}",
-        f"storage.reusable_setup.path={cfg.storage.reusable_setup.path}",
-        f"storage.reusable_setup.enabled={str(bool(cfg.storage.reusable_setup.enabled)).lower()}",
-        f"storage.resource_profiles.enabled={str(bool(cfg.storage.get('resource_profiles', {}).get('enabled', True))).lower()}",
-        f"storage.resource_profiles.update_history={str(bool(cfg.storage.get('resource_profiles', {}).get('update_history', True))).lower()}",
-        "storage.resource_profiles.path=" + (
-            str(cfg.storage.get("resource_profiles", {}).get("path"))
-            if cfg.storage.get("resource_profiles", {}).get("path") is not None else "null"
-        ),
-    ]
+    """Pass canonical runtime settings to both standalone processes."""
+    import json
+
+    def flatten(prefix, value):
+        if isinstance(value, dict):
+            for key, item in value.items():
+                yield from flatten(f"{prefix}.{key}" if prefix else key, item)
+        else:
+            yield f"{prefix}={json.dumps(value)}"
+
+    sections = ("coordinator", "node", "partitioning", "preparation", "scheduling",
+                "resources", "cache", "resource_model", "profiling", "verification",
+                "storage", "jobs", "heartbeat")
+    return [arg for section in sections
+            for arg in flatten(section, OmegaConf.to_container(cfg[section], resolve=True))]
 
 
 def coordinator_command(cfg: DictConfig) -> List[str]:
-    return [
-        sys.executable,
-        "-u",
-        "-m",
-        "zkinfer.runtime.coordinator_grpc",
-        *common_overrides(cfg),
-    ]
+    return [sys.executable, "-u", "-m", "zkinfer.runtime.coordinator_grpc", *common_overrides(cfg)]
 
 
 def node_command(cfg: DictConfig) -> List[str]:
-    admission = cfg.node.stage_admission
-    overrides = [
-        f"node.node_id={cfg.node.node_id}",
-        f"node.resource_sampling_interval_sec={cfg.node.resource_sampling_interval_sec}",
-        f"node.stage_admission.enabled={str(bool(admission.enabled)).lower()}",
-        f"node.stage_admission.mode={admission.get('mode', 'stage')}",
-        f"node.stage_admission.memory_safety_reserve_gb={admission.memory_safety_reserve_gb}",
-        f"node.stage_admission.history_percentile={admission.history_percentile}",
-    ]
-    if cfg.node.get("max_concurrent_jobs", None) is not None:
-        overrides.append(f"node.max_concurrent_jobs={int(cfg.node.max_concurrent_jobs)}")
-    else:
-        overrides.append("node.max_concurrent_jobs=null")
-
-    return [
-        sys.executable,
-        "-u",
-        "-m",
-        "zkinfer.runtime.node.supervisor",
-        *common_overrides(cfg),
-        *overrides,
-    ]
+    return [sys.executable, "-u", "-m", "zkinfer.runtime.node.supervisor", *common_overrides(cfg)]
 
 
 def wait_for_port(
@@ -326,7 +276,7 @@ def load_workload_cfg(workload_name: str) -> DictConfig:
 
 
 def _runtime_partition_mode(cfg: DictConfig) -> str:
-    return "fixed" if bool(cfg.execution.partitioning_enabled) else "none"
+    return "fixed" if bool(cfg.partitioning.enabled) else "none"
 
 
 def submit_workload(
@@ -334,7 +284,7 @@ def submit_workload(
     cfg: DictConfig,
     workload_cfg: DictConfig,
 ) -> str:
-    partition_size = int(cfg.execution.partition_size)
+    partition_size = int(cfg.partitioning.size)
     if partition_size < 1:
         raise ValueError("execution.partition_size must be at least one")
     return client.submit_inference_request(
@@ -343,7 +293,7 @@ def submit_workload(
         input_data_path=workload_cfg.input_file,
         split_mode=_runtime_partition_mode(cfg),
         ops_per_chunk=partition_size,
-        simplify_model=cfg.execution.get("simplify_model", False),
+        simplify_model=cfg.partitioning.simplify,
         input_shapes=workload_cfg.get("input_shapes", None),
     )
 
@@ -361,8 +311,8 @@ def save_request_metadata(
     OmegaConf.save(config=cfg, f=config_dir / "experiment_config.yaml")
     OmegaConf.save(config=workload_cfg, f=config_dir / "workload_config.yaml")
     (config_dir / "runtime_partitioning.txt").write_text(
-        f"enabled={str(bool(cfg.execution.partitioning_enabled)).lower()}\n"
-        f"partition_size={int(cfg.execution.partition_size)}\n"
+        f"enabled={str(bool(cfg.partitioning.enabled)).lower()}\n"
+        f"partition_size={int(cfg.partitioning.size)}\n"
         f"runtime_mode={_runtime_partition_mode(cfg)}\n",
         encoding="utf-8",
     )
@@ -374,13 +324,13 @@ def cleanup_request_store(
     logger: logging.Logger,
     request_ids: List[str],
 ) -> None:
-    if bool(cfg.output.keep_request_data):
+    if bool(cfg.output.keep_proofs):
         logger.info("Keeping canonical request inputs and proof outputs after experiment run")
         return
 
-    request_root = Path(str(cfg.storage.request_data.path)).resolve()
+    request_root = Path(str(cfg.storage.request_path)).resolve()
     protected = [
-        Path(str(cfg.storage.reusable_setup.path)).resolve(),
+        Path(str(cfg.cache.path)).resolve(),
         Path(str(cfg.paths.runs_dir)).resolve(),
     ]
     for request_id in set(request_ids):
@@ -435,8 +385,8 @@ def run(cfg: DictConfig) -> None:
             )
         )
         wait_for_port(
-            cfg.launch.coordinator_host,
-            int(cfg.launch.coordinator_port),
+            cfg.coordinator.host,
+            int(cfg.coordinator.port),
             int(cfg.launch.coordinator_ready_timeout_sec),
             group,
         )
@@ -453,7 +403,7 @@ def run(cfg: DictConfig) -> None:
         time.sleep(float(cfg.launch.node_startup_delay_sec))
 
         client = ZKInferenceClient(
-            target=f"{cfg.launch.coordinator_host}:{cfg.launch.coordinator_port}"
+            target=f"{cfg.coordinator.host}:{cfg.coordinator.port}"
         )
         failures = []
 
@@ -490,8 +440,8 @@ def run(cfg: DictConfig) -> None:
         active_log.close()
         stopped_cleanly = group.stop_all()
         wait_for_port_closed(
-            cfg.launch.coordinator_host,
-            int(cfg.launch.coordinator_port),
+            cfg.coordinator.host,
+            int(cfg.coordinator.port),
             10,
         )
         reports_ok = True
@@ -507,9 +457,6 @@ def run(cfg: DictConfig) -> None:
         if successful and stopped_cleanly and reports_ok:
             logger.info("Cleaning temporary storage according to output settings")
             cleanup_request_store(cfg, logger, submitted_request_ids)
-            root = Path(str(cfg.paths.runs_dir)).resolve() / "storage"
-            if not cfg.output.get("keep_cache", True) and (root / "cache").exists():
-                shutil.rmtree(root / "cache")
             if (root / "runtime").exists():
                 shutil.rmtree(root / "runtime")
             prune_empty_run_dirs(Path(str(cfg.paths.runs_dir)), submitted_request_ids)
@@ -521,16 +468,7 @@ def run(cfg: DictConfig) -> None:
                 raise RuntimeError("Workloads completed but shutdown or reporting failed; cleanup skipped")
 
 
-@hydra.main(config_path="./config", config_name="runtime_experiment", version_base=None)
-def advanced_main(cfg: DictConfig) -> None:
-    run(cfg)
-
-
 def main():
-    # Preserve existing Hydra overrides for advanced scripts.
-    if any("=" in arg for arg in sys.argv[1:]):
-        advanced_main()
-        return
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="experiments/config/config.yaml")
     parser.add_argument("--workload")

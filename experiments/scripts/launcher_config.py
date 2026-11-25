@@ -57,8 +57,8 @@ def _validate(user: DictConfig) -> None:
         raise ValueError(f"Unknown workload: {workload}")
 
     _positive_int(user.partitioning.size, "partitioning.size")
-    _choice(user.partitioning.get("witness_preparation", "upfront"),
-            "partitioning.witness_preparation", ("independent", "upfront"))
+    if "witness_preparation" in user.partitioning:
+        raise ValueError("Remove partitioning.witness_preparation; linked preparation is mandatory")
     cap_scale = user.partitioning.get("max_propagated_scale", 0)
     if type(cap_scale) is not int or not 0 <= cap_scale <= 62:
         raise ValueError("partitioning.max_propagated_scale must be in [0, 62]")
@@ -97,59 +97,16 @@ def _validate(user: DictConfig) -> None:
         _boolean(OmegaConf.select(user, field), field)
 
 
-def _apply_execution(cfg: DictConfig, user: DictConfig) -> None:
-    cfg.suite.workloads = [user.workload]
-    for kind in ("coordinator_threads", "prover_threads"):
-        cfg.resources[kind] = user.get("resources", {}).get(kind)
-    cfg.execution.partitioning_enabled = user.partitioning.enabled
-    cfg.execution.partition_size = user.partitioning.size
-    cfg.execution.simplify_model = user.partitioning.simplify
-    cfg.coordinator.witness_preparation = user.partitioning.get("witness_preparation", "upfront")
-    cfg.coordinator.max_propagated_scale = user.partitioning.get("max_propagated_scale", 0)
-    cfg.coordinator.allow_boundary_rescale = user.partitioning.get("allow_boundary_rescale", True)
-    preparation = user.get("preparation", {})
-    cfg.coordinator.preparation_dispatch = preparation.get("dispatch", "batch")
-    cfg.coordinator.preparation_workers = preparation.get("workers", 1)
-    cfg.coordinator.preparation_max_pending = preparation.get("max_pending", 8)
-    cfg.coordinator.preparation_cache_enabled = _reuse(user, "circuits")
-    cfg.verification.enabled = cfg.coordinator.witness_preparation == "upfront"
-    cfg.verification.trusted_vk_manifest = user.get("verification", {}).get("trusted_vk_manifest", None)
-
-
-def _apply_scheduling(cfg: DictConfig, user: DictConfig) -> None:
-    scheduling = user.scheduling
-    admission = cfg.node.stage_admission
-    mode = scheduling.memory_admission
-
-    cfg.coordinator.scheduling_policy = scheduling.policy
-    cfg.node.max_concurrent_jobs = scheduling.max_concurrent_jobs
-    admission.enabled = mode != "disabled"
-    admission.mode = "stage" if mode == "disabled" else mode
-    admission.memory_safety_reserve_gb = scheduling.memory_reserve_gib
-
-
-def _apply_storage(cfg: DictConfig, user: DictConfig) -> None:
-    cfg.storage.reusable_setup.enabled = _reuse(user, "keys")
-    cfg.storage.resource_profiles.enabled = user.resource_model.use_history
-    cfg.storage.resource_profiles.update_history = user.resource_model.update_history
-    cfg.storage.resource_profiles.path = None
-    cfg.output.keep_proof_artifacts = user.output.keep_proofs
-    cfg.output.keep_request_data = user.output.keep_proofs
-    cfg.output.keep_cache = True
-
-
-def configure_run_paths(
-    cfg: DictConfig,
-    user: DictConfig,
-    run_dir: str | Path,
-) -> None:
-    """Keep request data run-local and isolate disposable caches."""
+def configure_run_paths(cfg: DictConfig, user: DictConfig, run_dir: str | Path) -> None:
+    """Keep request artifacts and coordinator state private to each run."""
     root = Path(run_dir).resolve()
-    storage = root / "storage"
-
     cfg.paths.runs_dir = str(root)
-    cfg.storage.request_data.path = str(storage / "requests")
-    cfg.node.runtime_state_dir = "storage/node/runtime"
+    cfg.storage.request_path = str(root / "storage" / "requests")
+    cfg.coordinator.runs_dir = str(root / "requests")
+    cfg.node.runs_dir = str(root / "requests")
+    cfg.coordinator.logs_dir = str(root / "logs")
+    cfg.node.logs_dir = str(root / "logs")
+    cfg.coordinator.state_db_path = str(root / "coordinator_state.sqlite3")
 
 
 def make_run_name(
@@ -180,7 +137,7 @@ def make_run_name(
     return "_".join((
         timestamp, user.workload, partition, setup, concurrency,
         policy, admission,
-        *(() if user.partitioning.get("witness_preparation", "upfront") == "independent" else ("exact",)),
+        "exact",
         *(() if "preparation" not in user else (
             user.preparation.get("dispatch", "batch"),
             "circuits-on" if _reuse(user, "circuits") else "circuits-off",
@@ -205,12 +162,14 @@ def load_config(
         user.partitioning.simplify = True
     _validate(user)
 
-    cfg = OmegaConf.load(CONFIG_DIR / "runtime_experiment.yaml")
-    _apply_execution(cfg, user)
-    _apply_scheduling(cfg, user)
-    _apply_storage(cfg, user)
-    cfg.profiling.mode = user.profiling.mode
-    cfg.node.resource_sampling_interval_sec = user.profiling.sampling_interval_sec
+    defaults = OmegaConf.load(CONFIG_DIR.parents[1] / "zkinfer/config/config.yaml")
+    cfg = OmegaConf.merge(defaults, user, {
+        "suite": {"workloads": [user.workload]},
+        "node": {"node_id": "local-node"},
+        "paths": {"runs_dir": "experiments/runs"},
+        "launch": {"coordinator_ready_timeout_sec": 30, "node_startup_delay_sec": 1,
+                   "poll_completion_interval_sec": 5},
+    })
 
     if run_dir is not None:
         configure_run_paths(cfg, user, run_dir)
