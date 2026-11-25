@@ -83,6 +83,14 @@ class RuntimeVerifier:
         self.trusted_vk_manifest = Path(trusted_vk_manifest) if trusted_vk_manifest else None
 
     def verify_request(self, request: InferenceRequest) -> RequestVerificationReport:
+        if (not getattr(request, "preparation_complete", True)
+                or getattr(request, "preparation_error", None) is not None
+                or (getattr(request, "expected_job_count", None) is not None
+                    and len(request.proof_jobs) != request.expected_job_count)):
+            return RequestVerificationReport(
+                request_id=request.request_id, enabled=self.enabled, valid=False,
+                total_verification_time_s=0.0, error="Request preparation incomplete or failed",
+            )
         if not self.enabled:
             return RequestVerificationReport(
                 request_id=request.request_id,

@@ -179,7 +179,8 @@ def make_run_name(
         *(() if user.partitioning.get("witness_preparation", "upfront") == "independent" else ("exact",)),
         *(() if "preparation" not in user else (
             user.preparation.get("dispatch", "batch"),
-            "prep-on" if user.preparation.get("cache_enabled", user.cache.setup) else "prep-off",
+            "prep-on" if (user.cache.setup if user.preparation.get("cache_enabled") is None
+                          else user.preparation.cache_enabled) else "prep-off",
         )),
         unique,
     ))

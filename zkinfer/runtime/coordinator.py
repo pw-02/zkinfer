@@ -171,12 +171,18 @@ class Coordinator:
         if self.preparation_dispatch == "streaming":
             self._prepare_streaming_request(request)
         else:
+            started = time.perf_counter()
             request.proof_jobs = self.request_builder.build_jobs(
                 request=request,
                 shared_storage=self.shared_storage,
                 setup_store=self.setup_store,
                 max_retries=self.max_retries,
             )
+            request.expected_job_count = len(request.proof_jobs)
+            ready_s = time.perf_counter() - started
+            request.preparation_metrics["first_job_ready_time(s)"] = ready_s
+            request.preparation_metrics["all_jobs_ready_time(s)"] = ready_s
+            request.preparation_metrics["preparation_overlap_time(s)"] = 0.0
             self._enqueue_request(request)
         self.logger.info(
             "Submitted request %s with %d jobs | scheduler=%s | run_dir=%s",
@@ -199,6 +205,8 @@ class Coordinator:
 
         def register_plan(count: int) -> None:
             with self.lock:
+                if count < 1 or request.expected_job_count is not None:
+                    raise ValueError("Expected a single nonempty preparation plan")
                 request.expected_job_count = count
                 if self.state_store:
                     self.state_store.save_request(request)
@@ -217,10 +225,10 @@ class Coordinator:
                     request.queued_time = datetime.now(timezone.utc)
                     request.request_status = RequestStatus.QUEUED
                     request.preparation_metrics["first_job_ready_time(s)"] = time.perf_counter() - started
+                self.scheduler.add_jobs([job])
                 if self.state_store:
                     self.state_store.save_request(request)
                     self.state_store.append_event("job_ready", request_id=request.request_id, job_id=job.job_id)
-                self.scheduler.add_jobs([job])
 
         try:
             self.request_builder.build_jobs(
@@ -236,7 +244,14 @@ class Coordinator:
             request.preparation_error = str(exc) or type(exc).__name__
         finally:
             with self.lock:
-                request.preparation_metrics["all_jobs_ready_time(s)"] = time.perf_counter() - started
+                elapsed = time.perf_counter() - started
+                if request.preparation_error is None:
+                    request.preparation_metrics["all_jobs_ready_time(s)"] = elapsed
+                request.preparation_metrics["preparation_finished_time(s)"] = elapsed
+                request.preparation_metrics["preparation_overlap_time(s)"] = (
+                    max(0.0, (datetime.now(timezone.utc) - request.started_time).total_seconds())
+                    if request.started_time else 0.0
+                )
                 request.preparation_complete = True
                 if self.state_store:
                     self.state_store.save_request(request)

@@ -202,3 +202,39 @@ def test_high_scale_fallback_is_explicit_and_exact(tmp_path):
             partitions, tmp_path / "strict", max_propagated_scale=7,
             allow_rescale=False, ezkl_module=FakeEZKL()
         )
+
+
+def test_streaming_callback_precedes_next_calibration(tmp_path):
+    partitions = [
+        fake_partition("second", ["a"], ["b"], [[999.0]]),
+        fake_partition("first", ["x"], ["a"], [[0.5]]),
+    ]
+    backend = FakeEZKL()
+    observed = []
+
+    def ready(part):
+        assert part.settings_path.is_file()
+        assert part.compiled_path.is_file()
+        assert part.witness_path.is_file()
+        observed.append((part.name, len(backend.calibrations), len(backend.witness_calls)))
+
+    prepared = prepare_partitions(
+        partitions, tmp_path / "streaming", ezkl_module=backend, on_prepared=ready,
+    )
+    assert observed == [("first", 1, 1), ("second", 2, 2)]
+    assert list(prepared) == ["first", "second"]
+
+
+def test_streaming_callback_failure_does_not_prepare_successor(tmp_path):
+    partitions = [
+        fake_partition("first", ["x"], ["a"], [[0.5]]),
+        fake_partition("second", ["a"], ["b"], [[999.0]]),
+    ]
+    backend = FakeEZKL()
+
+    def fail(_part):
+        raise RuntimeError("publication failed")
+
+    with pytest.raises(RuntimeError, match="publication failed"):
+        prepare_partitions(partitions, tmp_path / "failed", ezkl_module=backend, on_prepared=fail)
+    assert len(backend.witness_calls) == 1

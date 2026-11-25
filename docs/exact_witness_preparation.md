@@ -116,3 +116,21 @@ wheel for the essential integration tests:
 No real EZKL end-to-end run or performance result is implied by the mock
 tests. Approximate linking is deliberately not implemented: it would be a
 different, explicitly weaker verification policy.
+
+## Streaming preparation and cache reuse
+
+The experiment YAML now accepts:
+
+```yaml
+preparation:
+  cache_enabled: true
+  dispatch: streaming # batch | streaming
+cache:
+  setup: true # PK/VK reuse (independent of preparation cache)
+```
+
+Streaming publishes a job after its prepared artifacts and validated witness are available, in topological preparation order. The existing scheduler selects among ready jobs throughout preparation. The request is sealed only after all planned jobs are published. Verification cannot accept an unsealed or partially prepared graph. A preparation error fails the request after already published jobs drain; restart during preparation marks the incomplete request failed rather than resuming it. The submit RPC still returns after preparation, while worker polling and proving proceed concurrently on other gRPC threads. At least two gRPC threads are required; many simultaneous submissions may contend for the pool.
+
+The preparation cache reuses settings and compiled circuits keyed by partition model/backend/scale configuration. It is populated on first use, not by a separate offline representative calibration dataset. Warm witnesses are still generated from the current request, and out-of-range inputs must fail rather than silently accept an invalid proof. Use fresh cache roots for cold experiments. With preparation.cache_enabled=false, calibration and compilation run for each prepared partition even if cache.setup is true. This independent cache setting applies to upfront preparation; the legacy independent worker path still follows cache.setup.
+
+Compare batch and streaming with preparation cache off/on, and independently hold key caching and profiles constant. Reports include first_job_ready_time(s), all_jobs_ready_time(s), preparation_finished_time(s), preparation_overlap_time(s) (window between first lease and end of preparation, not measured active proving time), preparation_wall_time(s), and expected_proof_jobs. The existing preparation_time(s) is time to first queue publication, and request_runtime(s) can include overlapping preparation in streaming mode. Do not sum overlapping intervals as if they were disjoint. Run names record dispatch and preparation cache settings.

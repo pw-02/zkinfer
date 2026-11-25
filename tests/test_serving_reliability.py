@@ -161,6 +161,97 @@ class ResultAcceptanceTests(unittest.TestCase):
         )
 
 
+class StreamingPreparationTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.cfg = runtime_config(Path(self.tmp.name))
+        self.coordinator = Coordinator(self.cfg, logging.getLogger("test-streaming"))
+        self.addCleanup(self.coordinator.shutdown)
+        self.coordinator.preparation_dispatch = "streaming"
+        self.node = NodeResources("node", memory_total_gb=64, memory_available_gb=60)
+
+    @staticmethod
+    def job(request, name):
+        empty = ArtifactRef.empty()
+        return ProofJob(request.name, name, request.request_id, empty, empty, empty, empty)
+
+    def submit(self):
+        return self.coordinator.submit_request("model", "model.onnx", "input.json", "none", 1)
+
+    def test_first_job_can_finish_before_last_job_is_published(self):
+        owner = self.coordinator
+
+        def build(request, on_plan, on_job_ready, **_kwargs):
+            on_plan(2)
+            first = self.job(request, "first")
+            on_job_ready(first)
+            self.assertEqual(owner.get_request_status(request.request_id)["total_jobs"], 2)
+            self.assertIs(owner.poll_node(self.node), first)
+            self.assertTrue(owner.submit_job_result("node", first.job_id, "COMPLETED", first.lease_id))
+            self.assertFalse(request.all_jobs_finished())
+            self.assertNotIn(request.request_id, owner.finalizing_requests)
+            self.assertIsNone(request.completed_time)
+            second = self.job(request, "second")
+            on_job_ready(second)
+            return [first, second]
+
+        with patch.object(owner.request_builder, "build_jobs", side_effect=build), \
+                patch.object(owner, "_finalize_job"), \
+                patch.object(owner, "_verify_request_if_enabled", return_value={"valid": True}) as verify:
+            rid = self.submit()
+            request = owner.active_requests[rid]
+            self.assertTrue(request.preparation_complete)
+            self.assertFalse(request.all_jobs_finished())
+            verify.assert_not_called()
+            second = owner.poll_node(self.node)
+            self.assertEqual(second.model_name, "second")
+            owner.submit_job_result("node", second.job_id, "COMPLETED", second.lease_id)
+            owner.finalization_pool.shutdown(wait=True)
+            self.assertEqual(request.request_status, RequestStatus.COMPLETED)
+            verify.assert_called_once()
+
+    def test_preparation_failure_never_verifies_partial_graph(self):
+        owner = self.coordinator
+
+        def build(request, on_plan, on_job_ready, **_kwargs):
+            on_plan(2)
+            first = self.job(request, "first")
+            on_job_ready(first)
+            self.assertIs(owner.poll_node(self.node), first)
+            owner.submit_job_result("node", first.job_id, "COMPLETED", first.lease_id)
+            raise RuntimeError("calibration failed")
+
+        with patch.object(owner.request_builder, "build_jobs", side_effect=build), \
+                patch.object(owner, "_finalize_job"), \
+                patch.object(owner, "_verify_request_if_enabled") as verify:
+            rid = self.submit()
+            owner.finalization_pool.shutdown(wait=True)
+            request = owner.active_requests[rid]
+            self.assertEqual(request.request_status, RequestStatus.FAILED)
+            self.assertIn("calibration failed", request.error_message)
+            verify.assert_not_called()
+
+    def test_recovery_rejects_interrupted_preparation(self):
+        owner = self.coordinator
+        request = InferenceRequest("model", "model.onnx", "input.json", "none", 1, "fifo")
+        owner._create_request_dirs(request)
+        request.preparation_complete = False
+        request.expected_job_count = 2
+        request.request_status = RequestStatus.PREPARING
+        job = self.job(request, "first")
+        job.job_status = JobStatus.QUEUED
+        owner.state_store.save_request(request)
+        owner.state_store.save_job(job)
+        restarted = Coordinator(self.cfg, logging.getLogger("test-streaming-recovery"))
+        self.addCleanup(restarted.shutdown)
+        restarted.finalization_pool.shutdown(wait=True)
+        recovered = restarted.active_requests[request.request_id]
+        self.assertEqual(recovered.request_status, RequestStatus.FAILED)
+        self.assertIn("restarted", recovered.error_message)
+        self.assertTrue(restarted.scheduler.empty())
+
+
 class NodeAttemptTests(unittest.TestCase):
     def test_retry_replaces_local_job_folder(self):
         with tempfile.TemporaryDirectory() as tmp:
