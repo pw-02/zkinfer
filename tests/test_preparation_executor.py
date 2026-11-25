@@ -61,7 +61,7 @@ class PreparationExecutorTests(unittest.TestCase):
                         self.assertEqual(status.status, "preparing")
                         self.assertFalse(stub.PollNode(pb.NodeStatus(node_id="node"), timeout=3).job_available)
                         self.assertTrue(stub.SendNodeHeartbeat(
-                            pb.HeartbeatRequest(node_id="node"), timeout=3).success)
+                            pb.NodeHeartbeat(node_id="node"), timeout=3).success)
                         with self.assertRaises(grpc.RpcError) as rejected:
                             stub.SubmitInferenceRequest(request, timeout=3)
                         self.assertEqual(rejected.exception.code(), grpc.StatusCode.RESOURCE_EXHAUSTED)
