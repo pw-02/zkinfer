@@ -31,6 +31,9 @@ from zkinfer.runtime.node.stage_admission import (
 )
 from zkinfer.runtime.node.prover_task import LocalProverTask, ProverTaskResult
 from zkinfer.utils.network import get_ip
+from zkinfer.profiling.resource_parser import parse_resource_usage_file
+from zkinfer.profiling.execution_trace import write_execution_trace
+from zkinfer.profiling.job_features import save_circuit_features
 
 
 def setup_logger(name: str, log_file: Optional[str] = None) -> logging.Logger:
@@ -534,16 +537,35 @@ class NodeSupervisor:
                 exc,
                 exc_info=True,
             )
+            partial = {"node_id": self.node_id}
+            if local_task is not None:
+                for operation in (
+                    lambda: save_circuit_features(local_task),
+                    lambda: write_execution_trace(output_dir),
+                ):
+                    try:
+                        operation()
+                    except Exception:
+                        self.logger.warning("Partial profiling checkpoint failed", exc_info=True)
+                try:
+                    partial.update(parse_resource_usage_file(str(output_dir / "resource_usage.csv")))
+                except Exception:
+                    self.logger.warning("Partial RSS metrics unavailable", exc_info=True)
             self.submit_job_result(
                 lease=lease,
                 status="FAILED",
                 message=str(exc),
-                metrics={"node_id": self.node_id},
+                metrics=partial,
             )
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
-            if failed:
-                shutil.rmtree(output_dir, ignore_errors=True)
+            if failed and output_dir.is_dir():
+                # Keep attempt diagnostics outside canonical job directories;
+                # a retry may recreate the latter.
+                archive = output_dir.parent.parent / "failed_attempts" / lease.job_id / lease.lease_id
+                archive.parent.mkdir(parents=True, exist_ok=True)
+                if not archive.exists():
+                    output_dir.rename(archive)
             if cleanup_published and local_task:
                 try:
                     self._cleanup_published_attempt(local_task)
