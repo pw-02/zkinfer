@@ -75,7 +75,7 @@ class JobScheduler:
                 key=lambda item: (item[1].predicted_duration_s or 0.0, -item[0]),
             )[0]
 
-        cached = set(node.cached_setup_keys or [])
+        cached = set(node.cached_setup_keys or []) if self.policy == "cache_aware" else set()
 
         def score(item):
             idx, job = item

@@ -302,7 +302,6 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
     elif process_role == "node":
         node_runs_dir.mkdir(parents=True, exist_ok=True)
         node_logs_dir.mkdir(parents=True, exist_ok=True)
-        node_cache_dir.mkdir(parents=True, exist_ok=True)
         node_runtime_state_dir.mkdir(parents=True, exist_ok=True)
 
     preparation_dispatch = str(cfg.coordinator.get("preparation_dispatch", "batch"))

@@ -201,8 +201,6 @@ def common_overrides(cfg: DictConfig) -> List[str]:
         f"node.runs_dir={requests_dir}",
         f"node.logs_dir={logs_dir}",
         f"node.runtime_state_dir={cfg.node.get('runtime_state_dir', 'storage/node/runtime')}",
-        f"node.local_cache.path={cfg.storage.local_cache.path}",
-        f"node.local_cache.max_gb={cfg.storage.local_cache.max_gb}",
         f"storage.request_data.path={cfg.storage.request_data.path}",
         f"storage.reusable_setup.path={cfg.storage.reusable_setup.path}",
         f"storage.reusable_setup.enabled={str(bool(cfg.storage.reusable_setup.enabled)).lower()}",

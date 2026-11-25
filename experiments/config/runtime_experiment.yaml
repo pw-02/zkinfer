@@ -20,13 +20,11 @@ execution:
   simplify_model: true
 
 coordinator:
-  # fifo | lpt | cache_aware | resource_aware
+  # fifo | lpt | resource_aware
   # fifo: request-fair queue order
   # lpt: longest predicted job first within the selected request
-  # cache_aware: prefer setup already present on the polling node
-  # resource_aware: reject jobs that cannot fit the machine, then use cache
-  # locality and duration only as coarse placement preferences. Stage-level
-  # admission remains node-local.
+  # resource_aware: reject jobs that cannot fit the machine and prioritise
+  # predicted duration. Stage-level admission remains node-local.
   scheduling_policy: lpt
   witness_preparation: upfront
   max_propagated_scale: 0

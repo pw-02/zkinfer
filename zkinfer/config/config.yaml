@@ -18,8 +18,8 @@ coordinator:
 
   # Global request-fair scheduling policy for whole-job placement.
   # Stage-level memory admission remains node-local.
-  # fifo | lpt | cache_aware | resource_aware
-  scheduling_policy: cache_aware
+  # fifo | lpt | resource_aware
+  scheduling_policy: resource_aware
   # upfront prepares public-linked witnesses before each job is eligible (filesystem only).
   witness_preparation: upfront # independent | upfront
   max_propagated_scale: 0
@@ -48,7 +48,7 @@ node:
     path: storage/node/cache
     max_gb: 5000
 
-  # Live stage reservations and node-local historical profiles.
+  # Live stage reservations and historical admission estimates.
   runtime_state_dir: storage/node/runtime
 
   stage_admission:

@@ -346,6 +346,35 @@ class NodeCache:
             metrics["publish_time(s)"] = time.perf_counter() - started
             return metrics
 
+        if shared_setup_ref.backend == "filesystem":
+            import fcntl
+            import tempfile
+            destination = Path(shared_setup_ref.uri)
+            destination.mkdir(parents=True, exist_ok=True)
+            with (destination / ".publish.lock").open("a") as lock:
+                fcntl.flock(lock, fcntl.LOCK_EX)
+                if not all((local_dir / name).is_file() for name in self.SETUP_FILES):
+                    raise ValueError("Cannot publish incomplete proving setup")
+                for name in self.SETUP_FILES:
+                    target = destination / name
+                    if target.exists() and name in {"settings.json", "network.compiled"}:
+                        if sha256_file(target) != sha256_file(local_dir / name):
+                            raise ValueError(f"Shared setup mismatch: {target}")
+                # A complete bundle is immutable. Never replace a key already in use.
+                if not all((destination / name).is_file() for name in self.SETUP_FILES):
+                    for name in self.SETUP_FILES:
+                        source = local_dir / name
+                        fd, temp = tempfile.mkstemp(prefix=".publish-", dir=destination)
+                        os.close(fd)
+                        try:
+                            shutil.copyfile(source, temp)
+                            os.replace(temp, destination / name)
+                        finally:
+                            Path(temp).unlink(missing_ok=True)
+                        metrics["bytes_uploaded"] += source.stat().st_size
+                metrics["publish_time(s)"] = time.perf_counter() - started
+                return metrics
+
         for filename in self.SETUP_FILES:
             source = local_dir / filename
             if not source.exists():

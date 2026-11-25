@@ -107,13 +107,6 @@ class NodeSupervisor:
         self.stage_cfg = self.cfg.node.stage_admission
         self.grpc_max_message_bytes = self.cfg.coordinator.grpc_max_message_mb * 1024 * 1024
 
-        self.cache = NodeCache(
-            root_dir=self.cfg.node.local_cache_dir,
-            max_bytes=self.cfg.node.local_cache_max_bytes,
-            default_s3_bucket=self.cfg.request_store.s3_bucket
-            or self.cfg.setup_store.s3_bucket
-            or "",
-        )
         self.stage_admission_dir = Path(self.cfg.node.runtime_state_dir)
         self.stage_admission_dir.mkdir(parents=True, exist_ok=True)
         self.resource_profiles = StageResourceHistory(
@@ -280,10 +273,10 @@ class NodeSupervisor:
             memory_available_gb=reported_available_gb,
             cpu_total_cores=float(cpu_total),
             cpu_available_cores=actual_cpu_available,
-            cache_limit_gb=float(self.cfg.node.local_cache_max_bytes) / (1024**3),
-            cache_used_gb=float(self.cache.total_bytes()) / (1024**3),
+            cache_limit_gb=0.0,
+            cache_used_gb=0.0,
             active_job_ids=self.active_job_ids(),
-            cached_setup_keys=self.cache.cached_setup_keys(),
+            cached_setup_keys=[],
         )
 
     def poll_for_job(self):
@@ -488,23 +481,13 @@ class NodeSupervisor:
             with self.active_lock:
                 self.active_tasks[lease.job_id] = local_task
 
-            if not self.cfg.setup_store.enabled:
-                result = self._run_prover_subprocess(local_task)
-                setup_publish_metrics = {}
-            elif local_task.setup_read_only or self.cache.setup_ready(local_task.setup_key):
-                result = self._run_prover_subprocess(local_task)
-                setup_publish_metrics = {}
-            else:
-                with self.cache.setup_guard(local_task.setup_key, pin=False):
-                    if self.cache.setup_ready(local_task.setup_key):
-                        result = self._run_prover_subprocess(local_task)
-                        setup_publish_metrics = {}
-                    else:
-                        result = self._run_prover_subprocess(local_task)
-                        setup_publish_metrics = self.cache.publish_setup_with_metrics(
-                            local_task.setup_dir,
-                            from_pb_artifact(lease.setup_cache),
-                        )
+            result = self._run_prover_subprocess(local_task)
+            setup_publish_metrics = {}
+            if self.cfg.setup_store.enabled and not local_task.setup_read_only:
+                transfer = NodeCache(str(tmp_dir / "transfer"), max_bytes=0)
+                setup_publish_metrics = transfer.publish_setup_with_metrics(
+                    local_task.setup_dir, from_pb_artifact(lease.setup_cache)
+                )
 
             update_history = self.cfg.setup_store.resource_profiles_update_history
             if update_history is None:
@@ -514,7 +497,7 @@ class NodeSupervisor:
 
             metrics = {
                 "node_id": self.node_id,
-                "node_cache_bytes": self.cache.total_bytes(),
+                "node_cache_bytes": 0,
                 **result.metrics,
                 **self._flatten_setup_publish_metrics(setup_publish_metrics),
             }
@@ -590,8 +573,10 @@ class NodeSupervisor:
         copy_run_metadata(self.metadata_snapshot, request_dir)
 
         setup_key = lease.setup_key or lease.job_id
-        cache_leases.enter_context(self.cache.pinned_setup(setup_key))
-        model_path, model_metrics = self.cache.materialize_model_with_metrics(
+        # This transfer workspace is private to the attempt and removed in finally.
+        transfer = NodeCache(str(tmp_dir / "transfer"), max_bytes=0)
+        cache_leases.enter_context(transfer.pinned_setup(setup_key))
+        model_path, model_metrics = transfer.materialize_model_with_metrics(
             from_pb_artifact(lease.model),
             setup_key,
         )
@@ -600,7 +585,7 @@ class NodeSupervisor:
         )
 
         input_path, input_metrics = cache_leases.enter_context(
-            self.cache.materialized_artifact(
+            transfer.materialized_artifact(
                 from_pb_artifact(lease.input),
                 filename_hint="input.json",
             )
@@ -610,7 +595,7 @@ class NodeSupervisor:
         )
 
         if self.cfg.setup_store.enabled:
-            setup_dir, setup_metrics = self.cache.restore_setup_with_metrics(
+            setup_dir, setup_metrics = transfer.restore_setup_with_metrics(
                 from_pb_artifact(lease.setup_cache),
                 setup_key,
             )
@@ -646,7 +631,7 @@ class NodeSupervisor:
                 if ref.is_empty or not ref.sha256:
                     raise ValueError(f"Unbound prepared artifact: {name}")
                 local, metrics = cache_leases.enter_context(
-                    self.cache.materialized_artifact(ref, filename_hint=name)
+                    transfer.materialized_artifact(ref, filename_hint=name)
                 )
                 if file_digest(local) != ref.sha256:
                     raise ValueError(f"Prepared artifact hash mismatch: {name}")
@@ -655,7 +640,7 @@ class NodeSupervisor:
 
             # The setup identity binds the exact settings and compiled bytes.
             # Never overwrite conflicting cached setup/key material.
-            with self.cache.setup_guard(setup_key, pin=False):
+            with transfer.setup_guard(setup_key, pin=False):
                 for name, filename in (("settings", "settings.json"), ("compiled", "network.compiled")):
                     source, ref = refs[name]
                     target = Path(setup_dir) / filename
