@@ -42,13 +42,14 @@ def phase_rows(resource_path, transition_path):
     exact boundary measurements. CPU percentages cover sampling intervals.
     """
     samples = []
-    with open(resource_path, newline="", encoding="utf-8") as f:
-        for row in csv.DictReader(f):
-            if row.get("type") not in ("process", "process_tree"):
-                continue
-            samples.append((_unix_us(row["timestamp"]),
-                            _number(row.get("memory_gb")),
-                            _number(row.get("cpu_machine_percent"))))
+    if Path(resource_path).is_file():
+        with open(resource_path, newline="", encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if row.get("type") not in ("process", "process_tree"):
+                    continue
+                samples.append((_unix_us(row["timestamp"]),
+                                _number(row.get("memory_gb")),
+                                _number(row.get("cpu_machine_percent"))))
     samples.sort(key=lambda item: item[0])
     times = [s[0] for s in samples]
     pending = {}
@@ -56,8 +57,8 @@ def phase_rows(resource_path, transition_path):
     rows = []
 
     def finish(stage, occurrence, start, end=None, duration=None, status="incomplete"):
-        values = [] if end is None or end < start else samples[
-            bisect.bisect_left(times, start):bisect.bisect_left(times, end)]
+        values = [] if end is not None and end < start else samples[
+            bisect.bisect_left(times, start):bisect.bisect_left(times, end) if end is not None else len(samples)]
         rss = [v[1] for v in values if v[1] is not None]
         cpu = [v[2] for v in values if v[2] is not None]
         rows.append(dict(zip(FIELDS, (
@@ -83,7 +84,9 @@ def phase_rows(resource_path, transition_path):
                 pending[stage] = (counts[stage], stamp)
             elif event["event"] == "end":
                 if stage not in pending:
-                    raise ValueError(f"Unmatched end event: {stage}")
+                    counts[stage] += 1
+                    finish(stage, counts[stage], stamp, stamp, None, "missing_start")
+                    continue
                 occurrence, start = pending.pop(stage)
                 duration = _number(event.get("duration_s"))
                 status = "complete" if stamp >= start and duration is not None else "invalid"
