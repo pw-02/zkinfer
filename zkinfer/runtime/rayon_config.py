@@ -20,6 +20,3 @@ def configure_coordinator_rayon(threads):
         else:
             os.environ.pop(key, None)
 
-
-def profile_thread_label(threads):
-    return "rayon-auto" if threads is None else f"rayon-{threads}"

@@ -56,6 +56,31 @@ preparation-start-relative meaning. Total request elapsed time includes
 queueing, preparation, execution and verification; overlapping stages are
 not additive.
 
+## Native thread budgets
+
+```yaml
+resources:
+  coordinator_threads: null
+  prover_threads: null
+```
+
+Positive integers set the Rayon global pool size for the coordinator (including
+preparation and verification) and for each independent proof subprocess.
+Null removes inherited Rayon thread-count overrides and lets Rayon detect the
+available logical CPUs. Configure explicit values in YAML rather than exporting
+RAYON_NUM_THREADS. These are pool sizes, not CPU affinity or admission limits.
+All proof nodes in an experiment should use the same explicit prover setting
+as the coordinator configuration. Automatic counts can differ by host; use
+explicit values for controlled comparisons.
+
+Job reports record the requested count and actual Halo2 pool size when
+available. Process configuration snapshots also retain the requested settings.
+Thread changes do not invalidate circuit or key artifacts. Shared resource
+history is separated by configured prover thread budget, and node-local stage
+history is keyed by setup identity plus that budget. Existing history is not
+migrated. Auto history can mix effective counts across machines; use explicit
+budgets for heterogeneous deployments.
+
 ## Coordinator scheduling
 
 The coordinator chooses which whole proof job to lease to a polling node. The experiment-facing setting is:
@@ -197,9 +222,8 @@ storage:
 This configuration regenerates setup for every job while using earlier resource
 measurements for scheduling. Successful cold jobs also update their history.
 Profiles use the storage backend/bucket configured for the runtime. The layout is
-`<profile root>/<model namespace>/<partition namespace>/cold_resource_profile.json` when setup reuse is disabled
-and `<profile root>/<model namespace>/<partition namespace>/resource_profile.json` when it is enabled. The latter
-preserves the existing reuse-enabled path. No fallback loads a warm profile into
+`<profile root>/<model namespace>/<partition namespace>/rayon-<budget>/cold_resource_profile.json` when setup reuse is disabled
+and `<profile root>/<model namespace>/<partition namespace>/rayon-<budget>/resource_profile.json` when it is enabled. The budget component is `rayon-auto` or `rayon-N`. No fallback loads a warm profile into
 a forced-cold job. Reuse-enabled history may include initial cache misses; prepare
 and snapshot warm-only measurements for controlled warm evaluation.
 

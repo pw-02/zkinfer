@@ -57,6 +57,26 @@ class LauncherConfigTests(unittest.TestCase):
                     self.assertEqual(cfg.storage.resource_profiles.update_history, update)
                     self.assertEqual(cfg.storage.reusable_setup.path, "storage/cache")
 
+    def test_independent_rayon_settings(self):
+        from experiments.run_local_exp import common_overrides
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "config.yaml"
+            self.assertIsNone(self.cfg.resources.coordinator_threads)
+            self.assertIsNone(self.cfg.resources.prover_threads)
+            self.user.resources.coordinator_threads = 4
+            self.user.resources.prover_threads = 16
+            OmegaConf.save(self.user, path)
+            _, cfg = load_config(path, run_dir=tmp)
+            self.assertEqual(cfg.resources.coordinator_threads, 4)
+            self.assertEqual(cfg.resources.prover_threads, 16)
+            self.assertIn("resources.coordinator_threads=4", common_overrides(cfg))
+            self.assertIn("resources.prover_threads=16", common_overrides(cfg))
+            for value in (0, -1, True, 1.5, "eight"):
+                self.user.resources.prover_threads = value
+                OmegaConf.save(self.user, path)
+                with self.assertRaisesRegex(ValueError, "resources.prover_threads"):
+                    load_config(path)
+
     def test_invalid_configuration(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "config.yaml"

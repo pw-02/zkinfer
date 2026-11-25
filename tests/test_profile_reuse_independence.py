@@ -87,6 +87,15 @@ class ProfileIndependenceTests(unittest.TestCase):
         self.assertEqual(job.predicted_peak_memory_gb, 10)
         self.assertEqual(job.predicted_duration_s, 20)
 
+    def test_explicit_threads_do_not_reuse_automatic_history_or_change_setup_key(self):
+        auto = self.jobs()[0]
+        self.builder.prover_threads = 16
+        explicit = self.jobs()[0]
+        self.assertEqual(auto.artifact_key, explicit.artifact_key)
+        self.assertEqual(explicit.predicted_peak_memory_gb, 0)
+        self.assertIn("/rayon-16/", explicit.profiling_file_path)
+        self.assertNotEqual(auto.profiling_file_path, explicit.profiling_file_path)
+
     def test_missing_cold_profile_never_falls_back_to_warm(self):
         (self.profile_dir / "cold_resource_profile.json").unlink()
         job = self.jobs()[0]
