@@ -274,7 +274,7 @@ def normalize_runtime_config(cfg: DictConfig) -> DictConfig:
             "s3_bucket": None,
             "s3_prefix": "",
             "request_data": {"path": cfg.storage.request_path},
-            "reusable_setup": {"enabled": cfg.cache.keys, "path": cfg.cache.path},
+            "reusable_setup": {"enabled": cfg.cache["keys"], "path": cfg.cache.path},
             "resource_profiles": {
                 "enabled": cfg.resource_model.use_history,
                 "update_history": cfg.resource_model.update_history,

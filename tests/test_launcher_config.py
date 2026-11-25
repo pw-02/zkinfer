@@ -26,7 +26,7 @@ class LauncherConfigTests(unittest.TestCase):
         self.assertTrue(self.cfg.cache.circuits)
         self.user.partitioning.enabled = True
         self.user.partitioning.size = 4
-        self.user.cache.keys = False
+        self.user.cache["keys"] = False
         self.user.scheduling.policy = "fifo"
         self.user.scheduling.memory_admission = "disabled"
         self.user.scheduling.max_concurrent_jobs = 1
