@@ -6,6 +6,10 @@ defaults:
   - override hydra/hydra_logging: disabled
   - override hydra/job_logging: disabled
 
+resources:
+  coordinator_threads: null # Native Rayon parallelism in the coordinator.
+  prover_threads: null # Native Rayon parallelism per prover subprocess.
+
 coordinator:
   host: localhost
   port: 50051

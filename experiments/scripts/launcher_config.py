@@ -70,6 +70,10 @@ def _validate(user: DictConfig) -> None:
     pending = preparation.get("max_pending", 8)
     if type(pending) is not int or pending < 0:
         raise ValueError("preparation.max_pending must be a non-negative integer")
+    for kind in ("coordinator_threads", "prover_threads"):
+        value = user.get("resources", {}).get(kind)
+        if value is not None:
+            _positive_int(value, f"resources.{kind}")
     for kind in ("circuits", "keys"):
         _boolean(_reuse(user, kind), f"cache.{kind}")
     for kind in ("use_history", "update_history"):
@@ -95,6 +99,8 @@ def _validate(user: DictConfig) -> None:
 
 def _apply_execution(cfg: DictConfig, user: DictConfig) -> None:
     cfg.suite.workloads = [user.workload]
+    for kind in ("coordinator_threads", "prover_threads"):
+        cfg.resources[kind] = user.get("resources", {}).get(kind)
     cfg.execution.partitioning_enabled = user.partitioning.enabled
     cfg.execution.partition_size = user.partitioning.size
     cfg.execution.simplify_model = user.partitioning.simplify

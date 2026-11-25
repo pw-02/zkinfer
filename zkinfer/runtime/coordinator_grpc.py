@@ -16,6 +16,7 @@ from zkinfer.config.runtime import build_runtime_config
 from zkinfer.runtime.coordinator import Coordinator, PreparationQueueFull
 from zkinfer.runtime.data_plane import ArtifactRef
 from zkinfer.runtime.models import NodeResources
+from zkinfer.runtime.rayon_config import configure_coordinator_rayon
 
 
 def setup_logger(name: str, log_file: Optional[str] = None) -> logging.Logger:
@@ -275,6 +276,7 @@ def run_dead_node_monitor(
 def serve(cfg: DictConfig) -> None:
     validate_config(cfg)
     runtime_config = build_runtime_config(cfg=cfg, process_role="coordinator")
+    configure_coordinator_rayon(runtime_config.coordinator.rayon_threads)
     logger = setup_logger(
         "coordinator",
         log_file=f"{runtime_config.coordinator.logs_dir}/coordinator.log",

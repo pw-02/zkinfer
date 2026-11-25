@@ -180,6 +180,8 @@ def common_overrides(cfg: DictConfig) -> List[str]:
     requests_dir = Path(str(cfg.paths.runs_dir)) / "requests"
     logs_dir = Path(str(cfg.paths.runs_dir)) / "logs"
     return [
+        "resources.coordinator_threads=" + str(cfg.get("resources", {}).get("coordinator_threads") or "null"),
+        "resources.prover_threads=" + str(cfg.get("resources", {}).get("prover_threads") or "null"),
         f"coordinator.host={cfg.launch.coordinator_host}",
         f"coordinator.port={cfg.launch.coordinator_port}",
         f"coordinator.runs_dir={requests_dir}",

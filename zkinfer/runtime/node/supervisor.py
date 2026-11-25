@@ -24,6 +24,7 @@ import zkinfer.proto.zkservice_pb2 as pb
 import zkinfer.proto.zkservice_pb2_grpc as pb_grpc
 from zkinfer.config.runtime import RuntimeConfig, build_runtime_config
 from zkinfer.runtime.data_plane import ArtifactRef
+from zkinfer.runtime.rayon_config import rayon_environment, profile_thread_label
 from zkinfer.runtime.node.artifact_transfer import ArtifactTransfer
 from zkinfer.runtime.node.stage_admission import (
     StageAdmissionController,
@@ -393,7 +394,7 @@ class NodeSupervisor:
                 ],
                 stdout=log,
                 stderr=subprocess.STDOUT,
-                env=os.environ.copy(),
+                env=rayon_environment(self.cfg.node.rayon_threads),
             )
             return_code = proc.wait()
         wall_time = time.perf_counter() - started
@@ -491,7 +492,7 @@ class NodeSupervisor:
             if update_history is None:
                 update_history = self.cfg.setup_store.resource_profiles_enabled
             if update_history:
-                self.resource_profiles.update_from_metrics(local_task.setup_key, result.metrics)
+                self.resource_profiles.update_from_metrics(local_task.history_key, result.metrics)
 
             metrics = {
                 "node_id": self.node_id,
@@ -645,6 +646,7 @@ class NodeSupervisor:
             job_id=lease.job_id,
             lease_id=lease_id,
             setup_key=setup_key,
+            history_key=setup_key + ":" + ("rayon-auto" if getattr(self.cfg.node, "rayon_threads", None) is None else f"rayon-{self.cfg.node.rayon_threads}"),
             model_path=model_path,
             input_path=input_path,
             setup_dir=setup_dir,

@@ -34,12 +34,14 @@ class RequestBuilder:
         self, logger: logging.Logger, witness_preparation: str = "independent",
         max_propagated_scale: int = 16, allow_boundary_rescale: bool = True,
         preparation_cache_enabled: bool | None = None,
+        prover_threads: int | None = None,
     ):
         self.logger = logger
         self.witness_preparation = witness_preparation
         self.max_propagated_scale = max_propagated_scale
         self.allow_boundary_rescale = allow_boundary_rescale
         self.preparation_cache_enabled = preparation_cache_enabled
+        self.prover_threads = prover_threads
 
     def build_jobs(
         self,
@@ -104,7 +106,8 @@ class RequestBuilder:
             if (setup_store.resource_profiles_enabled or update_history) and not transfer_only:
                 profile_root = setup_store.resource_profiles_root_dir or setup_store.root_dir
                 filename = "resource_profile.json" if setup_store.enabled else "cold_resource_profile.json"
-                resource_profile_path = os.path.join(profile_root, namespace, filename)
+                thread_label = "rayon-auto" if self.prover_threads is None else f"rayon-{self.prover_threads}"
+                resource_profile_path = os.path.join(profile_root, namespace, thread_label, filename)
             profiling_data = (
                 self._load_resource_profile(partition.name, resource_profile_path, setup_store)
                 if resource_profile_path and setup_store.resource_profiles_enabled else {}

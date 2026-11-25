@@ -47,7 +47,7 @@ class ProfileIndependenceTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.store = config.SetupStoreConfig(False, "filesystem", str(self.root / "setup"), None, "",
                                              resource_profiles_root_dir=str(self.root / "profiles"))
-        self.profile_dir = self.root / "profiles/model/partition"
+        self.profile_dir = self.root / "profiles/model/partition/rayon-auto"
         self.profile_dir.mkdir(parents=True)
         self.cold = {"setup_key": "key", "job_runtime(s)": 100, "max_process_memory(GB)": 40}
         self.warm = {"setup_key": "key", "job_runtime(s)": 20, "max_process_memory(GB)": 10}

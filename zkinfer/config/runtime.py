@@ -20,6 +20,7 @@ class CoordinatorConfig:
     preparation_max_pending: int = 8
     preparation_dispatch: str = "batch"
     preparation_cache_enabled: Optional[bool] = None
+    rayon_threads: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -42,6 +43,7 @@ class NodeConfig:
     max_concurrent_jobs: Optional[int]
     stage_admission: StageAdmissionConfig
     runtime_state_dir: str
+    rayon_threads: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -320,6 +322,12 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
     if type(scale_cap) is not int or not 0 <= scale_cap <= 62:
         raise ValueError("max_propagated_scale must be an integer in [0, 62]")
 
+    resources = cfg.get("resources", {})
+    for kind in ("coordinator_threads", "prover_threads"):
+        value = resources.get(kind)
+        if value is not None and (type(value) is not int or value < 1):
+            raise ValueError(f"resources.{kind} must be a positive integer or null")
+
     return RuntimeConfig(
         coordinator=CoordinatorConfig(
             host=cfg.coordinator.host,
@@ -335,6 +343,7 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             preparation_max_pending=preparation_max_pending,
             preparation_dispatch=preparation_dispatch,
             preparation_cache_enabled=preparation_cache_enabled,
+            rayon_threads=resources.get("coordinator_threads"),
         ),
         node=NodeConfig(
             node_id=cfg.node.node_id,
@@ -348,6 +357,7 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             max_concurrent_jobs=_resolve_max_concurrent_jobs(cfg),
             stage_admission=stage_admission,
             runtime_state_dir=str(node_runtime_state_dir),
+            rayon_threads=resources.get("prover_threads"),
         ),
         request_store=request_store,
         setup_store=setup_store,

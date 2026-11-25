@@ -19,6 +19,10 @@ execution:
   partition_size: 4
   simplify_model: true
 
+resources:
+  coordinator_threads: null
+  prover_threads: null
+
 coordinator:
   # fifo | lpt | resource_aware
   # fifo: request-fair queue order

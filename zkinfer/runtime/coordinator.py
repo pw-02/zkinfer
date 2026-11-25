@@ -88,6 +88,7 @@ class Coordinator:
             max_propagated_scale=getattr(runtime_config.coordinator, "max_propagated_scale", 16),
             allow_boundary_rescale=getattr(runtime_config.coordinator, "allow_boundary_rescale", True),
             preparation_cache_enabled=getattr(runtime_config.coordinator, "preparation_cache_enabled", None),
+            prover_threads=runtime_config.node.rayon_threads,
         )
         self.preparation_dispatch = getattr(runtime_config.coordinator, "preparation_dispatch", "batch")
         if self.request_builder.witness_preparation == "upfront" and not self.verifier:

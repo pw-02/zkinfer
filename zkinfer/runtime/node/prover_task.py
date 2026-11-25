@@ -51,6 +51,7 @@ class LocalProverTask:
     output_prefix: str
     output_backend: str
     output_s3_bucket: str = ""
+    history_key: str = ""
     setup_read_only: bool = False
     prepared_witness_path: Optional[str] = None
     resource_sampling_interval_sec: float = 1.0
@@ -279,7 +280,7 @@ class ProverTaskRunner:
                     encoding="utf-8",
                 ) as file:
                     json.dump(
-                        proof_stages.admission.profiles.load(task.setup_key),
+                        proof_stages.admission.profiles.load(task.history_key or task.setup_key),
                         file,
                         indent=2,
                         sort_keys=True,
@@ -329,9 +330,11 @@ class ProverTaskRunner:
     ) -> ProverTaskResult:
         ezkl_metrics, settings = proof_stages.run_all(setup_only=False)
         try:
-            save_circuit_features(task, settings)
+            features = save_circuit_features(task, settings)
+            ezkl_metrics["prover_rayon_pool_size"] = features.get("rayon_pool_size")
         except Exception:
             self.logger.warning("Failed to save circuit features", exc_info=True)
+        ezkl_metrics["prover_rayon_num_threads"] = os.environ.get("RAYON_NUM_THREADS")
         ezkl_metrics.update(proof_stages.admission_metrics)
         ezkl_metrics["whole_job_admission_wait_time(s)"] = float(
             job_info.get("wait_time_s", 0.0)
@@ -405,7 +408,7 @@ class ProverTaskRunner:
         )
         admission = StageAdmissionController(
             root_dir=admission_dir,
-            setup_key=task.setup_key,
+            setup_key=task.history_key or task.setup_key,
             enabled=task.stage_admission_enabled,
             mode=task.admission_mode,
             fallback_memory_gb=task.predicted_peak_memory_gb,

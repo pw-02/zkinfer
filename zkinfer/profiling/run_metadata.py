@@ -40,7 +40,8 @@ def save_process_metadata(directory, role, runtime_config, resolved_config=None)
             packages[package] = None
     metadata = {"role": role, "started_at": stamp.isoformat(), "pid": os.getpid(),
                 "code": code_revision(), "packages": packages,
-                "resolved_config": resolved, "runtime_config": runtime}
+                "resolved_config": resolved, "runtime_config": runtime,
+                "rayon_num_threads_env": os.environ.get("RAYON_NUM_THREADS")}
     path = directory / f"{stem}.json"
     path.write_text(json.dumps(metadata, indent=2, default=str) + "\n", encoding="utf-8")
     return path

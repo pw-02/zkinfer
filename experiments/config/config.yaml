@@ -29,6 +29,10 @@ cache:
   circuits: true # Calibrated settings and compiled circuits.
   keys: true # Proving and verification keys.
 
+resources:
+  coordinator_threads: null # Rayon pool for preparation and verification; null = auto.
+  prover_threads: null # Rayon pool per proof subprocess; null = auto.
+
 resource_model:
   use_history: true # Load historical estimates for scheduling and admission.
   update_history: true # Update estimates from completed jobs.
