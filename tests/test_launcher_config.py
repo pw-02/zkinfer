@@ -28,13 +28,13 @@ class LauncherConfigTests(unittest.TestCase):
         self.assertTrue(self.cfg.coordinator.preparation_cache_enabled)
         self.user.partitioning.enabled = True
         self.user.partitioning.size = 4
-        self.user.cache.reuse.keys = False
+        self.user.cache.keys = False
         self.user.scheduling.policy = "fifo"
         self.user.scheduling.memory_admission = "disabled"
         self.user.scheduling.max_concurrent_jobs = 1
         self.assertEqual(
             make_run_name(self.user, now=self.now, suffix="abcd"),
-            "2026-11-25_12-30-00_bert_p4_keys-off_c1_fifo_noadm_exact_streaming_circuits-on_profiles-on_persistent_abcd",
+            "2026-11-25_12-30-00_bert_p4_keys-off_c1_fifo_noadm_exact_streaming_circuits-on_history-on_learn-on_abcd",
         )
 
     def test_monolithic_and_auto(self):
@@ -44,15 +44,18 @@ class LauncherConfigTests(unittest.TestCase):
         self.assertIn("_mono_", make_run_name(self.user, now=self.now))
         self.assertIn("_cauto_", make_run_name(self.user, now=self.now))
 
-    def test_run_owned_cache_and_profile_isolation(self):
+    def test_history_flags_independent(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp).resolve()
-            self.user.cache.scope = "run"
-            self.user.cache.reuse.profiles = False
-            configure_run_paths(self.cfg, self.user, root)
-            self.assertEqual(self.cfg.storage.reusable_setup.path, str(root / "storage/cache/setup"))
-            self.assertEqual(self.cfg.node.runtime_state_dir, str(root / "storage/runtime"))
-            self.assertEqual(self.cfg.storage.request_data.path, str(root / "storage/requests"))
+            path = Path(tmp) / "config.yaml"
+            for use in (False, True):
+                for update in (False, True):
+                    self.user.resource_model.use_history = use
+                    self.user.resource_model.update_history = update
+                    OmegaConf.save(self.user, path)
+                    _, cfg = load_config(path, run_dir=tmp)
+                    self.assertEqual(cfg.storage.resource_profiles.enabled, use)
+                    self.assertEqual(cfg.storage.resource_profiles.update_history, update)
+                    self.assertEqual(cfg.storage.reusable_setup.path, "storage/cache")
 
     def test_invalid_configuration(self):
         with tempfile.TemporaryDirectory() as tmp:

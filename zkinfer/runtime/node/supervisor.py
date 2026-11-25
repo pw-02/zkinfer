@@ -126,6 +126,7 @@ class NodeSupervisor:
             fallback_memory_gb=0.0,
             memory_safety_reserve_gb=self.stage_cfg.memory_safety_reserve_gb,
             history_percentile=self.stage_cfg.history_percentile,
+            use_history=self.cfg.setup_store.resource_profiles_enabled,
         )
 
         self.active_jobs: Dict[str, threading.Thread] = {}
@@ -505,10 +506,11 @@ class NodeSupervisor:
                             from_pb_artifact(lease.setup_cache),
                         )
 
-            self.resource_profiles.update_from_metrics(
-                local_task.setup_key,
-                result.metrics,
-            )
+            update_history = self.cfg.setup_store.resource_profiles_update_history
+            if update_history is None:
+                update_history = self.cfg.setup_store.resource_profiles_enabled
+            if update_history:
+                self.resource_profiles.update_from_metrics(local_task.setup_key, result.metrics)
 
             metrics = {
                 "node_id": self.node_id,
@@ -709,6 +711,7 @@ class NodeSupervisor:
             memory_safety_reserve_gb=self.stage_cfg.memory_safety_reserve_gb,
             history_percentile=self.stage_cfg.history_percentile,
             predicted_peak_memory_gb=float(lease.predicted_peak_memory_gb or 0.0),
+            use_resource_history=self.cfg.setup_store.resource_profiles_enabled,
         )
 
     @staticmethod

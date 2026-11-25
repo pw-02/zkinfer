@@ -650,13 +650,18 @@ class Coordinator:
             job_report["artifact_manifest_backend"] = job.artifact_manifest_ref.backend
             job_report["artifact_manifest_uri"] = job.artifact_manifest_ref.uri
 
-        if job.job_status == JobStatus.COMPLETED and job.profiling_file_path:
+        update_history = self.setup_store.resource_profiles_update_history
+        if update_history is None:
+            update_history = self.setup_store.resource_profiles_enabled
+        if job.job_status == JobStatus.COMPLETED and job.profiling_file_path and update_history:
             save_json(
                 job_report,
                 job.profiling_file_path,
                 storage_type=self.setup_store.backend,
                 s3_bucket=self.setup_store.s3_bucket,
             )
+            if not self.setup_store.resource_profiles_enabled:
+                return
             estimates = get_profile_estimates(job_report)
             with self.lock:
                 for request in self.active_requests.values():

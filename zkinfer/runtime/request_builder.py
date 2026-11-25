@@ -98,13 +98,16 @@ class RequestBuilder:
             # Scheduling history is reusable even when circuit/PK/VK reuse is off.
             # Keep forced-cold observations separate from reuse-enabled history.
             resource_profile_path = None
-            if setup_store.resource_profiles_enabled and not transfer_only:
+            update_history = getattr(setup_store, "resource_profiles_update_history", None)
+            if update_history is None:
+                update_history = setup_store.resource_profiles_enabled
+            if (setup_store.resource_profiles_enabled or update_history) and not transfer_only:
                 profile_root = setup_store.resource_profiles_root_dir or setup_store.root_dir
                 filename = "resource_profile.json" if setup_store.enabled else "cold_resource_profile.json"
                 resource_profile_path = os.path.join(profile_root, namespace, setup_key, filename)
             profiling_data = (
                 self._load_resource_profile(partition.name, resource_profile_path, setup_store)
-                if resource_profile_path else {}
+                if resource_profile_path and setup_store.resource_profiles_enabled else {}
             )
             profile_estimates = get_profile_estimates(profiling_data)
             predicted_duration_s = float(profile_estimates.get("job_runtime_s") or 0.0)

@@ -234,10 +234,12 @@ class StageAdmissionController:
         history_percentile: float = 0.90,
         poll_interval_s: float = 0.25,
         mode: str = "stage",
+        use_history: bool = True,
     ):
         if mode not in {"stage", "whole_job"}:
             raise ValueError("admission mode must be stage or whole_job")
         self.mode = mode
+        self.use_history = use_history
         self._whole_job_info: Optional[Dict[str, Any]] = None
         self.root_dir = Path(root_dir)
         self.root_dir.mkdir(parents=True, exist_ok=True)
@@ -296,6 +298,8 @@ class StageAdmissionController:
                 + process_tree_memory_gb(os.getpid()),
             ),
         )
+        if not self.use_history:
+            return {"memory_gb": fallback_memory, "samples": 0, "source": "fallback"}
         estimate = self.profiles.estimate(
             setup_key=self.setup_key,
             stage=stage,

@@ -63,6 +63,7 @@ class SetupStoreConfig:
     s3_prefix: str
     resource_profiles_enabled: bool = True
     resource_profiles_root_dir: Optional[str] = None
+    resource_profiles_update_history: Optional[bool] = None
 
 
 @dataclass(frozen=True)
@@ -144,6 +145,7 @@ def _resolve_setup_store_config(cfg: DictConfig) -> SetupStoreConfig:
     setup_path = str(reusable_setup.get("path", "storage/setup"))
     profiles = cfg.storage.get("resource_profiles", {})
     profiles_enabled = bool(profiles.get("enabled", True))
+    profiles_update = bool(profiles.get("update_history", profiles_enabled))
     profiles_path = str(profiles.get("path") or setup_path)
 
     if backend == "filesystem":
@@ -152,6 +154,7 @@ def _resolve_setup_store_config(cfg: DictConfig) -> SetupStoreConfig:
             backend="filesystem",
             root_dir=str(_resolve_path(setup_path)),
             resource_profiles_enabled=profiles_enabled,
+            resource_profiles_update_history=profiles_update,
             resource_profiles_root_dir=str(_resolve_path(profiles_path)),
             s3_bucket=None,
             s3_prefix="",
@@ -165,6 +168,7 @@ def _resolve_setup_store_config(cfg: DictConfig) -> SetupStoreConfig:
             backend="s3",
             root_dir=full_prefix,
             resource_profiles_enabled=profiles_enabled,
+            resource_profiles_update_history=profiles_update,
             resource_profiles_root_dir="/".join(
                 part for part in (base_prefix, profiles_path.strip("/")) if part
             ),
@@ -251,7 +255,7 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
     request_store = _resolve_request_store_config(cfg)
     setup_store = _resolve_setup_store_config(cfg)
     profiles_root = setup_store.resource_profiles_root_dir
-    if setup_store.resource_profiles_enabled and profiles_root:
+    if (setup_store.resource_profiles_enabled or setup_store.resource_profiles_update_history) and profiles_root:
         if request_store.backend == "filesystem":
             request_path = Path(request_store.root_dir).resolve()
             profile_path = Path(profiles_root).resolve()

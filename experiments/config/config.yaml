@@ -16,21 +16,26 @@ preparation:
   dispatch: streaming # batch | streaming
 
 scheduling:
-  policy: resource_aware # fifo | lpt | cache_aware | resource_aware
+  policy: resource_aware # fifo | lpt | resource_aware
   max_concurrent_jobs: 1 # 1 = isolated; null = admission-controlled concurrency.
   memory_admission: disabled # disabled | whole_job | stage
   memory_reserve_gib: 8 # RAM reserved for the OS and other processes.
 
 cache:
-  scope: persistent # persistent | run (isolated, discarded after success)
-  reuse:
-    circuits: true # calibrated settings and compiled circuits
-    keys: true # proving and verification keys
-    profiles: true # historical resource observations
+  # true: reuse compatible artifacts, or generate and cache if missing.
+  # false: regenerate without reading or updating that artifact cache.
+  circuits: true # Calibrated settings and compiled circuits.
+  keys: true # Proving and verification keys.
+
+resource_model:
+  use_history: true # Load historical estimates for scheduling and admission.
+  update_history: true # Update estimates from completed jobs.
 
 profiling:
   mode: research # basic | research | debug (retains extra diagnostic files).
   sampling_interval_sec: 0.1 # CPU/RSS sampling interval in seconds.
 
 output:
-  keep_proofs: false # false = remove request-owned bulky data after success.
+  # Retain proofs and witnesses after successful execution.
+  # Logs, measurements and reports are retained independently.
+  keep_proofs: false

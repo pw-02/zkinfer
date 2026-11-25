@@ -83,7 +83,7 @@ storage:
   reusable_setup:
     # Reuse settings/circuit/PK/VK generated for the same setup identity.
     enabled: true
-    path: storage/setup
+    path: storage/cache
 
   request_data:
     # Request-owned inputs, proofs, witnesses, and manifests.
@@ -91,7 +91,8 @@ storage:
 
   resource_profiles:
     # Independent of compiled-circuit / key reuse. Null keeps profiles alongside setup.
-    enabled: true
+    enabled: true # Read historical resource estimates.
+    update_history: true # Persist new observations independently.
     path: null
 
   s3_bucket: null

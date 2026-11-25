@@ -62,6 +62,7 @@ class LocalProverTask:
     admission_mode: str = "stage"
     memory_safety_reserve_gb: float = 8.0
     history_percentile: float = 0.90
+    use_resource_history: bool = True
     predicted_peak_memory_gb: float = 0.0
     lease_id: str = ""
     keep_proof_artifacts: bool = field(
@@ -410,6 +411,7 @@ class ProverTaskRunner:
             fallback_memory_gb=task.predicted_peak_memory_gb,
             memory_safety_reserve_gb=task.memory_safety_reserve_gb,
             history_percentile=task.history_percentile,
+            use_history=task.use_resource_history,
         )
         return StageAwareEZKLProofStages(
             input_data_path=task.input_path,

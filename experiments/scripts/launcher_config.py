@@ -11,7 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 
 CONFIG_DIR = Path(__file__).resolve().parents[1] / "config"
 DEFAULT_CONFIG = "experiments/config/config.yaml"
-SCHEDULERS = ("fifo", "lpt", "cache_aware", "resource_aware")
+SCHEDULERS = ("fifo", "lpt", "resource_aware")
 ADMISSION_MODES = ("disabled", "whole_job", "stage")
 PROFILING_MODES = ("basic", "research", "debug")
 
@@ -43,16 +43,7 @@ def _number(value: object, field: str, *, allow_zero: bool = False) -> None:
 
 
 def _reuse(user: DictConfig, kind: str) -> bool:
-    if "reuse" in user.cache:
-        return user.cache.reuse[kind]
-    if kind == "circuits":
-        value = user.get("preparation", {}).get("cache_enabled")
-        return user.cache.setup if value is None else value
-    return user.cache.setup if kind == "keys" else user.cache.profiles
-
-
-def _persistent(user: DictConfig) -> bool:
-    return user.cache.get("scope", "persistent" if user.get("output", {}).get("keep_cache", True) else "run") == "persistent"
+    return user.cache[kind]
 
 
 def _validate(user: DictConfig) -> None:
@@ -75,9 +66,10 @@ def _validate(user: DictConfig) -> None:
              "partitioning.allow_boundary_rescale")
     preparation = user.get("preparation", {})
     _choice(preparation.get("dispatch", "batch"), "preparation.dispatch", ("batch", "streaming"))
-    _choice(user.cache.get("scope", "persistent"), "cache.scope", ("persistent", "run"))
-    for kind in ("circuits", "keys", "profiles"):
-        _boolean(_reuse(user, kind), f"cache.reuse.{kind}")
+    for kind in ("circuits", "keys"):
+        _boolean(_reuse(user, kind), f"cache.{kind}")
+    for kind in ("use_history", "update_history"):
+        _boolean(user.resource_model[kind], f"resource_model.{kind}")
     _choice(user.scheduling.policy, "scheduling.policy", SCHEDULERS)
     _choice(user.scheduling.memory_admission, "scheduling.memory_admission", ADMISSION_MODES)
     cap = user.scheduling.max_concurrent_jobs
@@ -126,11 +118,12 @@ def _apply_scheduling(cfg: DictConfig, user: DictConfig) -> None:
 
 def _apply_storage(cfg: DictConfig, user: DictConfig) -> None:
     cfg.storage.reusable_setup.enabled = _reuse(user, "keys")
-    cfg.storage.resource_profiles.enabled = _reuse(user, "profiles")
+    cfg.storage.resource_profiles.enabled = user.resource_model.use_history
+    cfg.storage.resource_profiles.update_history = user.resource_model.update_history
     cfg.storage.resource_profiles.path = None
     cfg.output.keep_proof_artifacts = user.output.keep_proofs
     cfg.output.keep_request_data = user.output.keep_proofs
-    cfg.output.keep_cache = _persistent(user)
+    cfg.output.keep_cache = True
 
 
 def configure_run_paths(
@@ -144,18 +137,7 @@ def configure_run_paths(
 
     cfg.paths.runs_dir = str(root)
     cfg.storage.request_data.path = str(storage / "requests")
-    if _persistent(user):
-        cfg.node.runtime_state_dir = "storage/node/runtime"
-    else:
-        cache = storage / "cache"
-        cfg.storage.reusable_setup.path = str(cache / "setup")
-        cfg.storage.resource_profiles.path = None
-        cfg.storage.local_cache.path = str(cache / "node")
-        cfg.node.runtime_state_dir = str(cache / "runtime")
-
-    # Do not carry node-local admission history into a no-profile run.
-    if not _reuse(user, "profiles"):
-        cfg.node.runtime_state_dir = str(storage / "runtime")
+    cfg.node.runtime_state_dir = "storage/node/runtime"
 
 
 def make_run_name(
@@ -191,8 +173,8 @@ def make_run_name(
         *(() if "preparation" not in user else (
             user.preparation.get("dispatch", "batch"),
             "circuits-on" if _reuse(user, "circuits") else "circuits-off",
-            "profiles-on" if _reuse(user, "profiles") else "profiles-off",
-            "persistent" if _persistent(user) else "run",
+            "history-on" if user.resource_model.use_history else "history-off",
+            "learn-on" if user.resource_model.update_history else "learn-off",
         )),
         unique,
     ))

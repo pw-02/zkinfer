@@ -207,6 +207,7 @@ def common_overrides(cfg: DictConfig) -> List[str]:
         f"storage.reusable_setup.path={cfg.storage.reusable_setup.path}",
         f"storage.reusable_setup.enabled={str(bool(cfg.storage.reusable_setup.enabled)).lower()}",
         f"storage.resource_profiles.enabled={str(bool(cfg.storage.get('resource_profiles', {}).get('enabled', True))).lower()}",
+        f"storage.resource_profiles.update_history={str(bool(cfg.storage.get('resource_profiles', {}).get('update_history', True))).lower()}",
         "storage.resource_profiles.path=" + (
             str(cfg.storage.get("resource_profiles", {}).get("path"))
             if cfg.storage.get("resource_profiles", {}).get("path") is not None else "null"

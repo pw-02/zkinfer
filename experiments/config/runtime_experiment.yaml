@@ -61,13 +61,14 @@ node:
 storage:
   reusable_setup:
     enabled: true
-    path: storage/setup
+    path: storage/cache
 
   request_data:
     path: storage/requests
 
   resource_profiles:
-    enabled: true
+    enabled: true # Read historical resource estimates.
+    update_history: true # Persist new observations independently.
     path: null
 
   local_cache:
