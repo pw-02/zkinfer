@@ -16,7 +16,8 @@ Verified request latency, throughput, failures, memory, total work, planning ove
 
 ## Existing tooling / references
 
-- [evaluation/README.md](../../evaluation/README.md)
+- [Research experiment index](../experiment_index.csv)
+- [Local experiment configuration](../../experiments/config/config.yaml)
 
 ## Run registration
 

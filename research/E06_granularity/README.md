@@ -16,7 +16,7 @@ Number of jobs, sum of durations, longest job, max job RSS, key/proof sizes, bou
 
 ## Existing tooling / references
 
-- [evaluation/06_partition_granularity/README.md](../../evaluation/06_partition_granularity/README.md)
+- [Local experiment configuration](../../experiments/config/config.yaml)
 
 ## Run registration
 

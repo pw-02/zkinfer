@@ -1,17 +1,17 @@
 # Request-burst plots
 
-Run from the repository root with NumPy and Matplotlib installed:
+This retained analysis utility reads archived campaign outputs; it does not launch experiments. Run from the repository root with NumPy and Matplotlib installed:
 
 ```bash
 python analysis/plot_bursts.py \
-  --sources evaluation/results/paper-day-v2 evaluation/results/paper-day-v3 \
+  --sources /path/to/archived-campaign-a /path/to/archived-campaign-b \
   --models bert mobilenet_v2 nano_gpt_4_layers_64_embd \
   --output figures/evaluation/burst_serving
 ```
 
 ```bash
 python analysis/plot_bursts.py \
-  --sources evaluation/results/paper-day-v2 evaluation/results/paper-day-v3 \
+  --sources /path/to/archived-campaign-a /path/to/archived-campaign-b \
   --models bert mobilenet_v2 nano_gpt_4_layers_64_embd \
   --output figures/evaluation/burst_serving
 ```
@@ -21,15 +21,15 @@ You can instead pass individual completed cells (shell globs are expanded by Bas
 
 ```bash
 python analysis/plot_bursts.py \
-  --sources evaluation/results/paper-day-v2/runs/burst-*-b128-r1 \
-            evaluation/results/paper-day-v3/runs/burst-bert-*-b128-r1 \
+  --sources /path/to/archived-campaign-a/runs/burst-*-b128-r1 \
+            /path/to/archived-campaign-b/runs/burst-bert-*-b128-r1 \
   --output figures/evaluation/burst_serving_b128
 ```
 
 ```bash
 python analysis/plot_bursts.py \
-  --sources evaluation/results/paper-day-v2/runs/burst-*-b128-r1 \
-            evaluation/results/paper-day-v3/runs/burst-bert-*-b128-r1 \
+  --sources /path/to/archived-campaign-a/runs/burst-*-b128-r1 \
+            /path/to/archived-campaign-b/runs/burst-bert-*-b128-r1 \
   --output figures/evaluation/burst_serving_b128
 ```
 
@@ -63,8 +63,6 @@ verification, sampling, cache capacity, history percentile, coordinator policy
 and thread settings within each model. It records Git revision in the audit CSV;
 this does not replace checking hardware and initial profile compatibility when
 combining campaigns.
-
-This analysis-only addition is outside the campaign code-fingerprint inputs.
 
 Validation:
 

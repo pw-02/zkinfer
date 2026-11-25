@@ -16,8 +16,8 @@ Request latency, throughput, speedup, transfer overhead, node utilization and fa
 
 ## Existing tooling / references
 
-- [evaluation/04_scheduling/README.md](../../evaluation/04_scheduling/README.md)
-- [evaluation/05_scale_out/README.md](../../evaluation/05_scale_out/README.md)
+- [Runtime configuration](../../zkinfer/config/config.yaml)
+- Dedicated distributed campaign tooling is not currently provided.
 
 ## Run registration
 

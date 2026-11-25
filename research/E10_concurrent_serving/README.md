@@ -16,8 +16,8 @@ Request throughput, median/p95 latency, makespan, admission waits, failures, mem
 
 ## Existing tooling / references
 
-- [evaluation/02_concurrent_serving/README.md](../../evaluation/02_concurrent_serving/README.md)
-- [evaluation/03_memory_admission/README.md](../../evaluation/03_memory_admission/README.md)
+- [Configuration guide](../../docs/CONFIGURATION.md)
+- [Stage-admission analysis](../../analysis/section_3/analyze_stage_admission.py)
 
 ## Run registration
 

@@ -1,9 +1,9 @@
 # zkInfer research results
 
 This directory organizes evidence by research question. Raw data stays in
-`experiments/runs/`, microbenchmark output directories, or the original archived
-location. Existing `analysis/` scripts and `evaluation/` protocols remain the
-implementation and execution references, not duplicate datasets.
+`experiments/runs/` or the original archived location. Existing `analysis/`
+scripts provide analysis implementations; `experiments/` contains the active
+launchers and configurations.
 
 ## Start here
 
@@ -44,7 +44,7 @@ cache events for actual conditions. Existing run directories are unchanged.
 
 ## Workflow
 
-1. Run the existing experiment or microbenchmark tooling; do not relocate raw runs.
+1. Run the local experiment launcher or other explicitly documented runtime workflow; do not relocate raw runs.
 2. Register its request ID, source path, experimental conditions and provenance in the master index.
 3. Add analysis code to the relevant experiment directory (or reuse linked existing code).
 4. Write derived tables to `results/` and publication plots to `figures/`.

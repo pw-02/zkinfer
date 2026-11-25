@@ -17,7 +17,6 @@ Request latency, aggregate job time, peak process RSS, verification outcome; OOM
 ## Existing tooling / references
 
 - [analysis/section_3/analyze_characterization.py](../../analysis/section_3/analyze_characterization.py)
-- [evaluation/01_decomposition/README.md](../../evaluation/01_decomposition/README.md)
 
 ## Run registration
 

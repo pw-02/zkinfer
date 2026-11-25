@@ -16,8 +16,8 @@ Median, standard deviation, CV, observed peak RSS, memory underprediction magnit
 
 ## Existing tooling / references
 
-- [experiments/microbench/README.md](../../experiments/microbench/README.md)
-- [experiments/microbench/repeatability.py](../../experiments/microbench/repeatability.py)
+- [Local experiment configuration](../../experiments/config/config.yaml)
+- Dedicated repeatability tooling for linked witnesses is not currently provided.
 
 ## Run registration
 

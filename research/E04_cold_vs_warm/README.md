@@ -16,7 +16,8 @@ Job and request latency, stage timings, RSS, key sizes, load and transfer overhe
 
 ## Existing tooling / references
 
-- [evaluation/07_setup_reuse/README.md](../../evaluation/07_setup_reuse/README.md)
+- [Local experiment configuration](../../experiments/config/config.yaml)
+- [Profiling guide](../../docs/PROFILING.md)
 
 ## Run registration
 

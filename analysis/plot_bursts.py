@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Plot completed burst trials from campaign roots or explicit run directories.
 
-python analysis/plot_bursts.py --sources evaluation/results/paper-day-v2 /path/to/bert-campaign
+python analysis/plot_bursts.py --sources /path/to/archived-campaign-a /path/to/bert-campaign
 python analysis/plot_bursts.py --sources /path/to/runs/burst-bert-warm-stage-n4-b128-r1
 
 Campaign discovery follows runs/*/DONE.json, never unfinished attempts or profiles.

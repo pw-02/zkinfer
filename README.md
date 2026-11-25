@@ -216,7 +216,7 @@ storage:
     enabled: false
 ```
 
-The repeatability microbenchmark lives under `experiments/microbench/`. It selects representative jobs from a completed characterization run and repeats them under cold and warm setup conditions while holding circuit/setup identity fixed.
+The research plan and experiment registration workflow are documented in [research/README.md](research/README.md).
 
 ## Main entry points
 
