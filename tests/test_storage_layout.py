@@ -165,31 +165,18 @@ class NodeSetupLayoutTests(unittest.TestCase):
 
 
 class StorageConfigurationTests(unittest.TestCase):
-    def test_default_layout_and_s3_roots(self):
+    def test_default_layout_and_legacy_backend_rejection(self):
         cfg = OmegaConf.load(Path(__file__).parents[1] / "zkinfer/config/config.yaml")
         runtime = build_runtime_config(cfg)
         self.assertEqual(Path(runtime.setup_store.root_dir).name, "cache")
         self.assertEqual(Path(runtime.request_store.root_dir).name, "requests")
         cfg.storage.backend = "s3"
-        cfg.storage.s3_bucket = "bucket"
-        cfg.storage.s3_prefix = "prefix"
-        cfg.storage.reusable_setup.path = "setup"
-        cfg.storage.request_data.path = "requests"
-        runtime = build_runtime_config(cfg)
-        self.assertEqual(runtime.setup_store.root_dir, "prefix/setup")
-        self.assertEqual(runtime.request_store.root_dir, "prefix/requests")
-        cfg.storage.s3_prefix = ""
-        runtime = build_runtime_config(cfg)
-        self.assertEqual(runtime.setup_store.root_dir, "setup")
-        self.assertEqual(runtime.request_store.root_dir, "requests")
+        with self.assertRaisesRegex(ValueError, "filesystem"):
+            build_runtime_config(cfg)
 
     def test_overlapping_roots_are_rejected(self):
         cfg = OmegaConf.load(Path(__file__).parents[1] / "zkinfer/config/config.yaml")
-        cfg.storage.request_data.path = "storage"
-        with self.assertRaisesRegex(ValueError, "must be separate"):
-            build_runtime_config(cfg)
-        cfg.storage.backend = "s3"
-        cfg.storage.s3_bucket = "bucket"
+        cfg.storage.request_path = "storage"
         with self.assertRaisesRegex(ValueError, "must be separate"):
             build_runtime_config(cfg)
 
@@ -197,11 +184,9 @@ class StorageConfigurationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             cfg = OmegaConf.create({
-                "storage": {
-                    "request_data": {"path": str(root / "requests")},
-                    "reusable_setup": {"path": str(root / "setup"), "enabled": True},
-                },
-                "output": {"keep_request_data": False},
+                "storage": {"request_path": str(root / "requests")},
+                "cache": {"path": str(root / "setup"), "keys": True},
+                "output": {"keep_proofs": False},
                 "paths": {"runs_dir": str(root / "runs")},
             })
             own = root / "requests/own/proofs"
@@ -214,18 +199,18 @@ class StorageConfigurationTests(unittest.TestCase):
             self.assertFalse(own.exists())
             self.assertTrue(other.exists())
             self.assertTrue(model.exists())
-            cfg.output.keep_request_data = True
+            cfg.output.keep_proofs = True
             cleanup_request_store(cfg, Mock(), ["other"])
             self.assertTrue(other.exists())
 
     def test_experiment_overrides_use_current_runtime_keys(self):
         _, cfg = load_config(Path(__file__).parents[1] / "experiments/config/config.yaml")
-        cfg.storage.reusable_setup.enabled = False
+        cfg.cache.keys = False
         overrides = common_overrides(cfg)
-        self.assertIn("storage.reusable_setup.path=storage/cache", overrides)
-        self.assertIn("storage.request_data.path=storage/requests", overrides)
-        self.assertIn("storage.reusable_setup.enabled=false", overrides)
-        self.assertIn("coordinator.scheduling_policy=resource_aware", overrides)
+        self.assertIn("cache.path=storage/cache", overrides)
+        self.assertIn("storage.request_path=storage/requests", overrides)
+        self.assertIn("cache.keys=false", overrides)
+        self.assertIn(f"scheduling.policy={cfg.scheduling.policy}", overrides)
         with initialize_config_dir(config_dir=str(Path(__file__).parents[1] / "zkinfer/config"), version_base=None):
             resolved = compose(config_name="config", overrides=overrides)
         runtime = build_runtime_config(resolved)

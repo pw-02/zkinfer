@@ -22,10 +22,8 @@ class LauncherConfigTests(unittest.TestCase):
     def test_effective_workload_and_name(self):
         self.assertEqual(self.user.workload, "bert")
         self.assertEqual(list(self.cfg.suite.workloads), ["bert"])
-        self.assertEqual(self.cfg.coordinator.witness_preparation, "upfront")
-        self.assertTrue(self.cfg.verification.enabled)
-        self.assertEqual(self.cfg.coordinator.preparation_dispatch, "streaming")
-        self.assertTrue(self.cfg.coordinator.preparation_cache_enabled)
+        self.assertEqual(self.cfg.preparation.dispatch, "streaming")
+        self.assertTrue(self.cfg.cache.circuits)
         self.user.partitioning.enabled = True
         self.user.partitioning.size = 4
         self.user.cache.keys = False
@@ -53,9 +51,9 @@ class LauncherConfigTests(unittest.TestCase):
                     self.user.resource_model.update_history = update
                     OmegaConf.save(self.user, path)
                     _, cfg = load_config(path, run_dir=tmp)
-                    self.assertEqual(cfg.storage.resource_profiles.enabled, use)
-                    self.assertEqual(cfg.storage.resource_profiles.update_history, update)
-                    self.assertEqual(cfg.storage.reusable_setup.path, "storage/cache")
+                    self.assertEqual(cfg.resource_model.use_history, use)
+                    self.assertEqual(cfg.resource_model.update_history, update)
+                    self.assertEqual(cfg.cache.path, "storage/cache")
 
     def test_independent_rayon_settings(self):
         from experiments.run_local_exp import common_overrides

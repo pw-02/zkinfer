@@ -242,7 +242,11 @@ def normalize_runtime_config(cfg: DictConfig) -> DictConfig:
         raise ValueError("scheduling.memory_admission must be disabled, whole_job or stage")
     if cfg.scheduling.max_concurrent_jobs is None and mode == "disabled":
         raise ValueError("Unlimited concurrency requires memory admission")
-    return OmegaConf.merge(cfg, {
+    if cfg.partitioning.get('witness_preparation') is not None:
+        raise ValueError('Legacy witness preparation is no longer supported')
+    if cfg.storage.get('backend', 'filesystem') != 'filesystem':
+        raise ValueError('Linked preparation requires filesystem storage')
+    return OmegaConf.merge(OmegaConf.create(OmegaConf.to_container(cfg, resolve=True)), {
         "coordinator": {
             "grpc_max_message_mb": 128,
             "state_store_enabled": True,

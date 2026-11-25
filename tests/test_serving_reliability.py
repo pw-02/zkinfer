@@ -29,9 +29,9 @@ def runtime_config(root: Path):
     cfg.node.logs_dir = str(root / "node-logs")
     cfg.node.node_id = "test-node"
     cfg.node.runtime_state_dir = str(root / "runtime-state")
-    cfg.storage.request_data.path = str(root / "requests-store")
-    cfg.storage.reusable_setup.path = str(root / "setup")
-    cfg.storage.reusable_setup.enabled = True
+    cfg.storage.request_path = str(root / "requests-store")
+    cfg.cache.path = str(root / "setup")
+    cfg.cache.keys = True
     return build_runtime_config(cfg, process_role="coordinator")
 
 

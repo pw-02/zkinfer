@@ -22,7 +22,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
-import hydra
 from omegaconf import DictConfig, OmegaConf
 
 from zkinfer.client.api import ZKInferenceClient
@@ -185,7 +184,7 @@ def common_overrides(cfg: DictConfig) -> List[str]:
             for key, item in value.items():
                 yield from flatten(f"{prefix}.{key}" if prefix else key, item)
         else:
-            yield f"{prefix}={json.dumps(value)}"
+            yield f"{prefix}={value if isinstance(value, str) and value.replace(chr(95), chr(97)).replace(chr(47), chr(97)).replace(chr(45), chr(97)).replace(chr(46), chr(97)).isalnum() else json.dumps(value)}"
 
     sections = ("coordinator", "node", "partitioning", "preparation", "scheduling",
                 "resources", "cache", "resource_model", "profiling", "verification",
