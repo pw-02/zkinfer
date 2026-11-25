@@ -52,6 +52,7 @@ class LocalProverTask:
     output_backend: str
     output_s3_bucket: str = ""
     setup_read_only: bool = False
+    prepared_witness_path: Optional[str] = None
     resource_sampling_interval_sec: float = 1.0
     model_materialize_time_s: float = 0.0
     input_materialize_time_s: float = 0.0
@@ -425,6 +426,7 @@ class ProverTaskRunner:
             local_tmp_dir=task.tmp_dir,
             logger=self.logger,
             admission=admission,
+            prepared_witness_path=task.prepared_witness_path,
         )
 
     @staticmethod

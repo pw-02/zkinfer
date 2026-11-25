@@ -20,6 +20,10 @@ coordinator:
   # Stage-level memory admission remains node-local.
   # fifo | lpt | cache_aware | resource_aware
   scheduling_policy: cache_aware
+  # upfront prepares public-linked witnesses before scheduling (filesystem only).
+  witness_preparation: independent # independent | upfront
+  max_propagated_scale: 16
+  allow_boundary_rescale: true
 
 node:
   # One NodeSupervisor runs per physical machine/cloud instance.
@@ -63,6 +67,9 @@ verification:
   srs_dir: srs
   require_split_chain: false
   write_request_manifest: true
+  # Optional trusted JSON mapping setup identity -> VK SHA-256.
+  # Without this, upfront verification assumes trusted proving workers.
+  trusted_vk_manifest: null
 
 heartbeat:
   interval_sec: 15

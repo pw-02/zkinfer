@@ -1,6 +1,8 @@
 import logging
 import os
 import time
+from pathlib import Path
+from dataclasses import asdict
 from typing import Any, Dict, List
 
 from zkinfer.config.runtime import SetupStoreConfig
@@ -28,8 +30,14 @@ EZKL_SETUP_IDENTITY = {
 class RequestBuilder:
     """Materialize one inference request into independently executable proof jobs."""
 
-    def __init__(self, logger: logging.Logger):
+    def __init__(
+        self, logger: logging.Logger, witness_preparation: str = "independent",
+        max_propagated_scale: int = 16, allow_boundary_rescale: bool = True,
+    ):
         self.logger = logger
+        self.witness_preparation = witness_preparation
+        self.max_propagated_scale = max_propagated_scale
+        self.allow_boundary_rescale = allow_boundary_rescale
 
     def build_jobs(
         self,
@@ -43,12 +51,40 @@ class RequestBuilder:
         # and stored runtime state. New configuration cannot enable it.
         materialized_partitions = self._load_or_split_model(request)
         jobs: List[ProofJob] = []
+        prepared = {}
+        request.preparation_metrics["witness_preparation_mode"] = self.witness_preparation
+        if self.witness_preparation == "upfront":
+            if transfer_only or shared_storage.backend != "filesystem" or setup_store.backend != "filesystem":
+                raise ValueError("Upfront preparation requires filesystem proving storage")
+            from zkinfer.backends.ezkl.preparation import prepare_partitions
+            started = time.perf_counter()
+            prepared = prepare_partitions(
+                materialized_partitions,
+                Path(shared_storage.requests_root) / request.request_id / "prepared",
+                cache_root=(Path(shared_storage.setup_root) / "_prepared_v1" if setup_store.enabled else None),
+                max_propagated_scale=self.max_propagated_scale,
+                allow_rescale=self.allow_boundary_rescale,
+            )
+            metrics = request.preparation_metrics
+            metrics["upfront_preparation_time(s)"] = time.perf_counter() - started
+            for field in ("setup_time_s", "calibration_time_s", "compilation_time_s", "witness_time_s",
+                          "witness_bytes", "compiled_bytes", "rescaled_inputs", "setup_cache_hit"):
+                metrics[f"upfront_{field}"] = sum(part.metrics[field] for part in prepared.values())
+            metrics["upfront_partition_count"] = len(prepared)
+            if request.reports_dir:
+                from zkinfer.backends.ezkl.preparation import write_json
+                write_json(Path(request.reports_dir) / "witness_preparation.json",
+                           {name: part.metrics for name, part in prepared.items()})
 
         total_model_store_time = 0.0
         total_input_store_time = 0.0
 
         for index, partition in enumerate(materialized_partitions):
             model_write_time = 0.0
+            prepared_part = prepared.get(partition.name)
+            identity = dict(EZKL_SETUP_IDENTITY)
+            if prepared_part is not None:
+                identity.update(prepared_part.artifact_identity())
             if transfer_only:
                 model_ref = ArtifactRef.empty()
                 setup_key = partition.sub_hash
@@ -57,7 +93,7 @@ class RequestBuilder:
                 model_bytes = partition.model.SerializeToString()
                 setup_key = shared_storage.setup_key_for_model(
                     model_bytes,
-                    EZKL_SETUP_IDENTITY,
+                    identity,
                 )
                 started = time.perf_counter()
                 model_ref = shared_storage.put_model(model_bytes, setup_key=setup_key)
@@ -83,8 +119,31 @@ class RequestBuilder:
             output_prefix_ref = shared_storage.proof_prefix(request.request_id, partition_id)
 
             started = time.perf_counter()
+            input_data = partition.input_data
+            if prepared_part is not None:
+                from zkinfer.backends.ezkl.preparation import PREPARED_INPUT_KIND, file_digest
+
+                def artifact(path, digest=None):
+                    return ArtifactRef(
+                        "filesystem", str(path.resolve()),
+                        sha256=digest or file_digest(path), size_bytes=path.stat().st_size,
+                    ).to_dict()
+
+                input_data = {
+                    "kind": PREPARED_INPUT_KIND,
+                    "request_id": request.request_id,
+                    "partition_name": partition.name,
+                    "setup_key": setup_key,
+                    "settings": artifact(prepared_part.settings_path, identity["settings_sha256"]),
+                    "compiled": artifact(prepared_part.compiled_path, identity["compiled_sha256"]),
+                    "witness": artifact(prepared_part.witness_path),
+                    "input_specs": [asdict(spec) for spec in prepared_part.input_specs],
+                    "output_specs": [asdict(spec) for spec in prepared_part.output_specs],
+                }
             input_ref = shared_storage.put_input(
-                request.request_id, partition_id, partition.input_data,
+                request.request_id,
+                partition_id + (".prepared" if prepared_part is not None else ""),
+                input_data,
             )
             input_write_time = time.perf_counter() - started
             total_input_store_time += input_write_time
@@ -147,6 +206,7 @@ class RequestBuilder:
             input_shapes=getattr(request, "input_shapes", None),
             model_name=request.name,
             metrics=request.preparation_metrics,
+            **({"strict_boundaries": True} if self.witness_preparation == "upfront" else {}),
         )
 
     def _load_resource_profile(

@@ -4,6 +4,7 @@ import json
 import logging
 import math
 import os
+import shutil
 import time
 from pathlib import Path
 from types import ModuleType
@@ -34,6 +35,7 @@ class EZKLProofStages:
         srs_dir: Optional[str] = None,
         logger: Optional[logging.Logger] = None,
         proving_cache_read_only: bool = False,
+        prepared_witness_path: Optional[str] = None,
     ):
         import ezkl
 
@@ -41,6 +43,7 @@ class EZKLProofStages:
         self._fused_ezkl: Optional[ModuleType] = None
 
         self.input_data_path = input_data_path
+        self.prepared_witness_path = prepared_witness_path
         self.onnx_model_path = onnx_model_path
         self.logger = logger or logging.getLogger("ezkl")
         self.status_file = status_file
@@ -442,6 +445,9 @@ class EZKLProofStages:
 
     def gen_witness(self):
         self._update_status("GENERATING_WITNESS")
+        if self.prepared_witness_path:
+            shutil.copyfile(self.prepared_witness_path, self.witness_path)
+            return
         self.ezkl.gen_witness(
             self.input_data_path,
             self.compiled_circuit_path,
@@ -559,7 +565,9 @@ class EZKLProofStages:
         start = time.perf_counter()
         self.gen_witness()
         elapsed = time.perf_counter() - start
-        metrics["ezkl_gen_witness_time(s)"] = elapsed
+        metrics["ezkl_gen_witness_time(s)"] = 0.0 if self.prepared_witness_path else elapsed
+        metrics["ezkl_load_prepared_witness_time(s)"] = elapsed if self.prepared_witness_path else 0.0
+        metrics["ezkl_prepared_witness"] = bool(self.prepared_witness_path)
         total_setup_time += elapsed
 
         if setup_only:

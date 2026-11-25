@@ -13,6 +13,9 @@ class CoordinatorConfig:
     grpc_max_message_mb: int
     runs_dir: str
     logs_dir: str
+    witness_preparation: str = "independent"
+    max_propagated_scale: int = 16
+    allow_boundary_rescale: bool = True
 
 
 @dataclass(frozen=True)
@@ -84,6 +87,7 @@ class VerificationConfig:
     srs_dir: str
     require_split_chain: bool
     write_request_manifest: bool
+    trusted_vk_manifest: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -188,6 +192,10 @@ def _resolve_verification_config(cfg: DictConfig) -> VerificationConfig:
         srs_dir=str(_resolve_path(verification.get("srs_dir", "srs"))),
         require_split_chain=bool(verification.get("require_split_chain", False)),
         write_request_manifest=bool(verification.get("write_request_manifest", True)),
+        trusted_vk_manifest=(
+            str(_resolve_path(verification.trusted_vk_manifest))
+            if verification.get("trusted_vk_manifest") else None
+        ),
     )
 
 
@@ -291,6 +299,18 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
         node_cache_dir.mkdir(parents=True, exist_ok=True)
         node_runtime_state_dir.mkdir(parents=True, exist_ok=True)
 
+    witness_preparation = str(cfg.coordinator.get("witness_preparation", "independent"))
+    if witness_preparation not in {"independent", "upfront"}:
+        raise ValueError("coordinator.witness_preparation must be independent or upfront")
+    if witness_preparation == "upfront":
+        if not verification.enabled:
+            raise ValueError("Upfront witness preparation requires verification.enabled=true")
+        if request_store.backend != "filesystem" or setup_store.backend != "filesystem":
+            raise ValueError("Upfront witness preparation currently requires filesystem storage")
+    scale_cap = cfg.coordinator.get("max_propagated_scale", 16)
+    if type(scale_cap) is not int or not 0 <= scale_cap <= 126:
+        raise ValueError("max_propagated_scale must be an integer in [0, 126]")
+
     return RuntimeConfig(
         coordinator=CoordinatorConfig(
             host=cfg.coordinator.host,
@@ -299,6 +319,9 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             grpc_max_message_mb=int(cfg.coordinator.grpc_max_message_mb),
             runs_dir=str(coordinator_runs_dir),
             logs_dir=str(coordinator_logs_dir),
+            witness_preparation=witness_preparation,
+            max_propagated_scale=scale_cap,
+            allow_boundary_rescale=bool(cfg.coordinator.get("allow_boundary_rescale", True)),
         ),
         node=NodeConfig(
             node_id=cfg.node.node_id,

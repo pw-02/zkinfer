@@ -624,11 +624,60 @@ class NodeSupervisor:
                 "restore_time(s)": 0.0,
             }
 
+        prepared_witness_path = None
+        prepared_metrics = {}
+        if from_pb_artifact(lease.input).uri.endswith(".prepared.json"):
+            from zkinfer.backends.ezkl.preparation import PREPARED_INPUT_KIND, file_digest, read_json
+            descriptor_ref = from_pb_artifact(lease.input)
+            if not descriptor_ref.sha256 or file_digest(input_path) != descriptor_ref.sha256:
+                raise ValueError("Prepared descriptor hash mismatch")
+            descriptor = read_json(input_path)
+            if (
+                descriptor.get("kind") != PREPARED_INPUT_KIND
+                or descriptor.get("request_id") != lease.request_id
+                or descriptor.get("setup_key") != setup_key
+            ):
+                raise ValueError("Prepared descriptor does not match job")
+            refs = {}
+            for name in ("settings", "compiled", "witness"):
+                ref = ArtifactRef.from_dict(descriptor[name])
+                if ref.is_empty or not ref.sha256:
+                    raise ValueError(f"Unbound prepared artifact: {name}")
+                local, metrics = cache_leases.enter_context(
+                    self.cache.materialized_artifact(ref, filename_hint=name)
+                )
+                if file_digest(local) != ref.sha256:
+                    raise ValueError(f"Prepared artifact hash mismatch: {name}")
+                refs[name] = (Path(local), ref)
+                prepared_metrics[name] = metrics
+
+            # The setup identity binds the exact settings and compiled bytes.
+            # Never overwrite conflicting cached setup/key material.
+            with self.cache.setup_guard(setup_key, pin=False):
+                for name, filename in (("settings", "settings.json"), ("compiled", "network.compiled")):
+                    source, ref = refs[name]
+                    target = Path(setup_dir) / filename
+                    if target.exists():
+                        if file_digest(target) != ref.sha256:
+                            raise ValueError(f"Prepared setup cache mismatch: {filename}")
+                    else:
+                        if setup_metrics.get("shared_read_only"):
+                            raise ValueError(f"Missing read-only prepared setup: {filename}")
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        temporary = target.with_name(target.name + "." + lease_id + ".tmp")
+                        try:
+                            shutil.copyfile(source, temporary)
+                            os.replace(temporary, target)
+                        finally:
+                            temporary.unlink(missing_ok=True)
+            prepared_witness_path = str(refs["witness"][0])
+
         output_ref = from_pb_artifact(lease.output_prefix)
         transfer_metrics = {
             "model": model_metrics,
             "input": input_metrics,
             "setup": setup_metrics,
+            "prepared": prepared_metrics,
             "prepare_local_task_time(s)": time.perf_counter() - prepare_started,
         }
 
@@ -642,6 +691,7 @@ class NodeSupervisor:
             input_path=input_path,
             setup_dir=setup_dir,
             setup_read_only=bool(setup_metrics.get("shared_read_only", False)),
+            prepared_witness_path=prepared_witness_path,
             tmp_dir=str(tmp_dir),
             output_dir=str(output_dir),
             output_prefix=output_ref.uri or str(output_dir),

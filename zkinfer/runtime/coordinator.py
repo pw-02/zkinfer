@@ -66,6 +66,7 @@ class Coordinator:
                 enabled=self.verification_config.enabled,
                 require_split_chain=self.verification_config.require_split_chain,
                 write_request_manifest=False,
+                trusted_vk_manifest=getattr(self.verification_config, "trusted_vk_manifest", None),
             )
             if self.verification_config.enabled
             else None
@@ -77,7 +78,14 @@ class Coordinator:
         self.node_status: Dict[str, dict] = {}
         self.scheduler = JobScheduler(policy=self.scheduler_policy)
         self.scheduler_policy = self.scheduler.policy
-        self.request_builder = RequestBuilder(logger=logger)
+        self.request_builder = RequestBuilder(
+            logger=logger,
+            witness_preparation=getattr(runtime_config.coordinator, "witness_preparation", "independent"),
+            max_propagated_scale=getattr(runtime_config.coordinator, "max_propagated_scale", 16),
+            allow_boundary_rescale=getattr(runtime_config.coordinator, "allow_boundary_rescale", True),
+        )
+        if self.request_builder.witness_preparation == "upfront" and not self.verifier:
+            raise ValueError("Upfront witness preparation requires an enabled verifier")
         self.lock = threading.RLock()
         self.profile_locks: Dict[str, threading.Lock] = {}
         self.pending_job_reports: set[str] = set()
@@ -657,7 +665,11 @@ class Coordinator:
                     time.perf_counter() - verify_started
                 )
             else:
-                verification_report = {"enabled": False, "valid": True}
+                exact = parent_request.preparation_metrics.get("witness_preparation_mode") == "upfront"
+                verification_report = {
+                    "enabled": False, "valid": not exact,
+                    "error": "Upfront requests require verification" if exact else "",
+                }
 
             if verification_report and not verification_report.get("valid", True):
                 final_status = RequestStatus.FAILED

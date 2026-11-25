@@ -7,6 +7,10 @@ partitioning:
   enabled: true # false proves the entire model as one job.
   size: 1 # Number of consecutive ONNX operators per partition.
   simplify: true
+  # upfront: exact public linking; independent: legacy ORT inputs (unlinked).
+  witness_preparation: independent
+  max_propagated_scale: 16
+  allow_boundary_rescale: true
 
 scheduling:
   policy: resource_aware # fifo | lpt | cache_aware | resource_aware

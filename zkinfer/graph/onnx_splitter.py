@@ -445,6 +445,7 @@ def split_onnx_model_with_inputs(
     input_shapes: Optional[Dict[str, List[int]]] = None,
     model_name: Optional[str] = None,
     metrics: Optional[Dict[str, Any]] = None,
+    strict_boundaries: bool = False,
 ) -> List[MaterializedSubmodel]:
     metrics = metrics if metrics is not None else {}
     split_mode = (split_mode or "none").lower()
@@ -499,6 +500,17 @@ def split_onnx_model_with_inputs(
     original_inputs = {
         graph_input.name for graph_input in model.graph.input
     } - initializer_names
+
+    if strict_boundaries:
+        produced = {output.name for _, submodel in sub_models for output in submodel.graph.output}
+        consumed = {input_.name for _, submodel in sub_models for input_ in submodel.graph.input}
+        missing_sources = consumed - produced - original_inputs
+        missing_outputs = {output.name for output in model.graph.output} - produced
+        if missing_sources or missing_outputs:
+            raise ValueError(
+                "Partition graph does not cover the model interface: "
+                f"missing sources={sorted(missing_sources)}, missing outputs={sorted(missing_outputs)}"
+            )
 
     boundary_refs = [
         name

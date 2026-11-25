@@ -186,6 +186,13 @@ def common_overrides(cfg: DictConfig) -> List[str]:
         f"coordinator.logs_dir={logs_dir}",
         f"coordinator.state_db_path={Path(str(cfg.paths.runs_dir)) / 'coordinator_state.sqlite3'}",
         f"coordinator.scheduling_policy={cfg.coordinator.scheduling_policy}",
+        f"coordinator.witness_preparation={cfg.coordinator.get('witness_preparation', 'independent')}",
+        f"coordinator.max_propagated_scale={cfg.coordinator.get('max_propagated_scale', 16)}",
+        f"coordinator.allow_boundary_rescale={str(bool(cfg.coordinator.get('allow_boundary_rescale', True))).lower()}",
+        f"verification.enabled={str(bool(cfg.get('verification', {}).get('enabled', False))).lower()}",
+        "verification.trusted_vk_manifest=" + str(
+            cfg.get("verification", {}).get("trusted_vk_manifest") or "null"
+        ),
         f"node.runs_dir={requests_dir}",
         f"node.logs_dir={logs_dir}",
         f"node.runtime_state_dir={cfg.node.get('runtime_state_dir', 'storage/node/runtime')}",
