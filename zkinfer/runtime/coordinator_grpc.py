@@ -13,7 +13,7 @@ from omegaconf import DictConfig, OmegaConf
 import zkinfer.proto.zkservice_pb2 as pb2
 import zkinfer.proto.zkservice_pb2_grpc as pb_grpc
 from zkinfer.config.runtime import build_runtime_config
-from zkinfer.runtime.coordinator import Coordinator
+from zkinfer.runtime.coordinator import Coordinator, PreparationQueueFull
 from zkinfer.runtime.data_plane import ArtifactRef
 from zkinfer.runtime.models import NodeResources
 
@@ -91,7 +91,7 @@ class ZKCoordinatorGrpcService(pb_grpc.ZKJobServiceServicer):
     def SubmitInferenceRequest(self, request, context):
         try:
             input_shapes = parse_optional_json_dict(request.input_shapes)
-            request_id = self.coordinator.submit_request(
+            request_id = self.coordinator.enqueue_request(
                 name=request.name,
                 onnx_model_path=request.onnx_model_path,
                 input_data_path=request.input_data_path,
@@ -102,6 +102,9 @@ class ZKCoordinatorGrpcService(pb_grpc.ZKJobServiceServicer):
             )
             return pb2.InferenceRequestAck(request_id=request_id,
                                            scheduler=self.coordinator.scheduler_policy)
+        except PreparationQueueFull as exc:
+            context.set_code(grpc.StatusCode.RESOURCE_EXHAUSTED)
+            context.set_details(str(exc))
         except json.JSONDecodeError as exc:
             self._set_error(
                 context,

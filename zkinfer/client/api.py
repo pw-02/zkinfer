@@ -47,7 +47,7 @@ class ZKInferenceClient:
         simplify_model: bool = False,
         input_shapes: Optional[Dict[str, Any]] = None,
     ) -> str:
-        """Submit one request using the coordinator's configured scheduler policy."""
+        """Return the accepted request ID; poll status for preparation/proof completion."""
         input_shapes = _to_plain_dict(input_shapes)
         input_shapes_payload = json.dumps(input_shapes) if input_shapes is not None else ""
 

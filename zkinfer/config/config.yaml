@@ -24,6 +24,9 @@ coordinator:
   witness_preparation: upfront # independent | upfront
   max_propagated_scale: 0
   allow_boundary_rescale: true
+  # Preparation runs outside the synchronous gRPC handler pool.
+  preparation_workers: 1
+  preparation_max_pending: 8 # Waiting requests, in addition to active preparation.
   preparation_dispatch: batch # batch | streaming
   preparation_cache_enabled: null # null inherits reusable_setup.enabled
 

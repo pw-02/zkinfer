@@ -162,6 +162,7 @@ def write_request_report(request, out_dir: str = "reports") -> Dict[str, Any]:
         "request_status": request.request_status.value,
         "error_message": request.error_message,
         "preparation_time(s)": preparation_time_s,
+        "preparation_queue_wait_time(s)": request.preparation_metrics.get("preparation_queue_wait_time(s)"),
         "queue_wait_time(s)": queue_wait_time_s,
         "request_runtime(s)": request_runtime_s,
         "total_elapsed_time(s)": total_elapsed_time_s,

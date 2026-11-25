@@ -115,7 +115,7 @@ class ObservabilityTests(unittest.TestCase):
     def test_response_and_submit_log_use_coordinator_policy(self):
         coordinator = SimpleNamespace(
             scheduler_policy="resource_aware",
-            submit_request=Mock(return_value="request"),
+            enqueue_request=Mock(return_value="request"),
         )
         service = ZKCoordinatorGrpcService(coordinator)
         response = service.SubmitInferenceRequest(pb.InferenceRequest(), Mock())

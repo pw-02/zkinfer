@@ -32,6 +32,10 @@ from zkinfer.verification.request_manifest import write_request_artifact_manifes
 from zkinfer.verification.verifier import RuntimeVerifier
 
 
+class PreparationQueueFull(RuntimeError):
+    """The coordinator cannot accept more preparation work right now."""
+
+
 class Coordinator:
     """Global control plane for distributed proof jobs."""
 
@@ -92,6 +96,16 @@ class Coordinator:
         self.profile_locks: Dict[str, threading.Lock] = {}
         self.pending_job_reports: set[str] = set()
 
+        # RPC submissions never wait for expensive preparation. The semaphore
+        # bounds running plus queued work; ThreadPoolExecutor alone is unbounded.
+        workers = runtime_config.coordinator.preparation_workers
+        pending = runtime_config.coordinator.preparation_max_pending
+        self.preparation_slots = threading.BoundedSemaphore(workers + pending)
+        self.preparation_pool = ThreadPoolExecutor(
+            max_workers=workers, thread_name_prefix="request-preparer",
+        )
+        self.accepting_requests = True
+
         self.finalization_pool = ThreadPoolExecutor(
             max_workers=2,
             thread_name_prefix="request-finalizer",
@@ -101,6 +115,10 @@ class Coordinator:
         self._recover_state()
 
     def shutdown(self) -> None:
+        with self.lock:
+            self.accepting_requests = False
+        # Preparation may schedule finalization; drain it first.
+        self.preparation_pool.shutdown(wait=True)
         self.finalization_pool.shutdown(wait=True)
 
     def _recover_state(self) -> None:
@@ -145,7 +163,7 @@ class Coordinator:
         for request_id in needs_finalization:
             self._schedule_request_finalization(request_id)
 
-    def submit_request(
+    def _new_request(
         self,
         name: str,
         onnx_model_path: str,
@@ -154,7 +172,7 @@ class Coordinator:
         ops_per_chunk: int,
         simplify_model: bool = False,
         input_shapes: Optional[Dict] = None,
-    ) -> str:
+    ) -> InferenceRequest:
         request = InferenceRequest(
             name=name,
             onnx_model_path=onnx_model_path,
@@ -166,42 +184,108 @@ class Coordinator:
             input_shapes=input_shapes,
         )
         request.request_status = RequestStatus.PREPARING
+        request.preparation_complete = False
+        request.preparation_metrics.update(
+            scheduler_policy=self.scheduler_policy,
+            preparation_dispatch=self.preparation_dispatch,
+            witness_preparation_mode=self.request_builder.witness_preparation,
+        )
         self._create_request_dirs(request)
-        request.preparation_metrics["scheduler_policy"] = self.scheduler_policy
-        if self.preparation_dispatch == "streaming":
-            self._prepare_streaming_request(request)
-        else:
-            started = time.perf_counter()
-            request.proof_jobs = self.request_builder.build_jobs(
+        self.active_requests[request.request_id] = request
+        if self.state_store:
+            self.state_store.save_request(request)
+            self.state_store.append_event("request_accepted", request_id=request.request_id)
+        return request
+
+    def enqueue_request(self, *args, **kwargs) -> str:
+        """Accept and persist an RPC request without waiting for preparation."""
+        if not self.preparation_slots.acquire(blocking=False):
+            raise PreparationQueueFull("Preparation queue is full; retry later")
+        try:
+            with self.lock:
+                if not self.accepting_requests:
+                    raise PreparationQueueFull("Coordinator is shutting down")
+                request = self._new_request(*args, **kwargs)
+                enqueued = time.perf_counter()
+                try:
+                    future = self.preparation_pool.submit(self._prepare_request, request, enqueued)
+                except Exception as exc:
+                    self._fail_preparation(request, exc)
+                    raise
+                future.add_done_callback(
+                    lambda fut, req=request: self._preparation_finished(req, fut)
+                )
+        except BaseException:
+            self.preparation_slots.release()
+            raise
+        return request.request_id
+
+    def submit_request(self, *args, **kwargs) -> str:
+        """Blocking in-process entry point retained for existing callers/tests."""
+        with self.lock:
+            if not self.accepting_requests:
+                raise PreparationQueueFull("Coordinator is shutting down")
+            request = self._new_request(*args, **kwargs)
+        self._prepare_request(request, time.perf_counter())
+        return request.request_id
+
+    def _prepare_request(self, request: InferenceRequest, enqueued: float) -> None:
+        started = time.perf_counter()
+        request.preparation_metrics["preparation_queue_wait_time(s)"] = started - enqueued
+        try:
+            if self.preparation_dispatch == "streaming":
+                self._prepare_streaming_request(request)
+                return
+
+            jobs = self.request_builder.build_jobs(
                 request=request,
                 shared_storage=self.shared_storage,
                 setup_store=self.setup_store,
                 max_retries=self.max_retries,
             )
-            request.expected_job_count = len(request.proof_jobs)
+            if not jobs:
+                raise ValueError("Request contains no proof jobs")
             ready_s = time.perf_counter() - started
-            request.preparation_metrics["first_job_ready_time(s)"] = ready_s
-            request.preparation_metrics["all_jobs_ready_time(s)"] = ready_s
-            request.preparation_metrics["preparation_overlap_time(s)"] = 0.0
-            self._enqueue_request(request)
-        self.logger.info(
-            "Submitted request %s with %d jobs | scheduler=%s | run_dir=%s",
-            request.request_id,
-            len(request.proof_jobs),
-            self.scheduler_policy,
-            request.run_dir,
-        )
-        return request.request_id
+            with self.lock:
+                request.proof_jobs = jobs
+                request.expected_job_count = len(jobs)
+                request.preparation_metrics.update({
+                    "first_job_ready_time(s)": ready_s,
+                    "all_jobs_ready_time(s)": ready_s,
+                    "preparation_finished_time(s)": ready_s,
+                    "preparation_overlap_time(s)": 0.0,
+                })
+                request.preparation_complete = True
+                self._enqueue_request(request)
+        except Exception as exc:
+            self._fail_preparation(request, exc)
+
+    def _fail_preparation(self, request: InferenceRequest, exc: BaseException) -> None:
+        self.logger.error("Preparation failed for %s: %s", request.request_id, exc)
+        with self.lock:
+            request.preparation_error = str(exc) or type(exc).__name__
+            request.preparation_complete = True
+            # Normally a batch failure has no published jobs. Streaming failures
+            # drain already released jobs using the existing finalization guard.
+            if self.state_store:
+                self.state_store.save_request(request)
+                self.state_store.append_event(
+                    "preparation_finished", request_id=request.request_id,
+                    payload={"error": request.preparation_error},
+                )
+        self._schedule_request_finalization(request.request_id)
+
+    def _preparation_finished(self, request: InferenceRequest, future: Future) -> None:
+        try:
+            future.result()
+        except BaseException as exc:
+            self._fail_preparation(request, exc)
+        finally:
+            self.preparation_slots.release()
 
     def _prepare_streaming_request(self, request: InferenceRequest) -> None:
         """Publish ready jobs under the scheduler lock; seal before verification."""
-        request.preparation_complete = False
-        request.preparation_metrics["preparation_dispatch"] = "streaming"
         started = time.perf_counter()
-        with self.lock:
-            self.active_requests[request.request_id] = request
-            if self.state_store:
-                self.state_store.save_request(request)
 
         def register_plan(count: int) -> None:
             with self.lock:

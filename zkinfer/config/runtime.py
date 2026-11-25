@@ -16,6 +16,8 @@ class CoordinatorConfig:
     witness_preparation: str = "independent"
     max_propagated_scale: int = 0
     allow_boundary_rescale: bool = True
+    preparation_workers: int = 1
+    preparation_max_pending: int = 8
     preparation_dispatch: str = "batch"
     preparation_cache_enabled: Optional[bool] = None
 
@@ -300,8 +302,12 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
     preparation_cache_enabled = cfg.coordinator.get("preparation_cache_enabled", None)
     if preparation_cache_enabled is not None and type(preparation_cache_enabled) is not bool:
         raise ValueError("coordinator.preparation_cache_enabled must be boolean or null")
-    if preparation_dispatch == "streaming" and int(cfg.coordinator.grpc_thread_pool_size) < 2:
-        raise ValueError("Streaming preparation requires at least two gRPC threads")
+    preparation_workers = cfg.coordinator.get("preparation_workers", 1)
+    preparation_max_pending = cfg.coordinator.get("preparation_max_pending", 8)
+    if type(preparation_workers) is not int or preparation_workers < 1:
+        raise ValueError("coordinator.preparation_workers must be a positive integer")
+    if type(preparation_max_pending) is not int or preparation_max_pending < 0:
+        raise ValueError("coordinator.preparation_max_pending must be a non-negative integer")
     witness_preparation = str(cfg.coordinator.get("witness_preparation", "upfront"))
     if witness_preparation not in {"independent", "upfront"}:
         raise ValueError("coordinator.witness_preparation must be independent or upfront")
@@ -325,6 +331,8 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             witness_preparation=witness_preparation,
             max_propagated_scale=scale_cap,
             allow_boundary_rescale=bool(cfg.coordinator.get("allow_boundary_rescale", True)),
+            preparation_workers=preparation_workers,
+            preparation_max_pending=preparation_max_pending,
             preparation_dispatch=preparation_dispatch,
             preparation_cache_enabled=preparation_cache_enabled,
         ),
