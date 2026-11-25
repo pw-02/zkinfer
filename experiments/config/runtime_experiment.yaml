@@ -29,7 +29,7 @@ coordinator:
   # admission remains node-local.
   scheduling_policy: lpt
   witness_preparation: upfront
-  max_propagated_scale: 16
+  max_propagated_scale: 0
   allow_boundary_rescale: true
 
 verification:

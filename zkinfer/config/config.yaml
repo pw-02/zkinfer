@@ -22,7 +22,7 @@ coordinator:
   scheduling_policy: cache_aware
   # upfront prepares public-linked witnesses before scheduling (filesystem only).
   witness_preparation: upfront # independent | upfront
-  max_propagated_scale: 16
+  max_propagated_scale: 0
   allow_boundary_rescale: true
 
 node:

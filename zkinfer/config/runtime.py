@@ -14,7 +14,7 @@ class CoordinatorConfig:
     runs_dir: str
     logs_dir: str
     witness_preparation: str = "independent"
-    max_propagated_scale: int = 16
+    max_propagated_scale: int = 0
     allow_boundary_rescale: bool = True
 
 
@@ -307,9 +307,9 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             raise ValueError("Upfront witness preparation requires verification.enabled=true")
         if request_store.backend != "filesystem" or setup_store.backend != "filesystem":
             raise ValueError("Upfront witness preparation currently requires filesystem storage")
-    scale_cap = cfg.coordinator.get("max_propagated_scale", 16)
-    if type(scale_cap) is not int or not 0 <= scale_cap <= 126:
-        raise ValueError("max_propagated_scale must be an integer in [0, 126]")
+    scale_cap = cfg.coordinator.get("max_propagated_scale", 0)
+    if type(scale_cap) is not int or not 0 <= scale_cap <= 62:
+        raise ValueError("max_propagated_scale must be an integer in [0, 62]")
 
     return RuntimeConfig(
         coordinator=CoordinatorConfig(

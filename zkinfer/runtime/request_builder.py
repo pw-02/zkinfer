@@ -18,8 +18,8 @@ from zkinfer.storage.io import exists, load_json
 # implementation change in a way that can alter settings, compiled circuits,
 # PKs, or VKs.
 EZKL_SETUP_IDENTITY = {
-    "setup_identity_version": 1,
-    "backend": "ezkl",
+    "setup_identity_version": 2,
+    "backend": "ezkl-upstream-v23",
     "settings_generation": "gen_settings_then_calibrate_with_fallback",
     "calibration_target": "resources",
     "proof_type": "single",

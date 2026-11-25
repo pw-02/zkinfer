@@ -9,7 +9,7 @@ partitioning:
   simplify: true
   # upfront: exact public linking; independent: legacy ORT inputs (unlinked).
   witness_preparation: upfront
-  max_propagated_scale: 16
+  max_propagated_scale: 0
   allow_boundary_rescale: true
 
 scheduling:

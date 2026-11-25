@@ -16,7 +16,7 @@ def tensor(name, scale, values):
     )
 
 
-@pytest.mark.parametrize("value", [0, 1, -1, 123456, -123456, (1 << 127) - 1])
+@pytest.mark.parametrize("value", [0, 1, -1, 123456, -123456, (1 << 63) - 1])
 def test_field_roundtrip(value):
     assert decode_felt(encode_felt(value)) == value
 
@@ -25,7 +25,7 @@ def test_reject_noncanonical_and_overflow():
     with pytest.raises(ValueError):
         decode_felt(FIELD_MODULUS.to_bytes(32, "little").hex())
     with pytest.raises(ValueError):
-        encode_felt(1 << 127)
+        encode_felt(1 << 63)
 
 
 @pytest.mark.parametrize("value,expected", [(3, 2), (-3, -2), (2, 1), (-2, -1), (1, 1)])

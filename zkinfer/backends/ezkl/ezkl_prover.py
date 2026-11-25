@@ -494,7 +494,6 @@ class EZKLProofStages:
             self.compiled_circuit_path,
             self.pk_path,
             self.proof_path,
-            "single",
             srs_path=self.srs_path,
         )
 

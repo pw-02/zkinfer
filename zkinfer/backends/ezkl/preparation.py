@@ -23,9 +23,9 @@ from typing import Any, Sequence
 FIELD_MODULUS = (
     21888242871839275222246405745257275088548364400416034343698204186575808495617
 )
-PREPARATION_VERSION = 1
+PREPARATION_VERSION = 2
 PREPARED_INPUT_KIND = "zkinfer.ezkl.prepared.v1"
-SIGNED_LIMIT = 1 << 127
+SIGNED_LIMIT = 1 << 63
 
 
 def read_json(path: str | Path) -> dict:
@@ -47,7 +47,7 @@ def file_digest(path: str | Path) -> str:
 
 
 def decode_felt(value: str) -> int:
-    """Decode a canonical signed field element within EZKL's i128 domain."""
+    """Decode a canonical signed field element within EZKL's i64 domain."""
     if not isinstance(value, str) or len(value) != 64:
         raise ValueError("Expected a 32-byte hexadecimal EZKL field element")
     try:
@@ -62,18 +62,18 @@ def decode_felt(value: str) -> int:
     if integer > FIELD_MODULUS // 2:
         integer -= FIELD_MODULUS
     if not -SIGNED_LIMIT < integer < SIGNED_LIMIT:
-        raise ValueError("Field element outside supported signed i128 range")
+        raise ValueError("Field element outside supported signed i64 range")
     return integer
 
 
 def encode_felt(integer: int) -> str:
     if type(integer) is not int or not -SIGNED_LIMIT < integer < SIGNED_LIMIT:
-        raise ValueError("Integer outside supported signed i128 range")
+        raise ValueError("Integer outside supported signed i64 range")
     return (integer % FIELD_MODULUS).to_bytes(32, "little").hex()
 
 
 def checked_scale(scale: int) -> int:
-    if type(scale) is not int or not 0 <= scale <= 126:
+    if type(scale) is not int or not 0 <= scale <= 62:
         raise ValueError(f"Unsupported fixed-point scale: {scale!r}")
     return scale
 
@@ -94,7 +94,7 @@ def rescale_integer(value: int, source_scale: int, target_scale: int) -> int:
             magnitude += 1
         result = -magnitude if value < 0 else magnitude
     if not -SIGNED_LIMIT < result < SIGNED_LIMIT:
-        raise ValueError("Rescaled boundary exceeds supported signed i128 range")
+        raise ValueError("Rescaled boundary exceeds supported signed i64 range")
     return result
 
 
@@ -209,7 +209,7 @@ def validate_settings(settings: dict, input_count: int, output_count: int):
     ):
         if str(run_args[key]).lower() != expected:
             raise ValueError(f"Expected {key}={expected}")
-    tolerance = run_args["tolerance"]
+    tolerance = run_args.get("tolerance", 0)
     if (tolerance["val"] if isinstance(tolerance, dict) else tolerance) != 0:
         raise ValueError("Exact linking requires zero circuit output tolerance")
     input_scales = settings["model_input_scales"]
