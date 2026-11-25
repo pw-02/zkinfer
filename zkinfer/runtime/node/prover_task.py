@@ -24,6 +24,7 @@ from zkinfer.profiling.msm_fft_parser import (
 from zkinfer.profiling.resource_parser import parse_resource_usage_file
 from zkinfer.profiling.halo2_phases import write_phase_report
 from zkinfer.profiling.execution_trace import write_execution_trace
+from zkinfer.profiling.job_features import save_circuit_features
 from zkinfer.runtime.data_plane import ArtifactRef
 from zkinfer.runtime.node.stage_admission import StageAdmissionController
 from zkinfer.storage.s3 import upload_file
@@ -186,7 +187,10 @@ class StageAwareEZKLProofStages(EZKLProofStages):
 
     def calibrate_settings_with_fallback(self):
         with self._admit("CALIBRATING"):
-            return super().calibrate_settings_with_fallback()
+            result = super().calibrate_settings_with_fallback()
+            if getattr(self, "checkpoint_features", None):
+                self.checkpoint_features(self.ezkl_settings_dict)
+            return result
 
     def compile_circuit(self):
         with self._admit("COMPILING"):
@@ -259,6 +263,13 @@ class ProverTaskRunner:
         result = None
         try:
             proof_stages = self._build_proof_stages(task, status_file)
+            def checkpoint(settings=None):
+                try:
+                    save_circuit_features(task, settings)
+                except Exception:
+                    self.logger.warning("Failed to checkpoint circuit features", exc_info=True)
+            proof_stages.checkpoint_features = checkpoint
+            checkpoint()
             if os.environ.get("ZKINFER_PROFILING_MODE", "research") == "debug":
                 with open(
                     os.path.join(task.output_dir, "admission_profile_before.json"),
@@ -281,8 +292,14 @@ class ProverTaskRunner:
                 return result
         finally:
             self._stop_process(resource_proc)
-            if result is not None:
-                self._compact_successful_artifacts(task.output_dir)
+            try:
+                save_circuit_features(task)
+                write_execution_trace(task.output_dir)
+            except Exception:
+                self.logger.warning("Failed to finalize profiling data", exc_info=True)
+            else:
+                if result is not None:
+                    self._compact_successful_artifacts(task.output_dir)
 
     def _compact_successful_artifacts(self, directory: str) -> None:
         """Remove redundant artifacts only after successful publication and logger shutdown."""
@@ -298,6 +315,7 @@ class ProverTaskRunner:
             for name in ("stage_transitions.csv", "fused_stage_transitions.csv",
                          "halo2_stage_transitions.csv", "halo2_circuit.csv",
                          "halo2_phase_resources.csv", "admission_profile_before.json",
+                         "halo2_structure.json", "rayon_pool_size.txt",
                          "status.txt"):
                 (root / name).unlink(missing_ok=True)
         except Exception as exc:
@@ -309,17 +327,9 @@ class ProverTaskRunner:
     ) -> ProverTaskResult:
         ezkl_metrics, settings = proof_stages.run_all(setup_only=False)
         try:
-            circuit_features = {
-                "setup_key": task.setup_key,
-                "settings": settings,
-                "halo2": read_csv_first_row(os.path.join(task.output_dir, "halo2_circuit.csv")),
-                "profiling_mode": os.environ.get("ZKINFER_PROFILING_MODE", "research"),
-                "rayon_num_threads": os.environ.get("RAYON_NUM_THREADS"),
-            }
-            with open(os.path.join(task.output_dir, "circuit_features.json"), "w", encoding="utf-8") as file:
-                json.dump(circuit_features, file, indent=2)
-        except Exception as exc:
-            self.logger.warning("Failed to save circuit features: %s", exc)
+            save_circuit_features(task, settings)
+        except Exception:
+            self.logger.warning("Failed to save circuit features", exc_info=True)
         ezkl_metrics.update(proof_stages.admission_metrics)
         ezkl_metrics["whole_job_admission_wait_time(s)"] = float(
             job_info.get("wait_time_s", 0.0)
@@ -380,6 +390,7 @@ class ProverTaskRunner:
             process.wait(timeout=3)
         except Exception:
             process.kill()
+            process.wait()
 
     def _build_proof_stages(
         self,
