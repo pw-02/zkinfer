@@ -273,7 +273,7 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
         return settings, compiled, cal_s, comp_s, False
 
     from zkinfer.storage.partition_cache import (
-        atomic_copy, matches, metadata, partition_lock, save_metadata,
+        matches, metadata, partition_lock, publish_group,
     )
 
     identity = {
@@ -283,7 +283,6 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
         "candidate_scale": candidate,
         "visibility": ["public", "public", "fixed"],
     }
-    directory = Path(directory)
     names = ("settings.json", "network.compiled")
     with partition_lock(cache_root) as root:
         info = metadata(root)
@@ -291,20 +290,22 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
         hashes = circuit.get("sha256", {})
         if (circuit.get("identity") == identity and set(hashes) == set(names)
                 and matches(root, hashes)):
-            directory.mkdir(parents=True, exist_ok=True)
-            for name in names:
-                atomic_copy(root / name, directory / name)
-            return directory / names[0], directory / names[1], 0.0, 0.0, True
-        settings, compiled, cal_s, comp_s = _run_setup(
-            ezkl, model, calibration, directory, candidate
-        )
-        hashes = {name: file_digest(path) for name, path in zip(names, (settings, compiled))}
-        for name, path in zip(names, (settings, compiled)):
-            atomic_copy(path, root / name)
-        info["circuit"] = {"identity": identity, "sha256": hashes}
-        # Prepared jobs hold private settings/compiled snapshots, not mutable cache paths.
-        save_metadata(root, info)
-        return settings, compiled, cal_s, comp_s, False
+            return root / names[0], root / names[1], 0.0, 0.0, True
+        # A committed slot is never replaced, even if incompatible or damaged.
+        if "circuit" not in info and "keys" not in info:
+            with tempfile.TemporaryDirectory(prefix=".circuit-", dir=root) as staging:
+                settings, compiled, cal_s, comp_s = _run_setup(
+                    ezkl, model, calibration, Path(staging), candidate
+                )
+                sources = dict(zip(names, (settings, compiled)))
+                hashes = {name: file_digest(path) for name, path in sources.items()}
+                publish_group(root, info, "circuit",
+                              {"identity": identity, "sha256": hashes}, sources)
+                return root / names[0], root / names[1], cal_s, comp_s, False
+    settings, compiled, cal_s, comp_s = _run_setup(
+        ezkl, model, calibration, directory, candidate
+    )
+    return settings, compiled, cal_s, comp_s, False
 
 
 def prepare_partitions(

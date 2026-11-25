@@ -36,6 +36,10 @@ class EZKLProofStages:
         logger: Optional[logging.Logger] = None,
         proving_cache_read_only: bool = False,
         prepared_witness_path: Optional[str] = None,
+        prepared_settings_path: Optional[str] = None,
+        prepared_compiled_path: Optional[str] = None,
+        cached_pk_path: Optional[str] = None,
+        cached_vk_path: Optional[str] = None,
     ):
         import ezkl
 
@@ -87,7 +91,14 @@ class EZKLProofStages:
         self.pk_path = os.path.join(setup_dir, "pk.json")
         self.vk_path = os.path.join(setup_dir, "vk.json")
 
-        self.witness_path = os.path.join(self.tmp_dir, "witness.json")
+        if prepared_settings_path and prepared_compiled_path:
+            self.settings_path = prepared_settings_path
+            self.compiled_circuit_path = prepared_compiled_path
+        if cached_pk_path and cached_vk_path:
+            self.pk_path = cached_pk_path
+            self.vk_path = cached_vk_path
+
+        self.witness_path = prepared_witness_path or os.path.join(self.tmp_dir, "witness.json")
         self.proof_path = os.path.join(self.tmp_dir, "proof.pf")
 
         self.ezkl_settings_dict: Dict[str, Any] = {}
@@ -435,10 +446,18 @@ class EZKLProofStages:
             )
             return
 
-        self.ezkl.gen_srs(
-            srs_path=self.srs_path,
-            logrows=logrows,
-        )
+        from zkinfer.storage.partition_cache import partition_lock
+        import tempfile
+        # All nodes use the same configured SRS path; never expose a partial file.
+        with partition_lock(Path(self.srs_path).parent):
+            if not os.path.exists(self.srs_path):
+                with tempfile.TemporaryDirectory(prefix=".srs-", dir=Path(self.srs_path).parent) as tmp:
+                    candidate = str(Path(tmp) / Path(self.srs_path).name)
+                    self.ezkl.gen_srs(srs_path=candidate, logrows=logrows)
+                    if not Path(candidate).stat().st_size:
+                        raise ValueError("Generated empty SRS")
+                    os.chmod(candidate, 0o444)
+                    os.replace(candidate, self.srs_path)
 
         if not os.path.exists(self.srs_path):
             raise FileNotFoundError(f"SRS file not created: {self.srs_path}")
@@ -452,7 +471,6 @@ class EZKLProofStages:
     def gen_witness(self):
         self._update_status("GENERATING_WITNESS")
         if self.prepared_witness_path:
-            shutil.copyfile(self.prepared_witness_path, self.witness_path)
             return
         self.ezkl.gen_witness(
             self.input_data_path,

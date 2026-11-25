@@ -15,7 +15,7 @@ def save_circuit_features(task, settings=None):
                    profiling_mode=os.environ.get("ZKINFER_PROFILING_MODE", "research"),
                    rayon_num_threads=os.environ.get("RAYON_NUM_THREADS"))
     if settings is None:
-        path = Path(task.setup_dir) / "settings.json"
+        path = Path(getattr(task, "prepared_settings_path", None) or (Path(task.setup_dir) / "settings.json"))
         if path.is_file():
             settings = json.loads(path.read_text())
     if settings:

@@ -54,6 +54,12 @@ class LocalProverTask:
     history_key: str = ""
     setup_read_only: bool = False
     prepared_witness_path: Optional[str] = None
+    prepared_settings_path: Optional[str] = None
+    prepared_compiled_path: Optional[str] = None
+    cached_pk_path: Optional[str] = None
+    cached_vk_path: Optional[str] = None
+    srs_dir: Optional[str] = None
+    publish_keys: bool = False
     resource_sampling_interval_sec: float = 1.0
     model_materialize_time_s: float = 0.0
     input_materialize_time_s: float = 0.0
@@ -356,6 +362,9 @@ class ProverTaskRunner:
         metrics.update(self._flatten_transfer_metrics(task.transfer_metrics))
         metrics.update(self._flatten_output_metrics(publish_metrics))
         metrics["prover_process_pid"] = os.getpid()
+        if task.publish_keys:
+            from zkinfer.storage.partition_cache import checked_digest
+            metrics["prover_srs_sha256"] = checked_digest(proof_stages.srs_path)
         return ProverTaskResult(
             artifact_manifest_ref=manifest_ref,
             metrics=metrics,
@@ -432,6 +441,11 @@ class ProverTaskRunner:
             logger=self.logger,
             admission=admission,
             prepared_witness_path=task.prepared_witness_path,
+            prepared_settings_path=task.prepared_settings_path,
+            prepared_compiled_path=task.prepared_compiled_path,
+            cached_pk_path=task.cached_pk_path,
+            cached_vk_path=task.cached_vk_path,
+            srs_dir=task.srs_dir,
         )
 
     @staticmethod
@@ -556,7 +570,13 @@ class ProverTaskRunner:
             output_path = os.path.join(task.output_prefix, published_name)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             if not self._same_path(local_path, output_path):
-                shutil.copy2(local_path, output_path)
+                import errno
+                try:
+                    os.link(local_path, output_path)
+                except OSError as exc:
+                    if exc.errno != errno.EXDEV:
+                        raise
+                    shutil.copy2(local_path, output_path)
             return output_path, {
                 "artifact": artifact_name,
                 "backend": "filesystem",
@@ -628,11 +648,14 @@ class ProverTaskRunner:
                 retained_path = output_path
 
             size_bytes = publish_source.stat().st_size
-            published_uri, file_metrics = self._publish_file(
-                str(publish_source),
-                task,
-                artifact_name,
-            )
+            if (task.output_backend == "filesystem" and not task.keep_proof_artifacts
+                    and ((artifact_name == "witness.json" and task.prepared_witness_path)
+                         or (artifact_name == "settings.json" and task.prepared_settings_path)
+                         or (artifact_name == "vk.json" and task.cached_vk_path))):
+                published_uri = str(source)
+                file_metrics = {"bytes_uploaded": 0, "bytes_written": 0, "publish_time(s)": 0.0}
+            else:
+                published_uri, file_metrics = self._publish_file(str(publish_source), task, artifact_name)
             publish_metrics["artifacts"][artifact_name] = file_metrics
             publish_metrics["output_bytes_uploaded"] += int(
                 file_metrics.get("bytes_uploaded", 0) or 0

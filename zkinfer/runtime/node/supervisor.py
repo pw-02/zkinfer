@@ -9,6 +9,7 @@ import subprocess
 import sys
 import threading
 import time
+import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Optional
@@ -481,11 +482,12 @@ class NodeSupervisor:
 
             result = self._run_prover_subprocess(local_task)
             setup_publish_metrics = {}
-            if self.cfg.setup_store.enabled and not local_task.setup_read_only:
+            if local_task.publish_keys:
                 transfer = ArtifactTransfer(tmp_dir / "transfer")
                 setup_publish_metrics = transfer.publish_setup(
                     from_pb_artifact(lease.setup_cache), local_task.setup_key,
                     local_task.setup_dir, bool(local_task.prepared_witness_path),
+                    srs_digest=result.metrics.get("prover_srs_sha256"),
                 )
 
             update_history = self.cfg.setup_store.resource_profiles_update_history
@@ -541,6 +543,8 @@ class NodeSupervisor:
                 metrics=partial,
             )
         finally:
+            if local_task is not None and local_task.publish_keys:
+                shutil.rmtree(local_task.setup_dir, ignore_errors=True)
             shutil.rmtree(tmp_dir, ignore_errors=True)
             if failed and output_dir.is_dir():
                 # Keep attempt diagnostics outside canonical job directories;
@@ -578,58 +582,61 @@ class NodeSupervisor:
         input_materialize_time_s = float(input_metrics["materialize_time(s)"])
         setup_dir = str(tmp_dir / "setup")
         Path(setup_dir).mkdir(parents=True, exist_ok=True)
-        prepared = from_pb_artifact(lease.input).uri.endswith(".prepared.json")
-        setup_metrics = {"setup_key": setup_key, "bytes_downloaded": 0,
-                         "restore_time(s)": 0.0}
-        if self.cfg.setup_store.enabled:
-            setup_metrics = transfer.restore_setup(
-                from_pb_artifact(lease.setup_cache), setup_key, setup_dir, prepared
-            )
-
-        prepared_witness_path = None
+        prepared_witness_path = prepared_settings_path = prepared_compiled_path = None
+        cached_pk_path = cached_vk_path = None
         prepared_metrics = {}
-        if from_pb_artifact(lease.input).uri.endswith(".prepared.json"):
-            from zkinfer.backends.ezkl.preparation import PREPARED_INPUT_KIND, file_digest, read_json
+        setup_metrics = {"bytes_downloaded": 0, "restore_time(s)": 0.0}
+        publish_keys = False
+        srs_dir = getattr(getattr(self.cfg, "verification", None), "srs_dir", "srs")
+        prepared = from_pb_artifact(lease.input).uri.endswith(".prepared.json")
+        if prepared:
+            from zkinfer.backends.ezkl.preparation import PREPARED_INPUT_KIND, read_json
+            from zkinfer.storage.partition_cache import checked_digest, metadata, partition_lock
             descriptor_ref = from_pb_artifact(lease.input)
-            if not descriptor_ref.sha256 or file_digest(input_path) != descriptor_ref.sha256:
-                raise ValueError("Prepared descriptor hash mismatch")
+            if not descriptor_ref.sha256:
+                raise ValueError("Missing prepared descriptor digest")
             descriptor = read_json(input_path)
-            if (
-                descriptor.get("kind") != PREPARED_INPUT_KIND
-                or descriptor.get("request_id") != lease.request_id
-                or descriptor.get("setup_key") != setup_key
-            ):
+            if (descriptor.get("kind") != PREPARED_INPUT_KIND
+                    or descriptor.get("request_id") != lease.request_id
+                    or descriptor.get("setup_key") != setup_key):
                 raise ValueError("Prepared descriptor does not match job")
-            refs = {}
+            paths = {}
             for name in ("settings", "compiled", "witness"):
                 ref = ArtifactRef.from_dict(descriptor[name])
-                if ref.is_empty or not ref.sha256:
+                if ref.is_empty or not ref.sha256 or ref.backend != "filesystem":
                     raise ValueError(f"Unbound prepared artifact: {name}")
-                local, metrics = transfer.materialize(ref, name)
-                if file_digest(local) != ref.sha256:
-                    raise ValueError(f"Prepared artifact hash mismatch: {name}")
-                refs[name] = (Path(local), ref)
-                prepared_metrics[name] = metrics
-
-            # The setup identity binds the exact settings and compiled bytes.
-            # Never overwrite conflicting cached setup/key material.
-            for name, filename in (("settings", "settings.json"), ("compiled", "network.compiled")):
-                source, ref = refs[name]
-                target = Path(setup_dir) / filename
-                if target.exists():
-                    if file_digest(target) != ref.sha256:
-                        raise ValueError(f"Prepared setup cache mismatch: {filename}")
-                else:
-                    if setup_metrics.get("shared_read_only"):
-                        raise ValueError(f"Missing read-only prepared setup: {filename}")
-                    target.parent.mkdir(parents=True, exist_ok=True)
-                    temporary = target.with_name(target.name + "." + lease_id + ".tmp")
-                    try:
-                        shutil.copyfile(source, temporary)
-                        os.replace(temporary, target)
-                    finally:
-                        temporary.unlink(missing_ok=True)
-            prepared_witness_path = str(refs["witness"][0])
+                paths[name], prepared_metrics[name] = transfer.materialize(ref, name)
+            prepared_settings_path = paths["settings"]
+            prepared_compiled_path = paths["compiled"]
+            prepared_witness_path = paths["witness"]
+            if self.cfg.setup_store.enabled:
+                settings = read_json(prepared_settings_path)["run_args"]
+                commitment = str(settings.get("commitment", "KZG")).lower()
+                srs = Path(srs_dir) / f"{'ipa' if commitment == 'ipa' else 'kzg'}{settings['logrows']}.srs"
+                setup_ref = from_pb_artifact(lease.setup_cache)
+                if srs.is_file():
+                    setup_metrics = transfer.restore_setup(setup_ref, setup_key, setup_dir, True,
+                                                          srs_digest=checked_digest(srs))
+                cached_pk_path = setup_metrics.get("paths", {}).get("pk.json")
+                cached_vk_path = setup_metrics.get("paths", {}).get("vk.json")
+                if not cached_pk_path:
+                    with partition_lock(setup_ref.uri) as root:
+                        if "keys" not in metadata(root):
+                            setup_dir = tempfile.mkdtemp(prefix=".keys-", dir=root)
+                            publish_keys = True
+        elif self.cfg.setup_store.enabled:
+            # Historical programmatic callers, not the supported linked path.
+            setup_metrics = transfer.restore_setup(from_pb_artifact(lease.setup_cache),
+                                                   setup_key, setup_dir, False)
+            for name, path in setup_metrics.get("paths", {}).items():
+                if name == "settings.json":
+                    prepared_settings_path = path
+                elif name == "network.compiled":
+                    prepared_compiled_path = path
+                elif name == "pk.json":
+                    cached_pk_path = path
+                elif name == "vk.json":
+                    cached_vk_path = path
 
         output_ref = from_pb_artifact(lease.output_prefix)
         transfer_metrics = {
@@ -650,7 +657,13 @@ class NodeSupervisor:
             model_path=model_path,
             input_path=input_path,
             setup_dir=setup_dir,
-            setup_read_only=bool(setup_metrics.get("shared_read_only", False)),
+            setup_read_only=False,
+            prepared_settings_path=prepared_settings_path,
+            prepared_compiled_path=prepared_compiled_path,
+            cached_pk_path=cached_pk_path,
+            cached_vk_path=cached_vk_path,
+            srs_dir=srs_dir,
+            publish_keys=publish_keys,
             prepared_witness_path=prepared_witness_path,
             tmp_dir=str(tmp_dir),
             output_dir=str(output_dir),
