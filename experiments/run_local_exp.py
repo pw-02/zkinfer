@@ -456,8 +456,6 @@ def run(cfg: DictConfig) -> None:
         if successful and stopped_cleanly and reports_ok:
             logger.info("Cleaning temporary storage according to output settings")
             cleanup_request_store(cfg, logger, submitted_request_ids)
-            if (root / "runtime").exists():
-                shutil.rmtree(root / "runtime")
             prune_empty_run_dirs(Path(str(cfg.paths.runs_dir)), submitted_request_ids)
             logger.info("Experiment completed successfully")
             logger.info("Results saved to %s", cfg.paths.runs_dir)
