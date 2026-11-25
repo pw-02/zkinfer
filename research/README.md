@@ -33,13 +33,14 @@ evidence. Record failures as well as successful requests.
 New runs launched through the small experiment YAML use descriptive directories:
 
 ```
-2026-11-25_12-30-00_bert_p4_setup-off_c1_fifo_noadm_abcd1234
+2026-11-25_12-30-00_bert_p4_keys-off_c1_fifo_noadm_exact_streaming_circuits-off_history-off_learn-off_abcd1234
 ```
 
 The name records the timestamp, workload, partition size (or `mono`), setup
 reuse setting, concurrency cap (`cauto` for automatic admission), scheduling
-policy, admission mode, and a unique suffix. `setup-on` means reuse is enabled,
-not that a cache hit occurred. Consult the effective configuration and measured
+policy, admission mode, witness preparation and dispatch, circuit reuse, history
+reading/updating, and a unique suffix. `keys-on` and `circuits-on` enable reuse;
+they do not imply a cache hit. Consult the effective configuration and measured
 cache events for actual conditions. Existing run directories are unchanged.
 
 ## Workflow

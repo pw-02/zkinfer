@@ -28,7 +28,6 @@ def runtime_config(root: Path):
     cfg.node.runs_dir = str(root / "node-runs")
     cfg.node.logs_dir = str(root / "node-logs")
     cfg.node.node_id = "test-node"
-    cfg.node.local_cache.path = str(root / "node-cache")
     cfg.node.runtime_state_dir = str(root / "runtime-state")
     cfg.storage.request_data.path = str(root / "requests-store")
     cfg.storage.reusable_setup.path = str(root / "setup")

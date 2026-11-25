@@ -1,6 +1,6 @@
 # zkInfer
 
-zkInfer is a distributed runtime for partitioned zkML proof serving with an EZKL/Halo2 backend. The `sacdad27` branch focuses on resource-aware proof execution, reusable setup state, request-fair placement, node-local memory admission, verification, recovery, and reproducible experiment accounting.
+zkInfer is a distributed runtime for partitioned zkML proof serving with an EZKL/Halo2 backend. The `ccgrid-upstream-v23` branch focuses on resource-aware proof execution, reusable setup state, request-fair placement, node-local memory admission, verification, recovery, and reproducible experiment accounting.
 
 ## Architecture
 
@@ -12,15 +12,14 @@ Coordinator
   |- partitions each request into proof jobs
   |- maintains request-fair global scheduling state
   |- chooses feasible jobs for polling nodes
-  |- considers reusable-setup locality
   |- persists leases and request state
   `- requeues jobs after node failure
           |
           | gRPC control plane
           v
 NodeSupervisor                         one per machine
-  |- reports fresh node and cache state
-  |- owns the bounded local cache
+  |- reports fresh node resource state
+  |- materializes artifacts in private job workspaces
   |- restores reusable setup
   |- launches one isolated prover process per proof job
   `- applies node-local stage admission
@@ -59,12 +58,9 @@ node:
 storage:
   reusable_setup:
     enabled: true
-    path: storage/setup
+    path: storage/cache
   request_data:
     path: storage/requests
-  local_cache:
-    path: storage/node/cache
-    max_gb: 50
 
 output:
   keep_proof_artifacts: false
@@ -77,9 +73,9 @@ output:
 
 ### Coordinator scheduling
 
-The coordinator decides which whole proof job to lease to a node. Request fairness is applied before the within-request policy. Supported policies are `fifo`, `lpt`, `cache_aware`, and `resource_aware`.
+The coordinator decides which whole proof job to lease to a node. Request fairness is applied before the within-request policy. Supported policies are `fifo`, `lpt`, and `resource_aware`.
 
-The coordinator does not perform stage-level packing. For the resource-aware policy it rejects work whose predicted peak cannot fit the machine at all, then uses setup locality and predicted duration as placement preferences.
+The coordinator does not perform stage-level packing. For the resource-aware policy it rejects work whose predicted peak cannot fit the machine at all, then prioritizes predicted duration within the selected request.
 
 ### Stage admission
 
@@ -156,12 +152,14 @@ Shared storage is separated by lifetime.
 
 ```text
 reusable setup
-  <setup_key>/
+  <model_name>_<16-hex-hash>/<operator_label>_<16-hex-hash>/
     model.onnx
     settings.json
     network.compiled
-    pk.json.gz
+    pk.json
     vk.json
+    metadata.json
+    .identity.sha256
     resource_profile.json
 
 request data
@@ -174,7 +172,7 @@ request data
 
 The setup key includes the partition model and versioned setup-policy identity. A setup-policy change therefore does not silently reuse incompatible proving state.
 
-Node-local materialized copies live in the local cache. Setup locality is a scheduling preference, not a reason to override machine-feasibility or local stage-admission checks.
+Workers use private job workspaces, not persistent local artifact caches. Filesystem cache directory names use 16 hexadecimal digest characters; full SHA-256 identities are checked before reuse. Existing full-hash cache directories are left untouched.
 
 ## Output retention
 

@@ -35,7 +35,7 @@ class ArtifactTransferTests(unittest.TestCase):
         ref = ArtifactRef("filesystem", str(source), sha256=digest)
         path, metrics = self.transfer.materialize(ref, "settings.json")
         self.assertEqual(Path(path).read_bytes(), source.read_bytes())
-        self.assertFalse(metrics["cache_hit"])
+        self.assertNotIn("cache_hit", metrics)
         source.write_bytes(b"changed")
         self.assertNotEqual(Path(path).read_bytes(), source.read_bytes())
         with self.assertRaisesRegex(ValueError, "hash mismatch"):

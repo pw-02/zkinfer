@@ -8,7 +8,7 @@ How do placement and worker count affect request completion?
 
 ## Protocol
 
-FIFO, LPT, cache-aware and resource-aware; 1/2/4/8 workers where available; fixed workload and separate load scaling.
+FIFO, LPT and resource-aware; 1/2/4/8 workers where available; fixed workload and separate load scaling.
 
 ## Measurements
 
@@ -29,7 +29,7 @@ Pending verification and registration of source runs. Record measured findings h
 
 ## Limitations and checks
 
-Record physical nodes versus slots; actual scheduler semantics and cache locality; no assumed scalability.
+Record physical nodes versus slots; actual scheduler semantics and shared-storage overhead; no assumed scalability.
 
 ## Outputs
 

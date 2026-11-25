@@ -114,12 +114,12 @@ class ObservabilityTests(unittest.TestCase):
 
     def test_response_and_submit_log_use_coordinator_policy(self):
         coordinator = SimpleNamespace(
-            scheduler_policy="cache_aware",
+            scheduler_policy="resource_aware",
             submit_request=Mock(return_value="request"),
         )
         service = ZKCoordinatorGrpcService(coordinator)
         response = service.SubmitInferenceRequest(pb.InferenceRequest(), Mock())
-        self.assertEqual(response.scheduler, "cache_aware")
+        self.assertEqual(response.scheduler, "resource_aware")
         client = ZKInferenceClient("unused")
         with patch.object(client, "_channel"), patch(
             "zkinfer.client.api.pb_grpc.ZKJobServiceStub"
@@ -134,7 +134,7 @@ class ObservabilityTests(unittest.TestCase):
                     1,
                 )
             self.assertIn(
-                "coordinator scheduler: cache_aware",
+                "coordinator scheduler: resource_aware",
                 "\n".join(logs.output),
             )
 
@@ -146,7 +146,7 @@ class ObservabilityTests(unittest.TestCase):
                 {
                     "budget": 8,
                     "reserve": "${budget}",
-                    "coordinator": {"scheduling_policy": "cache_aware"},
+                    "coordinator": {"scheduling_policy": "resource_aware"},
                 }
             )
             with patch(

@@ -46,7 +46,7 @@ class CoordinatorPlacementPolicyTests(unittest.TestCase):
         ))
         self.assertIs(leased, job)
 
-    def test_resource_aware_never_uses_cache_to_override_machine_feasibility(self):
+    def test_resource_aware_rejects_machine_infeasible_jobs(self):
         too_large = make_job("request-a", "large", 100.0, 80.0, artifact_key="cached")
         fits = make_job("request-a", "small", 10.0, 8.0, artifact_key="uncached")
         scheduler = JobScheduler("resource_aware")
@@ -56,11 +56,10 @@ class CoordinatorPlacementPolicyTests(unittest.TestCase):
             node_id="node",
             memory_total_gb=64.0,
             memory_available_gb=32.0,
-            cached_setup_keys=("cached",),
         ))
         self.assertIs(leased, fits)
 
-    def test_request_round_robin_precedes_cache_preference(self):
+    def test_request_round_robin_precedes_duration_preference(self):
         cached = make_job("request-a", "a1", 10.0, 4.0, artifact_key="cached")
         other = make_job("request-b", "b1", 10.0, 4.0, artifact_key="uncached")
         scheduler = JobScheduler("resource_aware")
@@ -69,7 +68,6 @@ class CoordinatorPlacementPolicyTests(unittest.TestCase):
             node_id="node",
             memory_total_gb=64.0,
             memory_available_gb=32.0,
-            cached_setup_keys=("cached",),
         )
         self.assertEqual(scheduler.next_job(node).inference_request_id, "request-a")
         self.assertEqual(scheduler.next_job(node).inference_request_id, "request-b")

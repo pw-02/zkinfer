@@ -80,7 +80,7 @@ class ProtocolTests(unittest.TestCase):
 
 class SchedulerTests(unittest.TestCase):
     def test_zero_available_memory_rejects_known_demand(self):
-        for policy in ("fifo", "lpt", "cache_aware", "resource_aware"):
+        for policy in ("fifo", "lpt", "resource_aware"):
             with self.subTest(policy=policy):
                 scheduler = JobScheduler(policy)
                 scheduler.add_jobs([_job("a", "a1")])

@@ -70,6 +70,22 @@ class SharedStorageTests(unittest.TestCase):
             self.assertEqual(Path(first.output_prefix_ref.uri).parent, root / "requests-store" / first_request.request_id / "proofs")
             self.assertEqual(json.loads(Path(first.input_ref.uri).read_text()), {"input_data": [[1, 2]]})
 
+    def test_short_namespace_rejects_full_parent_hash_collision(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            shared = SharedStorage("filesystem", str(root / "cache"), str(root / "requests"))
+            first = "a" * 16 + "b" * 48
+            second = "a" * 16 + "c" * 48
+            namespace = shared.partition_path("model", first, b"partition", "matmul")
+            self.assertEqual(namespace.split("/")[0], "model_" + first[:16])
+            self.assertEqual(
+                (root / "cache" / namespace / ".identity.sha256").read_text().strip(),
+                hashlib.sha256(b"partition").hexdigest(),
+            )
+            self.assertEqual(shared.partition_path("model", first, b"partition", "matmul"), namespace)
+            with self.assertRaisesRegex(ValueError, "different content"):
+                shared.partition_path("model", second, b"other", "matmul")
+
     def test_request_input_cannot_be_overwritten_with_different_content(self):
         with tempfile.TemporaryDirectory() as tmp:
             shared = SharedStorage("filesystem", str(Path(tmp) / "setup"), str(Path(tmp) / "requests"))
@@ -134,7 +150,7 @@ class NodeSetupLayoutTests(unittest.TestCase):
             cold = cold_node.prepare_local_task(lease_for(job, "cold"))
             self.assertFalse((Path(cold.setup_dir) / "pk.json").exists())
             self.assertEqual(cold.transfer_metrics["setup"]["bytes_downloaded"], 0)
-            self.assertFalse(cold.transfer_metrics["model"]["cache_hit"])
+            self.assertNotIn("cache_hit", cold.transfer_metrics["model"])
             self.assertEqual((bundle / "pk.json").read_bytes(), b"derived setup")
 
     def test_cold_request_still_has_reusable_model_reference(self):

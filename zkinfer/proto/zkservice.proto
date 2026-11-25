@@ -55,9 +55,11 @@ message NodeStatus {
   double memory_available_gb = 3;
   double cpu_total_cores = 4;
   double cpu_available_cores = 5;
+  // Deprecated compatibility fields; ignored by the runtime.
   double cache_limit_gb = 6;
   double cache_used_gb = 7;
   repeated string active_job_ids = 8;
+  // Deprecated compatibility field; ignored by the runtime.
   repeated string cached_setup_keys = 9;
 }
 

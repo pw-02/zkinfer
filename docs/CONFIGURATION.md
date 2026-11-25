@@ -37,8 +37,7 @@ Supported policies are:
 
 - `fifo` gives request-fair queue order.
 - `lpt` chooses the longest predicted job within the selected request.
-- `cache_aware` prefers a job whose reusable setup is already present on the polling node, with predicted duration as a tie-breaker.
-- `resource_aware` first rejects jobs whose predicted peak cannot fit on the machine, then uses cache locality and duration as coarse placement preferences.
+- `resource_aware` first rejects jobs whose predicted peak cannot fit on the machine, then prioritizes predicted duration within the selected request.
 
 Request fairness is applied before the within-request policy. Stage-level packing is not a coordinator responsibility.
 
@@ -141,14 +140,11 @@ The storage configuration is organized by data lifetime.
 storage:
   reusable_setup:
     enabled: true
-    path: storage/setup
+    path: storage/cache
 
   request_data:
     path: storage/requests
 
-  local_cache:
-    path: storage/node/cache
-    max_gb: 50
 ```
 
 `reusable_setup` contains circuit-specific state that can be reused across requests, including the partition model, settings, compiled circuit, proving key, and verification key. `enabled: false` gives the cold setup baseline. `enabled: true` permits reuse when the setup identity matches.
@@ -169,18 +165,18 @@ storage:
 This configuration regenerates setup for every job while using earlier resource
 measurements for scheduling. Successful cold jobs also update their history.
 Profiles use the storage backend/bucket configured for the runtime. The layout is
-`<profile root>/<setup key>/cold_resource_profile.json` when setup reuse is disabled
-and `<profile root>/<setup key>/resource_profile.json` when it is enabled. The latter
+`<profile root>/<model namespace>/<partition namespace>/cold_resource_profile.json` when setup reuse is disabled
+and `<profile root>/<model namespace>/<partition namespace>/resource_profile.json` when it is enabled. The latter
 preserves the existing reuse-enabled path. No fallback loads a warm profile into
 a forced-cold job. Reuse-enabled history may include initial cache misses; prepare
 and snapshot warm-only measurements for controlled warm evaluation.
 
-`resource_profiles.enabled: false` disables coordinator history loading/persistence
+`resource_profiles.enabled: false` disables history reading; `update_history` independently controls persistence
 without disabling circuit/key reuse. Node-local stage history remains separately
 managed under `node.runtime_state_dir`; use matching snapshots in experiments.
 Changing `resource_profiles.path` does not copy existing history automatically.
 
-`local_cache` contains node-local materialized copies used to avoid repeated transfer or decompression. It is distinct from shared reusable setup storage.
+Workers materialize artifacts in private job workspaces; no persistent worker artifact cache is used. Filesystem cache namespaces use 16 hexadecimal SHA-256 characters in directory names, with full identities recorded and checked in `.identity.sha256` files. Old full-hash directories are not migrated automatically.
 
 The lower-level runtime configuration also supports `filesystem` and `s3` backends. For S3, the configured paths are interpreted as prefixes beneath `storage.s3_prefix`.
 
