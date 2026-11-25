@@ -1,4 +1,5 @@
 import json
+import hashlib
 import logging
 import os
 import time
@@ -12,7 +13,6 @@ import onnxruntime as ort
 from onnx.utils import Extractor
 from onnx import helper, numpy_helper, TensorProto
 import numpy as np
-from zkinfer.storage.io import compute_bytes_md5_hex
 from zkinfer.utils.onnx import (
     infer_shapes,
     inputs_to_json,
@@ -401,7 +401,7 @@ def materialize_submodels(
         if not input_values:
             raise RuntimeError(f"No inputs were materialized for {partition.name}")
 
-        sub_hash = compute_bytes_md5_hex(sub_model.SerializeToString())
+        sub_hash = hashlib.sha256(sub_model.SerializeToString(deterministic=True)).hexdigest()
 
         materialized.append(
             MaterializedSubmodel(
@@ -458,7 +458,7 @@ def split_onnx_model_with_inputs(
     )
 
     model = onnx.load(prepared_model_path)
-    model_hash = compute_bytes_md5_hex(model.SerializeToString())
+    model_hash = hashlib.sha256(model.SerializeToString(deterministic=True)).hexdigest()
 
     if split_mode == "none":
         metrics.update(

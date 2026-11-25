@@ -28,13 +28,13 @@ class LauncherConfigTests(unittest.TestCase):
         self.assertTrue(self.cfg.coordinator.preparation_cache_enabled)
         self.user.partitioning.enabled = True
         self.user.partitioning.size = 4
-        self.user.cache.setup = False
+        self.user.cache.reuse.keys = False
         self.user.scheduling.policy = "fifo"
         self.user.scheduling.memory_admission = "disabled"
         self.user.scheduling.max_concurrent_jobs = 1
         self.assertEqual(
             make_run_name(self.user, now=self.now, suffix="abcd"),
-            "2026-11-25_12-30-00_bert_p4_setup-off_c1_fifo_noadm_exact_streaming_prep-on_abcd",
+            "2026-11-25_12-30-00_bert_p4_keys-off_c1_fifo_noadm_exact_streaming_circuits-on_profiles-on_persistent_abcd",
         )
 
     def test_monolithic_and_auto(self):
@@ -47,8 +47,8 @@ class LauncherConfigTests(unittest.TestCase):
     def test_run_owned_cache_and_profile_isolation(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp).resolve()
-            self.user.output.keep_cache = False
-            self.user.cache.profiles = False
+            self.user.cache.scope = "run"
+            self.user.cache.reuse.profiles = False
             configure_run_paths(self.cfg, self.user, root)
             self.assertEqual(self.cfg.storage.reusable_setup.path, str(root / "storage/cache/setup"))
             self.assertEqual(self.cfg.node.runtime_state_dir, str(root / "storage/runtime"))

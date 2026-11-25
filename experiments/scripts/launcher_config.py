@@ -42,6 +42,19 @@ def _number(value: object, field: str, *, allow_zero: bool = False) -> None:
         raise ValueError(f"{field} must be a finite {constraint} number")
 
 
+def _reuse(user: DictConfig, kind: str) -> bool:
+    if "reuse" in user.cache:
+        return user.cache.reuse[kind]
+    if kind == "circuits":
+        value = user.get("preparation", {}).get("cache_enabled")
+        return user.cache.setup if value is None else value
+    return user.cache.setup if kind == "keys" else user.cache.profiles
+
+
+def _persistent(user: DictConfig) -> bool:
+    return user.cache.get("scope", "persistent" if user.get("output", {}).get("keep_cache", True) else "run") == "persistent"
+
+
 def _validate(user: DictConfig) -> None:
     workload = user.workload
     if (
@@ -62,8 +75,9 @@ def _validate(user: DictConfig) -> None:
              "partitioning.allow_boundary_rescale")
     preparation = user.get("preparation", {})
     _choice(preparation.get("dispatch", "batch"), "preparation.dispatch", ("batch", "streaming"))
-    if preparation.get("cache_enabled") is not None:
-        _boolean(preparation["cache_enabled"], "preparation.cache_enabled")
+    _choice(user.cache.get("scope", "persistent"), "cache.scope", ("persistent", "run"))
+    for kind in ("circuits", "keys", "profiles"):
+        _boolean(_reuse(user, kind), f"cache.reuse.{kind}")
     _choice(user.scheduling.policy, "scheduling.policy", SCHEDULERS)
     _choice(user.scheduling.memory_admission, "scheduling.memory_admission", ADMISSION_MODES)
     cap = user.scheduling.max_concurrent_jobs
@@ -78,10 +92,7 @@ def _validate(user: DictConfig) -> None:
     for field in (
         "partitioning.enabled",
         "partitioning.simplify",
-        "cache.setup",
-        "cache.profiles",
         "output.keep_proofs",
-        "output.keep_cache",
     ):
         _boolean(OmegaConf.select(user, field), field)
 
@@ -96,7 +107,7 @@ def _apply_execution(cfg: DictConfig, user: DictConfig) -> None:
     cfg.coordinator.allow_boundary_rescale = user.partitioning.get("allow_boundary_rescale", True)
     preparation = user.get("preparation", {})
     cfg.coordinator.preparation_dispatch = preparation.get("dispatch", "batch")
-    cfg.coordinator.preparation_cache_enabled = preparation.get("cache_enabled", None)
+    cfg.coordinator.preparation_cache_enabled = _reuse(user, "circuits")
     cfg.verification.enabled = cfg.coordinator.witness_preparation == "upfront"
     cfg.verification.trusted_vk_manifest = user.get("verification", {}).get("trusted_vk_manifest", None)
 
@@ -114,12 +125,12 @@ def _apply_scheduling(cfg: DictConfig, user: DictConfig) -> None:
 
 
 def _apply_storage(cfg: DictConfig, user: DictConfig) -> None:
-    cfg.storage.reusable_setup.enabled = user.cache.setup
-    cfg.storage.resource_profiles.enabled = user.cache.profiles
-    cfg.storage.resource_profiles.path = "storage/profiles"
+    cfg.storage.reusable_setup.enabled = _reuse(user, "keys")
+    cfg.storage.resource_profiles.enabled = _reuse(user, "profiles")
+    cfg.storage.resource_profiles.path = None
     cfg.output.keep_proof_artifacts = user.output.keep_proofs
     cfg.output.keep_request_data = user.output.keep_proofs
-    cfg.output.keep_cache = user.output.keep_cache
+    cfg.output.keep_cache = _persistent(user)
 
 
 def configure_run_paths(
@@ -133,17 +144,17 @@ def configure_run_paths(
 
     cfg.paths.runs_dir = str(root)
     cfg.storage.request_data.path = str(storage / "requests")
-    if user.output.keep_cache:
+    if _persistent(user):
         cfg.node.runtime_state_dir = "storage/node/runtime"
     else:
         cache = storage / "cache"
         cfg.storage.reusable_setup.path = str(cache / "setup")
-        cfg.storage.resource_profiles.path = str(cache / "profiles")
+        cfg.storage.resource_profiles.path = None
         cfg.storage.local_cache.path = str(cache / "node")
         cfg.node.runtime_state_dir = str(cache / "runtime")
 
     # Do not carry node-local admission history into a no-profile run.
-    if not user.cache.profiles:
+    if not _reuse(user, "profiles"):
         cfg.node.runtime_state_dir = str(storage / "runtime")
 
 
@@ -156,7 +167,7 @@ def make_run_name(
     """Describe requested settings, not observed cache hits or run outcomes."""
     timestamp = (now or datetime.now()).strftime("%Y-%m-%d_%H-%M-%S")
     partition = f"p{user.partitioning.size}" if user.partitioning.enabled else "mono"
-    setup = "setup-on" if user.cache.setup else "setup-off"
+    setup = "keys-on" if _reuse(user, "keys") else "keys-off"
     cap = user.scheduling.max_concurrent_jobs
     concurrency = f"c{cap}" if cap is not None else "cauto"
     admission = {
@@ -179,8 +190,9 @@ def make_run_name(
         *(() if user.partitioning.get("witness_preparation", "upfront") == "independent" else ("exact",)),
         *(() if "preparation" not in user else (
             user.preparation.get("dispatch", "batch"),
-            "prep-on" if (user.cache.setup if user.preparation.get("cache_enabled") is None
-                          else user.preparation.cache_enabled) else "prep-off",
+            "circuits-on" if _reuse(user, "circuits") else "circuits-off",
+            "profiles-on" if _reuse(user, "profiles") else "profiles-off",
+            "persistent" if _persistent(user) else "run",
         )),
         unique,
     ))

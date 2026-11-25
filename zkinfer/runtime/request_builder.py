@@ -63,6 +63,15 @@ class RequestBuilder:
         total_model_store_time = 0.0
         total_input_store_time = 0.0
 
+        def partition_path(partition):
+            model_bytes = partition.model.SerializeToString()
+            nodes = getattr(getattr(partition.model, "graph", None), "node", ())
+            label = "monolithic" if request.split_mode == "none" else "_".join(
+                dict.fromkeys(node.op_type.lower() for node in nodes)
+            ) or "partition"
+            return shared_storage.partition_path(Path(request.onnx_model_path).stem,
+                                                 partition.parent_hash, model_bytes, label)
+
         def materialize_job(index, partition, prepared_part=None):
             nonlocal total_model_store_time, total_input_store_time
             model_write_time = 0.0
@@ -80,8 +89,9 @@ class RequestBuilder:
                     identity,
                 )
                 started = time.perf_counter()
-                model_ref = shared_storage.put_model(model_bytes, setup_key=setup_key)
-                setup_ref = shared_storage.setup_ref(setup_key)
+                namespace = partition_path(partition)
+                model_ref = shared_storage.put_model(model_bytes, setup_key=setup_key, partition_path=namespace)
+                setup_ref = shared_storage.setup_ref(setup_key, partition_path=namespace)
                 model_write_time = time.perf_counter() - started
                 total_model_store_time += model_write_time
 
@@ -91,7 +101,7 @@ class RequestBuilder:
             if setup_store.resource_profiles_enabled and not transfer_only:
                 profile_root = setup_store.resource_profiles_root_dir or setup_store.root_dir
                 filename = "resource_profile.json" if setup_store.enabled else "cold_resource_profile.json"
-                resource_profile_path = os.path.join(profile_root, setup_key, filename)
+                resource_profile_path = os.path.join(profile_root, namespace, setup_key, filename)
             profiling_data = (
                 self._load_resource_profile(partition.name, resource_profile_path, setup_store)
                 if resource_profile_path else {}
@@ -180,7 +190,8 @@ class RequestBuilder:
             prepared = prepare_partitions(
                 materialized_partitions,
                 Path(shared_storage.requests_root) / request.request_id / "prepared",
-                cache_root=(Path(shared_storage.setup_root) / "_prepared_v1" if cache_enabled else None),
+                cache_root=(Path(shared_storage.setup_root) if cache_enabled else None),
+                cache_root_for_partition=(lambda part: Path(shared_storage.setup_root) / partition_path(part) / "calibration") if cache_enabled else None,
                 max_propagated_scale=self.max_propagated_scale,
                 allow_rescale=self.allow_boundary_rescale,
                 on_prepared=publish_prepared if on_job_ready else None,

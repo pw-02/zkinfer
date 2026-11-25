@@ -48,13 +48,13 @@ class ProfileIndependenceTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.store = config.SetupStoreConfig(False, "filesystem", str(self.root / "setup"), None, "",
                                              resource_profiles_root_dir=str(self.root / "profiles"))
-        self.profile_dir = self.root / "profiles/key"
+        self.profile_dir = self.root / "profiles/model/partition/key"
         self.profile_dir.mkdir(parents=True)
         self.cold = {"job_runtime(s)": 100, "max_process_memory(GB)": 40}
         self.warm = {"job_runtime(s)": 20, "max_process_memory(GB)": 10}
         (self.profile_dir / "cold_resource_profile.json").write_text(json.dumps(self.cold))
         (self.profile_dir / "resource_profile.json").write_text(json.dumps(self.warm))
-        ns = dict(logging=logging, os=os, time=time, EZKL_SETUP_IDENTITY={},
+        ns = dict(logging=logging, os=os, time=time, Path=Path, EZKL_SETUP_IDENTITY={},
                   ProofJob=lambda **kw: SimpleNamespace(**kw),
                   get_profile_estimates=profiles.get_profile_estimates,
                   max_stage_memory_gb=profiles.max_stage_memory_gb,
@@ -67,9 +67,10 @@ class ProfileIndependenceTests(unittest.TestCase):
             sub_hash="hash", parent_hash="parent", input_data={})])
         self.shared = SimpleNamespace(
             setup_key_for_model=lambda *a: "key", put_model=lambda *a, **kw: "model-ref",
-            setup_ref=lambda key: SimpleNamespace(uri=str(self.root / "setup/key")),
+            partition_path=lambda *a: "model/partition",
+            setup_ref=lambda key, **kw: SimpleNamespace(uri=str(self.root / "setup/key")),
             proof_prefix=lambda *a: "output-ref", put_input=lambda *a: "input-ref")
-        self.request = SimpleNamespace(name="model", request_id="req", preparation_metrics={})
+        self.request = SimpleNamespace(name="model", request_id="req", preparation_metrics={}, split_mode="none", onnx_model_path="model.onnx")
 
     def jobs(self, store=None):
         return self.builder.build_jobs(self.request, self.shared, store or self.store, 1)

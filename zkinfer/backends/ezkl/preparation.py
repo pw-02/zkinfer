@@ -309,6 +309,7 @@ def prepare_partitions(
     allow_rescale: bool = True,
     ezkl_module=None,
     on_prepared=None,
+    cache_root_for_partition=None,
 ) -> dict[str, PreparedPartition]:
     """Prepare witnesses in dependency order and optionally publish each ready partition.
 
@@ -376,10 +377,11 @@ def prepare_partitions(
             reason = "mixed or high incoming scales"
             candidate = None
 
+        partition_cache_root = cache_root_for_partition(partition) if cache_root_for_partition else cache_root
         start_setup = time.perf_counter()
         try:
             setup = _prepare_setup(
-                ezkl_module, model, calibration, directory / "setup", cache_root, candidate,
+                ezkl_module, model, calibration, directory / "setup", partition_cache_root, candidate,
                 backend_identity,
             )
         except Exception as exc:
@@ -387,7 +389,7 @@ def prepare_partitions(
                 raise
             reason = f"restricted calibration/compilation failed: {exc}"
             setup = _prepare_setup(
-                ezkl_module, model, calibration, directory / "fallback_setup", cache_root, None,
+                ezkl_module, model, calibration, directory / "fallback_setup", partition_cache_root, None,
                 backend_identity,
             )
             candidate = None

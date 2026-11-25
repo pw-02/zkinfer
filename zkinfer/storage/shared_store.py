@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import tempfile
 from pathlib import Path
 from typing import Any, Mapping
@@ -50,8 +51,22 @@ class SharedStorage:
     def prefix_ref(self, uri: str) -> ArtifactRef:
         return ArtifactRef(self.backend, uri, s3_bucket=self.s3_bucket)
 
-    def setup_ref(self, setup_key: str) -> ArtifactRef:
-        return self.prefix_ref(os.path.join(self.setup_root, _component(setup_key)))
+    @staticmethod
+    def partition_path(model_name: str, parent_hash: str, model_bytes: bytes, operator_label: str) -> str:
+        """Stable, descriptive namespace; full hashes prevent prefix collisions."""
+        def slug(value):
+            return re.sub(r"[^a-zA-Z0-9_-]+", "_", value).strip("_- ")[:64] or "model"
+        if not re.fullmatch(r"[0-9a-f]{64}", parent_hash):
+            raise ValueError("Expected full SHA-256 parent identity")
+        partition_hash = hashlib.sha256(model_bytes).hexdigest()
+        return os.path.join(f"{slug(model_name)}_{parent_hash}",
+                            f"{slug(operator_label)}_{partition_hash}")
+
+    def setup_ref(self, setup_key: str, partition_path: str | None = None) -> ArtifactRef:
+        root = self.setup_root
+        if partition_path is not None:
+            root = os.path.join(root, *[_component(part) for part in partition_path.split("/")])
+        return self.prefix_ref(os.path.join(root, _component(setup_key)))
 
     def proof_prefix(self, request_id: str, partition_id: str) -> ArtifactRef:
         return self.prefix_ref(os.path.join(
@@ -83,10 +98,13 @@ class SharedStorage:
         ).encode("utf-8")
         return hashlib.sha256(canonical).hexdigest()
 
-    def put_model(self, model_bytes: bytes, setup_key: str | None = None) -> ArtifactRef:
+    def put_model(self, model_bytes: bytes, setup_key: str | None = None,
+                  partition_path: str | None = None) -> ArtifactRef:
         # setup_key identifies reusable proving state; ArtifactRef.sha256 verifies bytes.
         setup_key = setup_key or hashlib.sha256(model_bytes).hexdigest()
-        uri = os.path.join(self.setup_ref(_component(setup_key)).uri, "model.onnx")
+        root = (os.path.join(self.setup_root, *[_component(part) for part in partition_path.split("/")])
+                if partition_path is not None else self.setup_ref(_component(setup_key)).uri)
+        uri = os.path.join(root, "model.onnx")
         return self._put_bytes(model_bytes, uri, validate_existing=True)
 
     def put_input(self, request_id: str, partition_id: str, obj: Any) -> ArtifactRef:

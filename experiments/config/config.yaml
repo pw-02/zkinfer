@@ -13,7 +13,6 @@ partitioning:
   allow_boundary_rescale: true
 
 preparation:
-  cache_enabled: true # Reuse calibrated settings and compiled circuits independently of key caching.
   dispatch: streaming # batch | streaming
 
 scheduling:
@@ -23,8 +22,11 @@ scheduling:
   memory_reserve_gib: 8 # RAM reserved for the OS and other processes.
 
 cache:
-  setup: true # false = regenerate proving/verification keys for every job.
-  profiles: true # false = do not reuse profiles from previous experiments.
+  scope: persistent # persistent | run (isolated, discarded after success)
+  reuse:
+    circuits: true # calibrated settings and compiled circuits
+    keys: true # proving and verification keys
+    profiles: true # historical resource observations
 
 profiling:
   mode: research # basic | research | debug (retains extra diagnostic files).
@@ -32,5 +34,3 @@ profiling:
 
 output:
   keep_proofs: false # false = remove request-owned bulky data after success.
-  keep_cache: true # false = use fresh run-owned caches, then delete them on success.
-                   # Existing persistent caches are never deleted by this setting.

@@ -28,7 +28,7 @@ from zkinfer.storage.shared_store import SharedStorage
 def build_jobs(cfg, shared, name="model"):
     request = InferenceRequest(name, "model.onnx", "input.json", "none", 1, "fifo")
     partition = SimpleNamespace(
-        name="partition", parent_hash="parent", sub_hash="legacy-md5",
+        name="partition", parent_hash=hashlib.sha256(b"parent").hexdigest(), sub_hash=hashlib.sha256(b"fixed-model").hexdigest(),
         model=SimpleNamespace(SerializeToString=lambda: b"fixed-model"),
         input_data={"input_data": [[1, 2]]},
     )
@@ -58,7 +58,9 @@ class SharedStorageTests(unittest.TestCase):
             key = hashlib.sha256(b"fixed-model").hexdigest()
             self.assertEqual(first.model_ref.sha256, key)
             key = first.artifact_key
-            self.assertEqual(first.model_ref.uri, str(root / "setup" / key / "model.onnx"))
+            namespace = shared.partition_path("model", hashlib.sha256(b"parent").hexdigest(), b"fixed-model", "monolithic")
+            self.assertEqual(first.model_ref.uri, str(root / "setup" / namespace / "model.onnx"))
+            self.assertEqual(first.setup_cache_ref.uri, str(root / "setup" / namespace / key))
             self.assertEqual(first.model_ref, second.model_ref)
             self.assertEqual(first.setup_cache_ref, second.setup_cache_ref)
             self.assertEqual(Path(first.model_ref.uri).read_bytes(), b"fixed-model")
