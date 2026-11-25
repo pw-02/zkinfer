@@ -24,6 +24,38 @@ execution:
 
 The runtime still translates these settings to the splitter's internal `none` and `fixed` modes, but those strings are not experiment-facing configuration.
 
+## Request preparation
+
+The synchronous gRPC server acknowledges an accepted request after registration
+(and persistence when the state store is enabled). Calibration, compilation,
+and witness generation run in a separate bounded preparation executor.
+
+```yaml
+preparation:
+  dispatch: streaming # batch | streaming
+  workers: 1
+  max_pending: 8
+```
+
+These settings are translated to `coordinator.preparation_dispatch`,
+`coordinator.preparation_workers`, and `coordinator.preparation_max_pending`.
+At most workers + max_pending requests occupy preparation slots. Full queues
+return gRPC RESOURCE_EXHAUSTED immediately; no request ID is issued. For burst
+experiments configure capacity for the intended offered load, or report
+rejections as outcomes. The batch submitter records explicit rejections.
+
+An acknowledgement is not proof of successful preparation. Poll the request
+status until completed or failed. Batch releases jobs after full preparation;
+streaming releases each ready job but verifies only a sealed complete graph.
+Shutdown drains accepted preparation before shutting down the finalizer.
+Interrupted unsealed preparation is failed on restart, not resumed.
+
+`preparation_queue_wait_time(s)` measures executor queue delay separately.
+First/all-job-ready and preparation-finished times retain their existing
+preparation-start-relative meaning. Total request elapsed time includes
+queueing, preparation, execution and verification; overlapping stages are
+not additive.
+
 ## Coordinator scheduling
 
 The coordinator chooses which whole proof job to lease to a polling node. The experiment-facing setting is:

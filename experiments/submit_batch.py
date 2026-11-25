@@ -13,6 +13,8 @@ import argparse
 import csv
 import json
 import time
+
+import grpc
 from pathlib import Path
 from typing import Dict, List
 
@@ -78,14 +80,30 @@ def main() -> None:
     submitted: List[Dict[str, object]] = []
     for index, input_path in enumerate(inputs, start=1):
         request_started = time.perf_counter()
-        request_id = client.submit_inference_request(
-            name=args.name,
-            onnx_model_path=args.model,
-            input_data_path=input_path,
-            split_mode=args.split_mode,
-            ops_per_chunk=args.ops_per_chunk,
-            simplify_model=args.simplify_model,
-        )
+        try:
+            request_id = client.submit_inference_request(
+                name=args.name,
+                onnx_model_path=args.model,
+                input_data_path=input_path,
+                split_mode=args.split_mode,
+                ops_per_chunk=args.ops_per_chunk,
+                simplify_model=args.simplify_model,
+            )
+        except grpc.RpcError as exc:
+            # Preserve the offered burst and report explicit admission rejection.
+            # Never retry an ambiguous submission automatically.
+            if exc.code() != grpc.StatusCode.RESOURCE_EXHAUSTED:
+                raise
+            submitted.append({
+                "batch_index": index,
+                "request_id": None,
+                "input_path": input_path,
+                "submit_offset_s": time.perf_counter() - batch_started,
+                "submit_rpc_time_s": time.perf_counter() - request_started,
+                "status": "rejected",
+                "message": exc.details(),
+            })
+            continue
         submitted.append(
             {
                 "batch_index": index,
@@ -98,12 +116,12 @@ def main() -> None:
         )
         print(f"Submitted request {index}/{len(inputs)}: {request_id}", flush=True)
 
-    remaining = {str(item["request_id"]): item for item in submitted}
+    remaining = {str(item["request_id"]): item for item in submitted if item["request_id"]}
     previous_progress = None
     while remaining:
         statuses = {
             str(item["request_id"]): client.get_request_status(str(item["request_id"]))
-            for item in submitted
+            for item in submitted if item["request_id"]
         }
         progress = tuple(
             sorted(
@@ -148,6 +166,7 @@ def main() -> None:
         "num_requests": len(submitted),
         "completed_requests": completed_requests,
         "failed_requests": failed_requests,
+        "rejected_requests": sum(item["status"] == "rejected" for item in submitted),
         "total_proof_jobs": total_jobs,
         "completed_proof_jobs": completed_jobs,
         "makespan_s": makespan_s,

@@ -66,6 +66,10 @@ def _validate(user: DictConfig) -> None:
              "partitioning.allow_boundary_rescale")
     preparation = user.get("preparation", {})
     _choice(preparation.get("dispatch", "batch"), "preparation.dispatch", ("batch", "streaming"))
+    _positive_int(preparation.get("workers", 1), "preparation.workers")
+    pending = preparation.get("max_pending", 8)
+    if type(pending) is not int or pending < 0:
+        raise ValueError("preparation.max_pending must be a non-negative integer")
     for kind in ("circuits", "keys"):
         _boolean(_reuse(user, kind), f"cache.{kind}")
     for kind in ("use_history", "update_history"):
@@ -99,6 +103,8 @@ def _apply_execution(cfg: DictConfig, user: DictConfig) -> None:
     cfg.coordinator.allow_boundary_rescale = user.partitioning.get("allow_boundary_rescale", True)
     preparation = user.get("preparation", {})
     cfg.coordinator.preparation_dispatch = preparation.get("dispatch", "batch")
+    cfg.coordinator.preparation_workers = preparation.get("workers", 1)
+    cfg.coordinator.preparation_max_pending = preparation.get("max_pending", 8)
     cfg.coordinator.preparation_cache_enabled = _reuse(user, "circuits")
     cfg.verification.enabled = cfg.coordinator.witness_preparation == "upfront"
     cfg.verification.trusted_vk_manifest = user.get("verification", {}).get("trusted_vk_manifest", None)

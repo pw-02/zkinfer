@@ -188,6 +188,8 @@ def common_overrides(cfg: DictConfig) -> List[str]:
         f"coordinator.scheduling_policy={cfg.coordinator.scheduling_policy}",
         f"coordinator.witness_preparation={cfg.coordinator.get('witness_preparation', 'upfront')}",
         f"coordinator.preparation_dispatch={cfg.coordinator.get('preparation_dispatch', 'batch')}",
+        f"coordinator.preparation_workers={cfg.coordinator.get('preparation_workers', 1)}",
+        f"coordinator.preparation_max_pending={cfg.coordinator.get('preparation_max_pending', 8)}",
         "coordinator.preparation_cache_enabled=" + (
             "null" if cfg.coordinator.get("preparation_cache_enabled") is None
             else str(cfg.coordinator.preparation_cache_enabled).lower()
