@@ -104,11 +104,13 @@ class RequestBuilder:
             if (setup_store.resource_profiles_enabled or update_history) and not transfer_only:
                 profile_root = setup_store.resource_profiles_root_dir or setup_store.root_dir
                 filename = "resource_profile.json" if setup_store.enabled else "cold_resource_profile.json"
-                resource_profile_path = os.path.join(profile_root, namespace, setup_key, filename)
+                resource_profile_path = os.path.join(profile_root, namespace, filename)
             profiling_data = (
                 self._load_resource_profile(partition.name, resource_profile_path, setup_store)
                 if resource_profile_path and setup_store.resource_profiles_enabled else {}
             )
+            if profiling_data and profiling_data.get("setup_key") != setup_key:
+                profiling_data = {}
             profile_estimates = get_profile_estimates(profiling_data)
             predicted_duration_s = float(profile_estimates.get("job_runtime_s") or 0.0)
             predicted_peak_memory_gb = max_stage_memory_gb(profiling_data)
@@ -194,7 +196,7 @@ class RequestBuilder:
                 materialized_partitions,
                 Path(shared_storage.requests_root) / request.request_id / "prepared",
                 cache_root=(Path(shared_storage.setup_root) if cache_enabled else None),
-                cache_root_for_partition=(lambda part: Path(shared_storage.setup_root) / partition_path(part) / "calibration") if cache_enabled else None,
+                cache_root_for_partition=(lambda part: Path(shared_storage.setup_root) / partition_path(part)) if cache_enabled else None,
                 max_propagated_scale=self.max_propagated_scale,
                 allow_rescale=self.allow_boundary_rescale,
                 on_prepared=publish_prepared if on_job_ready else None,

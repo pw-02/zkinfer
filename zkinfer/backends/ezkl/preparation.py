@@ -272,7 +272,9 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
         )
         return settings, compiled, cal_s, comp_s, False
 
-    import fcntl
+    from zkinfer.storage.partition_cache import (
+        atomic_copy, matches, metadata, partition_lock, save_metadata,
+    )
 
     identity = {
         "version": PREPARATION_VERSION,
@@ -281,22 +283,27 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
         "candidate_scale": candidate,
         "visibility": ["public", "public", "fixed"],
     }
-    key = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
-    cache_root = Path(cache_root)
-    cache_root.mkdir(parents=True, exist_ok=True)
-    destination = cache_root / key
-    with (cache_root / f"{key}.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        settings = destination / "settings.json"
-        compiled = destination / "network.compiled"
-        if destination.exists():
-            _require_file(settings)
-            _require_file(compiled)
-            return settings, compiled, 0.0, 0.0, True
-        with tempfile.TemporaryDirectory(dir=cache_root, prefix=".prepare-") as temp:
-            staged = Path(temp) / "setup"
-            _, _, cal_s, comp_s = _run_setup(ezkl, model, calibration, staged, candidate)
-            os.replace(staged, destination)
+    directory = Path(directory)
+    names = ("settings.json", "network.compiled")
+    with partition_lock(cache_root) as root:
+        info = metadata(root)
+        circuit = info.get("circuit", {})
+        hashes = circuit.get("sha256", {})
+        if (circuit.get("identity") == identity and set(hashes) == set(names)
+                and matches(root, hashes)):
+            directory.mkdir(parents=True, exist_ok=True)
+            for name in names:
+                atomic_copy(root / name, directory / name)
+            return directory / names[0], directory / names[1], 0.0, 0.0, True
+        settings, compiled, cal_s, comp_s = _run_setup(
+            ezkl, model, calibration, directory, candidate
+        )
+        hashes = {name: file_digest(path) for name, path in zip(names, (settings, compiled))}
+        for name, path in zip(names, (settings, compiled)):
+            atomic_copy(path, root / name)
+        info["circuit"] = {"identity": identity, "sha256": hashes}
+        # Prepared jobs hold private settings/compiled snapshots, not mutable cache paths.
+        save_metadata(root, info)
         return settings, compiled, cal_s, comp_s, False
 
 
@@ -377,7 +384,8 @@ def prepare_partitions(
             reason = "mixed or high incoming scales"
             candidate = None
 
-        partition_cache_root = cache_root_for_partition(partition) if cache_root_for_partition else cache_root
+        partition_cache_root = (cache_root_for_partition(partition) if cache_root_for_partition
+                                else Path(cache_root) / file_digest(model) if cache_root is not None else None)
         start_setup = time.perf_counter()
         try:
             setup = _prepare_setup(

@@ -66,6 +66,8 @@ class SharedStorage:
         root = self.setup_root
         if partition_path is not None:
             root = os.path.join(root, *[_component(part) for part in partition_path.split("/")])
+        if partition_path is not None and self.backend == "filesystem":
+            return self.prefix_ref(root)
         return self.prefix_ref(os.path.join(root, _component(setup_key)))
 
     def proof_prefix(self, request_id: str, partition_id: str) -> ArtifactRef:

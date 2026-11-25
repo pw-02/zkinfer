@@ -9,7 +9,7 @@ import subprocess
 import sys
 import threading
 import time
-from contextlib import ExitStack, contextmanager
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, Optional
 
@@ -24,7 +24,7 @@ import zkinfer.proto.zkservice_pb2 as pb
 import zkinfer.proto.zkservice_pb2_grpc as pb_grpc
 from zkinfer.config.runtime import RuntimeConfig, build_runtime_config
 from zkinfer.runtime.data_plane import ArtifactRef
-from zkinfer.runtime.node.cache import NodeCache
+from zkinfer.runtime.node.artifact_transfer import ArtifactTransfer
 from zkinfer.runtime.node.stage_admission import (
     StageAdmissionController,
     StageResourceHistory,
@@ -467,26 +467,27 @@ class NodeSupervisor:
                 )
 
     def run_lease(self, lease) -> None:
-        with self._job_guard(lease), ExitStack() as cache_leases:
-            self._run_lease(lease, cache_leases)
+        with self._job_guard(lease):
+            self._run_lease(lease)
 
-    def _run_lease(self, lease, cache_leases: ExitStack) -> None:
+    def _run_lease(self, lease) -> None:
         local_task = None
         _, tmp_dir, output_dir = self._job_paths(lease)
         failed = False
         completion_attempted = False
         cleanup_published = False
         try:
-            local_task = self.prepare_local_task(lease, cache_leases)
+            local_task = self.prepare_local_task(lease)
             with self.active_lock:
                 self.active_tasks[lease.job_id] = local_task
 
             result = self._run_prover_subprocess(local_task)
             setup_publish_metrics = {}
             if self.cfg.setup_store.enabled and not local_task.setup_read_only:
-                transfer = NodeCache(str(tmp_dir / "transfer"), max_bytes=0)
-                setup_publish_metrics = transfer.publish_setup_with_metrics(
-                    local_task.setup_dir, from_pb_artifact(lease.setup_cache)
+                transfer = ArtifactTransfer(tmp_dir / "transfer")
+                setup_publish_metrics = transfer.publish_setup(
+                    from_pb_artifact(lease.setup_cache), local_task.setup_key,
+                    local_task.setup_dir, bool(local_task.prepared_witness_path),
                 )
 
             update_history = self.cfg.setup_store.resource_profiles_update_history
@@ -560,7 +561,7 @@ class NodeSupervisor:
                         exc_info=True,
                     )
 
-    def prepare_local_task(self, lease, cache_leases: ExitStack) -> LocalProverTask:
+    def prepare_local_task(self, lease, _legacy_context=None) -> LocalProverTask:
         prepare_started = time.perf_counter()
         lease_id = lease.lease_id
         request_dir, tmp_dir, output_dir = self._job_paths(lease)
@@ -573,43 +574,20 @@ class NodeSupervisor:
         copy_run_metadata(self.metadata_snapshot, request_dir)
 
         setup_key = lease.setup_key or lease.job_id
-        # This transfer workspace is private to the attempt and removed in finally.
-        transfer = NodeCache(str(tmp_dir / "transfer"), max_bytes=0)
-        cache_leases.enter_context(transfer.pinned_setup(setup_key))
-        model_path, model_metrics = transfer.materialize_model_with_metrics(
-            from_pb_artifact(lease.model),
-            setup_key,
-        )
-        model_materialize_time_s = float(
-            model_metrics.get("materialize_time(s)", 0.0) or 0.0
-        )
-
-        input_path, input_metrics = cache_leases.enter_context(
-            transfer.materialized_artifact(
-                from_pb_artifact(lease.input),
-                filename_hint="input.json",
-            )
-        )
-        input_materialize_time_s = float(
-            input_metrics.get("materialize_time(s)", 0.0) or 0.0
-        )
-
+        transfer = ArtifactTransfer(tmp_dir / "transfer")
+        model_path, model_metrics = transfer.materialize(from_pb_artifact(lease.model), "model.onnx")
+        input_path, input_metrics = transfer.materialize(from_pb_artifact(lease.input), "input.json")
+        model_materialize_time_s = float(model_metrics["materialize_time(s)"])
+        input_materialize_time_s = float(input_metrics["materialize_time(s)"])
+        setup_dir = str(tmp_dir / "setup")
+        Path(setup_dir).mkdir(parents=True, exist_ok=True)
+        prepared = from_pb_artifact(lease.input).uri.endswith(".prepared.json")
+        setup_metrics = {"setup_key": setup_key, "bytes_downloaded": 0,
+                         "bytes_from_local_cache": 0, "restore_time(s)": 0.0}
         if self.cfg.setup_store.enabled:
-            setup_dir, setup_metrics = transfer.restore_setup_with_metrics(
-                from_pb_artifact(lease.setup_cache),
-                setup_key,
+            setup_metrics = transfer.restore_setup(
+                from_pb_artifact(lease.setup_cache), setup_key, setup_dir, prepared
             )
-        else:
-            private_setup_dir = tmp_dir / "setup"
-            private_setup_dir.mkdir(parents=True, exist_ok=True)
-            setup_dir = str(private_setup_dir)
-            setup_metrics = {
-                "setup_key": setup_key,
-                "cache_enabled": False,
-                "bytes_from_local_cache": 0,
-                "bytes_downloaded": 0,
-                "restore_time(s)": 0.0,
-            }
 
         prepared_witness_path = None
         prepared_metrics = {}
@@ -630,9 +608,7 @@ class NodeSupervisor:
                 ref = ArtifactRef.from_dict(descriptor[name])
                 if ref.is_empty or not ref.sha256:
                     raise ValueError(f"Unbound prepared artifact: {name}")
-                local, metrics = cache_leases.enter_context(
-                    transfer.materialized_artifact(ref, filename_hint=name)
-                )
+                local, metrics = transfer.materialize(ref, name)
                 if file_digest(local) != ref.sha256:
                     raise ValueError(f"Prepared artifact hash mismatch: {name}")
                 refs[name] = (Path(local), ref)
@@ -640,23 +616,22 @@ class NodeSupervisor:
 
             # The setup identity binds the exact settings and compiled bytes.
             # Never overwrite conflicting cached setup/key material.
-            with transfer.setup_guard(setup_key, pin=False):
-                for name, filename in (("settings", "settings.json"), ("compiled", "network.compiled")):
-                    source, ref = refs[name]
-                    target = Path(setup_dir) / filename
-                    if target.exists():
-                        if file_digest(target) != ref.sha256:
-                            raise ValueError(f"Prepared setup cache mismatch: {filename}")
-                    else:
-                        if setup_metrics.get("shared_read_only"):
-                            raise ValueError(f"Missing read-only prepared setup: {filename}")
-                        target.parent.mkdir(parents=True, exist_ok=True)
-                        temporary = target.with_name(target.name + "." + lease_id + ".tmp")
-                        try:
-                            shutil.copyfile(source, temporary)
-                            os.replace(temporary, target)
-                        finally:
-                            temporary.unlink(missing_ok=True)
+            for name, filename in (("settings", "settings.json"), ("compiled", "network.compiled")):
+                source, ref = refs[name]
+                target = Path(setup_dir) / filename
+                if target.exists():
+                    if file_digest(target) != ref.sha256:
+                        raise ValueError(f"Prepared setup cache mismatch: {filename}")
+                else:
+                    if setup_metrics.get("shared_read_only"):
+                        raise ValueError(f"Missing read-only prepared setup: {filename}")
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    temporary = target.with_name(target.name + "." + lease_id + ".tmp")
+                    try:
+                        shutil.copyfile(source, temporary)
+                        os.replace(temporary, target)
+                    finally:
+                        temporary.unlink(missing_ok=True)
             prepared_witness_path = str(refs["witness"][0])
 
         output_ref = from_pb_artifact(lease.output_prefix)
