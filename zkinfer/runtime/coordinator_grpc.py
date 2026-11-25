@@ -265,11 +265,17 @@ def run_dead_node_monitor(
     logger: logging.Logger,
 ) -> None:
     interval_sec = max(1, int(coordinator.heartbeat_config.interval_sec))
+    expected = time.monotonic() + interval_sec
     while not stop_event.wait(interval_sec):
+        now = time.monotonic()
+        lag = now - expected
+        if lag > 2.0:
+            logger.warning("Dead-node monitor delayed by %.1fs", lag)
         try:
             coordinator.check_for_dead_nodes()
         except Exception:
             logger.exception("Dead-node monitor failed")
+        expected = time.monotonic() + interval_sec
 
 
 @hydra.main(config_path="../config", config_name="config", version_base=None)

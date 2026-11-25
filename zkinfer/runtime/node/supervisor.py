@@ -165,7 +165,10 @@ class NodeSupervisor:
                     exc,
                     exc.code(),
                 )
-                self.reconnect()
+                # gRPC channels reconnect automatically; closing a shared channel
+                # here would cancel concurrent heartbeat/result calls.
+                if attempt < max_retries:
+                    self.stop_event.wait(self.poll_interval_sec)
             except Exception as exc:
                 last_error = exc
                 self.logger.error(
@@ -280,7 +283,7 @@ class NodeSupervisor:
 
     def poll_for_job(self):
         return self.safe_grpc_call(
-            lambda: self.stub.PollNode(self.build_node_status()),
+            lambda: self.stub.PollNode(self.build_node_status(), timeout=5.0),
             action="PollNode",
         )
 
@@ -303,7 +306,8 @@ class NodeSupervisor:
                     message=message or "",
                     perf_metrics_json=json.dumps(metrics or {}),
                     artifact_manifest=to_pb_artifact(artifact_manifest_ref),
-                )
+                ),
+                timeout=30.0,
             )
 
         ack = self.safe_grpc_call(_call, action=f"SubmitJobResult({status})")
@@ -328,7 +332,8 @@ class NodeSupervisor:
                     active_job_ids=self.active_job_ids(),
                     status="RUNNING",
                     message=json.dumps({"stages": stages}, sort_keys=True),
-                )
+                ),
+                timeout=5.0,
             )
 
         self.safe_grpc_call(_call, action="SendNodeHeartbeat", max_retries=1)

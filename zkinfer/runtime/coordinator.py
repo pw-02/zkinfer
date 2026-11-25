@@ -23,6 +23,7 @@ from zkinfer.runtime.models import (
     RequestStatus,
 )
 from zkinfer.runtime.request_builder import RequestBuilder
+from zkinfer.runtime.preparation_runner import run_preparation
 from zkinfer.runtime.resource_profiles import get_profile_estimates, max_stage_memory_gb
 from zkinfer.runtime.scheduler import JobScheduler
 from zkinfer.runtime.state_store import CoordinatorStateStore
@@ -91,13 +92,15 @@ class Coordinator:
             prover_threads=runtime_config.node.rayon_threads,
         )
         self.preparation_dispatch = getattr(runtime_config.coordinator, "preparation_dispatch", "batch")
+        self.preparation_rayon_threads = runtime_config.coordinator.rayon_threads
         if self.request_builder.witness_preparation == "upfront" and not self.verifier:
             raise ValueError("Upfront witness preparation requires an enabled verifier")
         self.lock = threading.RLock()
         self.profile_locks: Dict[str, threading.Lock] = {}
         self.pending_job_reports: set[str] = set()
 
-        # RPC submissions never wait for expensive preparation. The semaphore
+        # Threads supervise fresh preparation subprocesses; no native preparation
+        # runs inside the coordinator. The semaphore
         # bounds running plus queued work; ThreadPoolExecutor alone is unbounded.
         workers = runtime_config.coordinator.preparation_workers
         pending = runtime_config.coordinator.preparation_max_pending
@@ -230,6 +233,12 @@ class Coordinator:
         self._prepare_request(request, time.perf_counter())
         return request.request_id
 
+    def _build_prepared_jobs(self, request, **callbacks):
+        return run_preparation(
+            request, self.request_builder, self.shared_storage, self.setup_store,
+            self.max_retries, self.preparation_rayon_threads, **callbacks,
+        )
+
     def _prepare_request(self, request: InferenceRequest, enqueued: float) -> None:
         started = time.perf_counter()
         request.preparation_metrics["preparation_queue_wait_time(s)"] = started - enqueued
@@ -238,12 +247,7 @@ class Coordinator:
                 self._prepare_streaming_request(request)
                 return
 
-            jobs = self.request_builder.build_jobs(
-                request=request,
-                shared_storage=self.shared_storage,
-                setup_store=self.setup_store,
-                max_retries=self.max_retries,
-            )
+            jobs = self._build_prepared_jobs(request)
             if not jobs:
                 raise ValueError("Request contains no proof jobs")
             ready_s = time.perf_counter() - started
@@ -316,11 +320,7 @@ class Coordinator:
                     self.state_store.append_event("job_ready", request_id=request.request_id, job_id=job.job_id)
 
         try:
-            self.request_builder.build_jobs(
-                request=request, shared_storage=self.shared_storage,
-                setup_store=self.setup_store, max_retries=self.max_retries,
-                on_job_ready=publish, on_plan=register_plan,
-            )
+            self._build_prepared_jobs(request, on_job_ready=publish, on_plan=register_plan)
             if not request.expected_job_count or len(request.proof_jobs) != request.expected_job_count:
                 raise RuntimeError("Preparation did not publish every planned job")
         except Exception as exc:

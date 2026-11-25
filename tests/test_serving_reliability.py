@@ -195,7 +195,7 @@ class StreamingPreparationTests(unittest.TestCase):
             on_job_ready(second)
             return [first, second]
 
-        with patch.object(owner.request_builder, "build_jobs", side_effect=build), \
+        with patch.object(owner, "_build_prepared_jobs", side_effect=build), \
                 patch.object(owner, "_finalize_job"), \
                 patch.object(owner, "_verify_request_if_enabled", return_value={"valid": True}) as verify:
             rid = self.submit()
@@ -221,7 +221,7 @@ class StreamingPreparationTests(unittest.TestCase):
             owner.submit_job_result("node", first.job_id, "COMPLETED", first.lease_id)
             raise RuntimeError("calibration failed")
 
-        with patch.object(owner.request_builder, "build_jobs", side_effect=build), \
+        with patch.object(owner, "_build_prepared_jobs", side_effect=build), \
                 patch.object(owner, "_finalize_job"), \
                 patch.object(owner, "_verify_request_if_enabled") as verify:
             rid = self.submit()

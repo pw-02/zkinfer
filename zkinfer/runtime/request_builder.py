@@ -233,9 +233,8 @@ class RequestBuilder:
             metrics = request.preparation_metrics
             metrics["preparation_wall_time(s)"] = time.perf_counter() - started
             metrics["upfront_preparation_time(s)"] = max(0.0, metrics["preparation_wall_time(s)"] - publication_s)
-            # Linux process-wide RSS high-water mark; not a per-request peak
-            # when requests overlap or previous requests used more memory.
-            metrics["coordinator_process_max_rss_kib"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+            # Linux RSS high-water mark of the isolated preparation process.
+            metrics["preparation_process_max_rss_kib"] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
             for field in ("setup_time_s", "calibration_time_s", "compilation_time_s", "witness_time_s",
                           "witness_bytes", "compiled_bytes", "rescaled_inputs", "setup_cache_hit"):
                 metrics[f"upfront_{field}"] = sum(part.metrics[field] for part in prepared.values())
