@@ -53,7 +53,7 @@ def _validate(user: DictConfig) -> None:
         raise ValueError(f"Unknown workload: {workload}")
 
     _positive_int(user.partitioning.size, "partitioning.size")
-    _choice(user.partitioning.get("witness_preparation", "independent"),
+    _choice(user.partitioning.get("witness_preparation", "upfront"),
             "partitioning.witness_preparation", ("independent", "upfront"))
     cap_scale = user.partitioning.get("max_propagated_scale", 16)
     if type(cap_scale) is not int or not 0 <= cap_scale <= 126:
@@ -87,7 +87,7 @@ def _apply_execution(cfg: DictConfig, user: DictConfig) -> None:
     cfg.execution.partitioning_enabled = user.partitioning.enabled
     cfg.execution.partition_size = user.partitioning.size
     cfg.execution.simplify_model = user.partitioning.simplify
-    cfg.coordinator.witness_preparation = user.partitioning.get("witness_preparation", "independent")
+    cfg.coordinator.witness_preparation = user.partitioning.get("witness_preparation", "upfront")
     cfg.coordinator.max_propagated_scale = user.partitioning.get("max_propagated_scale", 16)
     cfg.coordinator.allow_boundary_rescale = user.partitioning.get("allow_boundary_rescale", True)
     cfg.verification.enabled = cfg.coordinator.witness_preparation == "upfront"
@@ -169,7 +169,7 @@ def make_run_name(
     return "_".join((
         timestamp, user.workload, partition, setup, concurrency,
         policy, admission,
-        *(() if user.partitioning.get("witness_preparation", "independent") == "independent" else ("exact",)),
+        *(() if user.partitioning.get("witness_preparation", "upfront") == "independent" else ("exact",)),
         unique,
     ))
 

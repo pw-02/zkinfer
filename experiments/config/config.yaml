@@ -8,7 +8,7 @@ partitioning:
   size: 1 # Number of consecutive ONNX operators per partition.
   simplify: true
   # upfront: exact public linking; independent: legacy ORT inputs (unlinked).
-  witness_preparation: independent
+  witness_preparation: upfront
   max_propagated_scale: 16
   allow_boundary_rescale: true
 

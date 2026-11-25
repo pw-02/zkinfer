@@ -21,7 +21,7 @@ coordinator:
   # fifo | lpt | cache_aware | resource_aware
   scheduling_policy: cache_aware
   # upfront prepares public-linked witnesses before scheduling (filesystem only).
-  witness_preparation: independent # independent | upfront
+  witness_preparation: upfront # independent | upfront
   max_propagated_scale: 16
   allow_boundary_rescale: true
 
@@ -63,7 +63,7 @@ jobs:
   max_retries: 1
 
 verification:
-  enabled: false
+  enabled: true
   srs_dir: srs
   require_split_chain: false
   write_request_manifest: true

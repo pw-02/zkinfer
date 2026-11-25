@@ -188,7 +188,7 @@ def _resolve_state_store_config(cfg: DictConfig) -> StateStoreConfig:
 def _resolve_verification_config(cfg: DictConfig) -> VerificationConfig:
     verification = cfg.get("verification", {})
     return VerificationConfig(
-        enabled=bool(verification.get("enabled", False)),
+        enabled=bool(verification.get("enabled", cfg.coordinator.get("witness_preparation", "upfront") == "upfront")),
         srs_dir=str(_resolve_path(verification.get("srs_dir", "srs"))),
         require_split_chain=bool(verification.get("require_split_chain", False)),
         write_request_manifest=bool(verification.get("write_request_manifest", True)),
@@ -299,7 +299,7 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
         node_cache_dir.mkdir(parents=True, exist_ok=True)
         node_runtime_state_dir.mkdir(parents=True, exist_ok=True)
 
-    witness_preparation = str(cfg.coordinator.get("witness_preparation", "independent"))
+    witness_preparation = str(cfg.coordinator.get("witness_preparation", "upfront"))
     if witness_preparation not in {"independent", "upfront"}:
         raise ValueError("coordinator.witness_preparation must be independent or upfront")
     if witness_preparation == "upfront":

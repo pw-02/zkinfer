@@ -1,6 +1,6 @@
 # Experimental upfront witness preparation
 
-This opt-in execution path retains the original independent ORT path for
+This default execution path retains the original independent ORT path for
 performance comparisons. It does not modify EZKL or change the scheduler's
 eligibility rules. The existing custom EZKL ccgrid wheel is required.
 
@@ -27,7 +27,7 @@ Keep the other existing configuration fields. Run:
 Start with mnist_classifier and one concurrent job. The simple launcher enables
 verification automatically for upfront mode. Direct runtime users must set
 coordinator.witness_preparation=upfront and verification.enabled=true.
-The default remains independent to avoid silently changing existing experiments.
+Upfront exact verification is now the default. Explicitly select independent to reproduce the unlinked baseline, and disable verification for direct runtime baseline runs. S3 runs must select independent until prepared-artifact transport is implemented.
 
 ## Design
 

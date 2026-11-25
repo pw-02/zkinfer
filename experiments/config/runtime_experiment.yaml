@@ -28,12 +28,12 @@ coordinator:
   # locality and duration only as coarse placement preferences. Stage-level
   # admission remains node-local.
   scheduling_policy: lpt
-  witness_preparation: independent
+  witness_preparation: upfront
   max_propagated_scale: 16
   allow_boundary_rescale: true
 
 verification:
-  enabled: false
+  enabled: true
   trusted_vk_manifest: null
 
 node:
