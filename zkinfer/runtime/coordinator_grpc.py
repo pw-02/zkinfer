@@ -305,12 +305,13 @@ def serve(cfg: DictConfig) -> None:
         while True:
             time.sleep(3600)
     except KeyboardInterrupt:
-        logger.warning("Shutting down coordinator...")
+        logger.info("Shutdown requested; stopping coordinator")
     finally:
         stop_event.set()
-        server.stop(0)
+        server.stop(5).wait()
         monitor_thread.join(timeout=5)
         coordinator.shutdown()
+        logger.info("Coordinator stopped successfully")
 
 
 if __name__ == "__main__":
