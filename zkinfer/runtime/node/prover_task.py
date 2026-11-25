@@ -581,7 +581,7 @@ class ProverTaskRunner:
                 "artifact": artifact_name,
                 "backend": "filesystem",
                 "bytes_uploaded": 0,
-                "bytes_written": size_bytes,
+                "bytes_written": 0 if os.stat(local_path).st_ino == os.stat(output_path).st_ino and os.stat(local_path).st_dev == os.stat(output_path).st_dev else size_bytes,
                 "publish_time(s)": time.perf_counter() - started,
             }
 
@@ -733,6 +733,7 @@ class ProverTaskRunner:
             "transfer_setup_bytes_downloaded": int(
                 setup.get("bytes_downloaded", 0) or 0
             ),
+            "transfer_shared_bytes_referenced": sum(int(m.get("bytes_referenced", 0)) for m in (model, input_metrics, setup, *(metrics.get("prepared", {}) or {}).values())),
             "transfer_setup_restore_time(s)": float(
                 setup.get("restore_time(s)", 0.0) or 0.0
             ),

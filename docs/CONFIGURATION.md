@@ -58,3 +58,21 @@ Preparation queue wait, first/all-job-ready times and overlap are reported
 separately. Overlapping activities are not additive.
 
 See comments in the two YAML files for remaining deployment settings.
+
+## Shared artifact lifetime
+
+The flat partition directory holds one canonical circuit and one compatible
+key bundle. Published groups are write-once; metadata is committed last under
+a filesystem lock. Workers read models, prepared descriptors, settings,
+compiled circuits, witnesses and compatible PK/VK directly. New artifacts
+are staged privately on shared storage, then renamed into the cache if the
+slot remains available. Incompatible or disabled reuse generates request-owned
+artifacts without replacing the canonical cache. Fully cold runs keep model
+and circuit artifacts request-owned too; resource-history flags remain independent.
+Existing key metadata without the SRS digest is not reused; reset stale caches
+only when no requests are active. All nodes must share the same SRS directory.
+Do not edit, replace or remove published files while requests are active.
+Filesystem output publication uses hard links where possible, with a cross-device
+copy only when needed. Optional debug retention and verifier snapshots can
+still copy artifacts. Direct references do not eliminate native deserialization
+or NFS reads.

@@ -65,14 +65,39 @@ class RequestBuilder:
         total_model_store_time = 0.0
         total_input_store_time = 0.0
 
+        cache_enabled = (setup_store.enabled if self.preparation_cache_enabled is None
+                         else self.preparation_cache_enabled)
+        model_refs = {}
+        namespaces = {}
+
         def partition_path(partition):
+            if partition.name in namespaces:
+                return namespaces[partition.name]
             model_bytes = partition.model.SerializeToString()
             nodes = getattr(getattr(partition.model, "graph", None), "node", ())
             label = "monolithic" if request.split_mode == "none" else "_".join(
                 dict.fromkeys(node.op_type.lower() for node in nodes)
             ) or "partition"
-            return shared_storage.partition_path(Path(request.onnx_model_path).stem,
-                                                 partition.parent_hash, model_bytes, label)
+            args = (Path(request.onnx_model_path).stem, partition.parent_hash, model_bytes, label)
+            if self.witness_preparation == "upfront" and not (cache_enabled or setup_store.enabled):
+                namespace = shared_storage.partition_path(*args, bind=False)
+            else:
+                namespace = shared_storage.partition_path(*args)
+            namespaces[partition.name] = namespace
+            return namespace
+
+        def model_path_for_partition(partition, directory):
+            nonlocal total_model_store_time
+            started = time.perf_counter()
+            model_bytes = partition.model.SerializeToString()
+            if cache_enabled or setup_store.enabled:
+                ref = shared_storage.put_model(model_bytes, partition_path=partition_path(partition))
+            else:
+                uri = str(directory / "model.onnx")
+                ref = shared_storage._put_bytes(model_bytes, uri, validate_existing=True)
+            model_refs[partition.name] = ref
+            total_model_store_time += time.perf_counter() - started
+            return ref.uri
 
         def materialize_job(index, partition, prepared_part=None):
             nonlocal total_model_store_time, total_input_store_time
@@ -92,7 +117,9 @@ class RequestBuilder:
                 )
                 started = time.perf_counter()
                 namespace = partition_path(partition)
-                model_ref = shared_storage.put_model(model_bytes, setup_key=setup_key, partition_path=namespace)
+                model_ref = model_refs.get(partition.name)
+                if model_ref is None:
+                    model_ref = shared_storage.put_model(model_bytes, setup_key=setup_key, partition_path=namespace)
                 setup_ref = shared_storage.setup_ref(setup_key, partition_path=namespace)
                 model_write_time = time.perf_counter() - started
                 total_model_store_time += model_write_time
@@ -174,8 +201,6 @@ class RequestBuilder:
                 on_job_ready(job)
 
         prepared = {}
-        cache_enabled = (setup_store.enabled if self.preparation_cache_enabled is None
-                         else self.preparation_cache_enabled)
         request.preparation_metrics["preparation_cache_enabled"] = cache_enabled
         request.preparation_metrics["preparation_dispatch"] = "streaming" if on_job_ready else "batch"
         request.preparation_metrics["witness_preparation_mode"] = self.witness_preparation
@@ -200,6 +225,7 @@ class RequestBuilder:
                 Path(shared_storage.requests_root) / request.request_id / "prepared",
                 cache_root=(Path(shared_storage.setup_root) if cache_enabled else None),
                 cache_root_for_partition=(lambda part: Path(shared_storage.setup_root) / partition_path(part)) if cache_enabled else None,
+                model_path_for_partition=model_path_for_partition,
                 max_propagated_scale=self.max_propagated_scale,
                 allow_rescale=self.allow_boundary_rescale,
                 on_prepared=publish_prepared if on_job_ready else None,

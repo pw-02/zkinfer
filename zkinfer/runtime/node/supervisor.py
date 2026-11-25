@@ -689,6 +689,7 @@ class NodeSupervisor:
     def _flatten_setup_publish_metrics(metrics: Dict) -> Dict[str, float | int]:
         return {
             "transfer_setup_bytes_uploaded": int(metrics.get("bytes_uploaded", 0) or 0),
+            "transfer_setup_bytes_published": int(metrics.get("bytes_published", 0) or 0),
             "transfer_setup_publish_time(s)": float(
                 metrics.get("publish_time(s)", 0.0) or 0.0
             ),

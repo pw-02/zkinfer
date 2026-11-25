@@ -1,7 +1,6 @@
 """Resolve immutable filesystem artifacts without copying them."""
 from pathlib import Path
 import time
-import shutil
 
 from zkinfer.storage import s3
 from zkinfer.storage.partition_cache import (
@@ -61,19 +60,20 @@ class ArtifactTransfer:
         metrics["restore_time(s)"] = time.perf_counter() - started
         return metrics
 
-    def publish_setup(self, ref, setup_key, directory, prepared, srs_digest=None):
+    def publish_setup(self, ref, setup_key, directory, prepared, srs_digest=None, circuit_hashes=None):
         started = time.perf_counter()
         count = 0
         if not ref.is_empty and ref.backend == "filesystem":
             with partition_lock(ref.uri) as root:
                 info = metadata(root)
-                if "keys" not in info:
+                canonical = info.get("circuit", {}).get("sha256", {})
+                if "keys" not in info and (not canonical or canonical == circuit_hashes):
                     files = self.KEY_FILES if prepared else self.SETUP_FILES
                     sources = {name: Path(directory) / name for name in files}
                     hashes = {name: checked_digest(path) for name, path in sources.items()}
                     count = sum(path.stat().st_size for path in sources.values())
                     publish_group(root, info, "keys",
                                   {"setup_key": setup_key, "sha256": hashes,
-                                   "srs_sha256": srs_digest}, sources)
+                                   "srs_sha256": srs_digest, "circuit_sha256": circuit_hashes}, sources)
         return {"bytes_uploaded": 0, "bytes_published": count,
                 "publish_time(s)": time.perf_counter() - started}

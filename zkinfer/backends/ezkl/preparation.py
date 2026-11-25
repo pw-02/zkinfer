@@ -138,8 +138,9 @@ class PreparedPartition:
     def artifact_identity(self) -> dict[str, Any]:
         return {
             "prepared_version": PREPARATION_VERSION,
-            "settings_sha256": file_digest(self.settings_path),
-            "compiled_sha256": file_digest(self.compiled_path),
+            "settings_sha256": self.metrics.get("settings_sha256") or file_digest(self.settings_path),
+            "compiled_sha256": self.metrics.get("compiled_sha256") or file_digest(self.compiled_path),
+            "backend_identity": self.metrics.get("backend_identity", {}),
         }
 
 
@@ -292,7 +293,7 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
                 and matches(root, hashes)):
             return root / names[0], root / names[1], 0.0, 0.0, True
         # A committed slot is never replaced, even if incompatible or damaged.
-        if "circuit" not in info and "keys" not in info:
+        if "circuit" not in info and not (set(info.get("keys", {}).get("sha256", {})) & set(names)):
             with tempfile.TemporaryDirectory(prefix=".circuit-", dir=root) as staging:
                 settings, compiled, cal_s, comp_s = _run_setup(
                     ezkl, model, calibration, Path(staging), candidate
@@ -318,6 +319,7 @@ def prepare_partitions(
     ezkl_module=None,
     on_prepared=None,
     cache_root_for_partition=None,
+    model_path_for_partition=None,
 ) -> dict[str, PreparedPartition]:
     """Prepare witnesses in dependency order and optionally publish each ready partition.
 
@@ -334,7 +336,8 @@ def prepare_partitions(
     if ezkl_module is None:
         import ezkl as ezkl_module
     checked_scale(max_propagated_scale)
-    backend_identity = _backend_identity(ezkl_module) if cache_root is not None else {}
+    backend_identity = _backend_identity(ezkl_module)
+    from zkinfer.storage.partition_cache import checked_digest
     root = Path(root)
     root.mkdir(parents=True, exist_ok=True)
     partitions = list(partitions)
@@ -352,8 +355,11 @@ def prepare_partitions(
         inputs, outputs = specs[name]
         directory = root / f"{index:05d}"
         directory.mkdir(parents=True, exist_ok=False)
-        model = directory / "model.onnx"
-        model.write_bytes(partition.model.SerializeToString())
+        if model_path_for_partition is not None:
+            model = Path(model_path_for_partition(partition, directory))
+        else:
+            model = directory / "model.onnx"
+            model.write_bytes(partition.model.SerializeToString())
         references = partition.input_data["input_data"]
         if len(references) != len(inputs):
             raise ValueError(f"Reference input count mismatch for {name}")
@@ -447,6 +453,9 @@ def prepare_partitions(
                 "compilation_time_s": comp_s,
                 "witness_time_s": witness_s,
                 "setup_cache_hit": cache_hit,
+                "settings_sha256": checked_digest(settings_path),
+                "compiled_sha256": checked_digest(compiled_path),
+                "backend_identity": backend_identity,
                 "rescaled_inputs": rescaled_count,
                 "scale_fallback_reason": reason,
                 "restricted_scale": candidate,

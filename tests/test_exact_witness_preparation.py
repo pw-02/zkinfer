@@ -184,6 +184,10 @@ def test_prepare_dag_and_cache_without_duplicate_witnesses(tmp_path):
     assert len(ezkl.calibrations) == 3
     assert len(ezkl.witness_calls) == 6
     assert all(part.metrics["setup_cache_hit"] for part in warm.values())
+    for name in warm:
+        assert warm[name].settings_path == cold[name].settings_path
+        assert warm[name].compiled_path == cold[name].compiled_path
+        assert warm[name].witness_path != cold[name].witness_path
 
 
 def test_high_scale_fallback_is_explicit_and_exact(tmp_path):

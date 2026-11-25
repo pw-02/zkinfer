@@ -1,4 +1,4 @@
-"""Regression coverage for private job snapshots and shared artifact transfers."""
+"""Regression coverage for immutable shared artifact references."""
 import hashlib
 import shutil
 import sys
@@ -29,15 +29,16 @@ class ArtifactTransferTests(unittest.TestCase):
             (self.source / name).write_bytes(b'{"run_args":{"logrows":1}}')
         self.transfer.publish_setup(self.ref, "key", self.source, False)
 
-    def test_materialization_validates_hash_and_keeps_private_copy(self):
+    def test_materialization_validates_hash_and_returns_original_path(self):
         source = self.source / "settings.json"
         digest = hashlib.sha256(source.read_bytes()).hexdigest()
         ref = ArtifactRef("filesystem", str(source), sha256=digest)
         path, metrics = self.transfer.materialize(ref, "settings.json")
-        self.assertEqual(Path(path).read_bytes(), source.read_bytes())
-        self.assertNotIn("cache_hit", metrics)
+        self.assertEqual(Path(path), source)
+        self.assertEqual(metrics["bytes_downloaded"], 0)
+        self.assertEqual(metrics["bytes_referenced"], source.stat().st_size)
+        source.unlink()
         source.write_bytes(b"changed")
-        self.assertNotEqual(Path(path).read_bytes(), source.read_bytes())
         with self.assertRaisesRegex(ValueError, "hash mismatch"):
             self.transfer.materialize(ref, "bad.json")
 
@@ -45,44 +46,32 @@ class ArtifactTransferTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             self.transfer.materialize(ArtifactRef("filesystem", str(self.root / "missing")), "missing")
 
-    def test_snapshot_survives_replacement_and_cleanup(self):
-        first = self.root / "first"
-        self.transfer.restore_setup(self.ref, "key", first, False)
-        original = (first / "pk.json").read_bytes()
+    def test_incompatible_publication_never_replaces_existing_keys(self):
+        original = (self.shared / "pk.json").read_bytes()
         for name in ArtifactTransfer.SETUP_FILES:
             (self.source / name).write_bytes(b"new")
         self.transfer.publish_setup(self.ref, "new-key", self.source, False)
-        self.assertEqual((first / "pk.json").read_bytes(), original)
-        self.assertEqual((self.shared / "pk.json").read_bytes(), b"new")
-        shutil.rmtree(first)
-        self.assertTrue((self.shared / "pk.json").exists())
+        self.assertEqual((self.shared / "pk.json").read_bytes(), original)
+        self.assertTrue((self.source / "pk.json").exists())
 
-    def test_concurrent_readers_have_separate_snapshots(self):
+    def test_concurrent_readers_reference_same_files(self):
         def restore(i):
             target = self.root / f"reader-{i}"
-            self.transfer.restore_setup(self.ref, "key", target, False)
-            return (target / "pk.json").read_bytes()
+            metrics = self.transfer.restore_setup(self.ref, "key", target, False)
+            self.assertFalse(target.exists())
+            return metrics["paths"]["pk.json"]
         with ThreadPoolExecutor(max_workers=4) as pool:
-            self.assertEqual(len(set(pool.map(restore, range(12)))), 1)
+            self.assertEqual(set(pool.map(restore, range(12))), {str(self.shared / "pk.json")})
 
     def test_incompatible_or_incomplete_bundle_is_not_restored(self):
         target = self.root / "incompatible"
-        self.transfer.restore_setup(self.ref, "other-key", target, False)
-        self.assertEqual(list(target.iterdir()), [])
+        self.assertFalse(self.transfer.restore_setup(self.ref, "other-key", target, False)["paths"])
         (self.shared / "pk.json").unlink()
-        target = self.root / "incomplete"
-        self.transfer.restore_setup(self.ref, "key", target, False)
-        self.assertEqual(list(target.iterdir()), [])
+        self.assertFalse(self.transfer.restore_setup(self.ref, "key", target, False)["paths"])
 
-    def test_prepared_keys_do_not_overwrite_circuit(self):
-        for name in ArtifactTransfer.KEY_FILES:
-            (self.source / name).write_bytes(b"new key")
-        original = (self.shared / "settings.json").read_bytes()
-        self.transfer.publish_setup(self.ref, "prepared", self.source, True)
-        target = self.root / "prepared"
-        self.transfer.restore_setup(self.ref, "prepared", target, True)
-        self.assertEqual(set(p.name for p in target.iterdir()), set(ArtifactTransfer.KEY_FILES))
-        self.assertEqual((self.shared / "settings.json").read_bytes(), original)
+    def test_srs_mismatch_is_not_restored(self):
+        self.assertFalse(self.transfer.restore_setup(self.ref, "key", self.root, False,
+                                                     srs_digest="different")["paths"])
 
     def test_s3_materializes_into_private_workspace(self):
         def download(bucket, key, destination):

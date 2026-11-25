@@ -51,7 +51,7 @@ class SharedStorage:
     def prefix_ref(self, uri: str) -> ArtifactRef:
         return ArtifactRef(self.backend, uri, s3_bucket=self.s3_bucket)
 
-    def partition_path(self, model_name: str, parent_hash: str, model_bytes: bytes, operator_label: str) -> str:
+    def partition_path(self, model_name: str, parent_hash: str, model_bytes: bytes, operator_label: str, *, bind: bool = True) -> str:
         """Readable filesystem namespace bound to full SHA-256 identities."""
         def slug(value):
             return re.sub(r"[^a-zA-Z0-9_-]+", "_", value).strip("_- ")[:64] or "model"
@@ -67,6 +67,8 @@ class SharedStorage:
         parent = f"{slug(model_name)}_{parent_hash[:16]}"
         child = f"{slug(operator_label)}_{partition_hash[:16]}"
         # Bind the namespace before reading or publishing mutable artifacts.
+        if not bind:
+            return os.path.join(parent, child)
         for relative, digest in ((parent, parent_hash),
                                  (os.path.join(parent, child), partition_hash)):
             root = Path(self.setup_root) / relative
@@ -145,7 +147,11 @@ class SharedStorage:
                 try:
                     with os.fdopen(fd, "wb") as file:
                         file.write(data)
-                    os.replace(tmp, uri)
+                    try:
+                        os.link(tmp, uri)
+                    except FileExistsError:
+                        if validate_existing and sha256_file(uri) != digest:
+                            raise ValueError(f"Immutable storage object has different content: {uri}")
                 finally:
                     if os.path.exists(tmp):
                         os.remove(tmp)
