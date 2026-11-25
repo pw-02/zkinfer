@@ -8,6 +8,7 @@ translates them into the runtime RPC fields where necessary.
 
 from __future__ import annotations
 
+import argparse
 import logging
 import os
 import shutil
@@ -22,8 +23,6 @@ from pathlib import Path
 from typing import List, Optional
 
 import hydra
-import argparse
-import uuid
 from omegaconf import DictConfig, OmegaConf
 
 from zkinfer.client.api import ZKInferenceClient
@@ -521,9 +520,15 @@ def main():
     parser.add_argument("--config", default="experiments/config/config.yaml")
     parser.add_argument("--workload")
     args = parser.parse_args()
-    from experiments.scripts.launcher_config import load_config
-    run_dir = Path("experiments/runs") / (time.strftime("%Y-%m-%d_%H-%M-%S") + "_" + uuid.uuid4().hex[:8])
-    user, cfg = load_config(args.config, workload=args.workload, run_dir=run_dir)
+    from experiments.scripts.launcher_config import (
+        configure_run_paths,
+        load_config,
+        make_run_name,
+    )
+
+    user, cfg = load_config(args.config, workload=args.workload)
+    run_dir = Path(str(cfg.paths.runs_dir)) / make_run_name(user)
+    configure_run_paths(cfg, user, run_dir)
     run_dir.mkdir(parents=True, exist_ok=False)
     (run_dir / "config").mkdir()
     OmegaConf.save(user, run_dir / "config" / "experiment.yaml")

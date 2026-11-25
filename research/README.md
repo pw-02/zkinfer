@@ -28,6 +28,20 @@ evidence. Record failures as well as successful requests.
 | [E11 — Distributed scheduling and scaling](E11_distributed_scaling/README.md) | Preliminary; verify |
 | [E12 — Combined end-to-end evaluation](E12_end_to_end/README.md) | Planned |
 
+## Local run names
+
+New runs launched through the small experiment YAML use descriptive directories:
+
+```
+2026-11-25_12-30-00_bert_p4_setup-off_c1_fifo_noadm_abcd1234
+```
+
+The name records the timestamp, workload, partition size (or `mono`), setup
+reuse setting, concurrency cap (`cauto` for automatic admission), scheduling
+policy, admission mode, and a unique suffix. `setup-on` means reuse is enabled,
+not that a cache hit occurred. Consult the effective configuration and measured
+cache events for actual conditions. Existing run directories are unchanged.
+
 ## Workflow
 
 1. Run the existing experiment or microbenchmark tooling; do not relocate raw runs.
