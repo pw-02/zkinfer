@@ -480,11 +480,17 @@ def run(cfg: DictConfig) -> None:
             int(cfg.launch.coordinator_port),
             10,
         )
-        if successful and stopped_cleanly:
+        reports_ok = True
+        try:
             from zkinfer.profiling.collect_reports import collect
-            logger.info("Generating request profiling reports")
-            for report, count in collect(Path(str(cfg.paths.runs_dir))):
-                logger.info("Saved %s (%d phase occurrences)", report, count)
+            if (Path(str(cfg.paths.runs_dir)) / "requests").is_dir():
+                logger.info("Generating request profiling reports (including partial results)")
+                for report, count in collect(Path(str(cfg.paths.runs_dir))):
+                    logger.info("Saved %s (%d phase occurrences)", report, count)
+        except Exception:
+            reports_ok = False
+            logger.exception("Report collection failed; retaining diagnostic storage")
+        if successful and stopped_cleanly and reports_ok:
             logger.info("Cleaning temporary storage according to output settings")
             cleanup_request_store(cfg, logger, submitted_request_ids)
             root = Path(str(cfg.paths.runs_dir)).resolve() / "storage"
@@ -498,7 +504,7 @@ def run(cfg: DictConfig) -> None:
         else:
             logger.warning("Run failed, was interrupted, or required forced shutdown; retaining diagnostic storage")
             if successful:
-                raise RuntimeError("Workloads completed but runtime shutdown failed; finalization skipped")
+                raise RuntimeError("Workloads completed but shutdown or reporting failed; cleanup skipped")
 
 
 @hydra.main(config_path="./config", config_name="runtime_experiment", version_base=None)
