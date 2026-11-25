@@ -60,6 +60,7 @@ def write_job_report(
     job,
     perf_metrics: Optional[Dict[str, Any]] = None,
     out_dir: str = "reports",
+    *, filename: str = "job_report.csv",
 ) -> Dict[str, Any]:
     """Append one canonical derived row for a completed/failed proof job."""
     perf_metrics = perf_metrics or {}
@@ -87,15 +88,15 @@ def write_job_report(
         "resource_sampling_interval(s)": perf_metrics.get("resource_sampling_interval(s)"),
         "model_write_time(s)": job.model_write_time,
         "input_write_time(s)": job.input_write_time,
-        "ezkl_setup_time(s)": perf_metrics.get("ezkl_setup_time(s)", 0.0),
-        "ezkl_calibrate_settings_time(s)": perf_metrics.get("ezkl_calibrate_settings_time(s)", 0.0),
-        "ezkl_compile_circuit_time(s)": perf_metrics.get("ezkl_compile_circuit_time(s)", 0.0),
-        "ezkl_get_srs_time(s)": perf_metrics.get("ezkl_get_srs_time(s)", 0.0),
-        "ezkl_gen_witness_time(s)": perf_metrics.get("ezkl_gen_witness_time(s)", 0.0),
-        "ezkl_key_gen_time(s)": perf_metrics.get("ezkl_key_gen_time(s)", 0.0),
-        "ezkl_proof_time(s)": perf_metrics.get("ezkl_proof_time(s)", 0.0),
-        "pk_file_size(GB)": perf_metrics.get("pk_file_size(GB)", 0.0),
-        "vk_file_size(GB)": perf_metrics.get("vk_file_size(GB)", 0.0),
+        "ezkl_setup_time(s)": perf_metrics.get("ezkl_setup_time(s)"),
+        "ezkl_calibrate_settings_time(s)": perf_metrics.get("ezkl_calibrate_settings_time(s)"),
+        "ezkl_compile_circuit_time(s)": perf_metrics.get("ezkl_compile_circuit_time(s)"),
+        "ezkl_get_srs_time(s)": perf_metrics.get("ezkl_get_srs_time(s)"),
+        "ezkl_gen_witness_time(s)": perf_metrics.get("ezkl_gen_witness_time(s)"),
+        "ezkl_key_gen_time(s)": perf_metrics.get("ezkl_key_gen_time(s)"),
+        "ezkl_proof_time(s)": perf_metrics.get("ezkl_proof_time(s)"),
+        "pk_file_size(GB)": perf_metrics.get("pk_file_size(GB)"),
+        "vk_file_size(GB)": perf_metrics.get("vk_file_size(GB)"),
         "max_system_memory(GB)": perf_metrics.get("max_system_memory(GB)"),
         "max_process_memory(GB)": perf_metrics.get("max_process_memory(GB)"),
         "avg_system_cpu(%)": perf_metrics.get("avg_system_cpu(%)"),
@@ -119,9 +120,9 @@ def write_job_report(
         ):
             report[key] = value
 
-    write_dict_to_csv(report, os.path.join(out_dir, "job_report.csv"))
+    write_dict_to_csv(report, os.path.join(out_dir, filename))
 
-    if report["job_status"] == "COMPLETED" and getattr(job, "profiling_file_path", None):
+    if filename == "job_report.csv" and report["job_status"] == "COMPLETED" and getattr(job, "profiling_file_path", None):
         existing_profile = _load_existing_resource_profile(job)
         return update_resource_profile(
             existing_profile,
@@ -130,6 +131,10 @@ def write_job_report(
         )
 
     return report
+
+
+def write_failed_attempt_report(job, perf_metrics, out_dir):
+    return write_job_report(job, perf_metrics, out_dir, filename="failed_attempt_report.csv")
 
 
 def write_request_report(request, out_dir: str = "reports") -> Dict[str, Any]:
