@@ -13,7 +13,6 @@ from unittest.mock import patch
 import zkinfer.proto.zkservice_pb2 as pb
 from zkinfer.runtime.data_plane import ArtifactRef
 from zkinfer.runtime.models import NodeResources, ProofJob
-from zkinfer.runtime.node.cache import NodeCache
 from zkinfer.runtime.node.stage_admission import (
     StageAdmissionController,
     StageResourceHistory,
@@ -235,62 +234,6 @@ class StateStoreMigrationTests(unittest.TestCase):
                     "SELECT assigned_node_id FROM jobs WHERE job_id = 'job-1'"
                 ).fetchone()[0]
                 self.assertEqual(node_id, "old-worker")
-
-
-class NodeCacheTests(unittest.TestCase):
-    def test_model_and_input_stay_pinned_until_job_releases_them(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            model, input_file = root / "model.onnx", root / "input.json"
-            model.write_bytes(b"m" * 24)
-            input_file.write_bytes(b"i" * 24)
-            cache = NodeCache(str(root / "cache"), max_bytes=32)
-            with cache.materialized_artifact(ArtifactRef("filesystem", str(model))) as (model_path, _):
-                with cache.materialized_artifact(ArtifactRef("filesystem", str(input_file))) as (input_path, _):
-                    cache.evict_if_needed()
-                    self.assertTrue(Path(model_path).exists())
-                    self.assertTrue(Path(input_path).exists())
-                    self.assertGreater(cache.total_bytes(), cache.max_bytes)
-            self.assertLessEqual(cache.total_bytes(), cache.max_bytes)
-            self.assertEqual(cache._pin_counts, {})
-
-    def test_failed_materialization_releases_its_pin(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            cache = NodeCache(str(Path(tmp) / "cache"), max_bytes=32)
-            with self.assertRaises(FileNotFoundError):
-                with cache.materialized_artifact(ArtifactRef("filesystem", str(Path(tmp) / "missing"))):
-                    pass
-            self.assertEqual(cache._pin_counts, {})
-
-    def test_setup_is_protected_during_restore(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            shared = root / "shared"
-            shared.mkdir()
-            for name in NodeCache.SETUP_FILES:
-                (shared / name).write_bytes(b"a" * 16)
-            cache = NodeCache(str(root / "cache"), max_bytes=32)
-            with cache.pinned_setup("key"):
-                cache.restore_setup(ArtifactRef("filesystem", str(shared)), "key")
-                cache.evict_if_needed()
-                self.assertTrue(cache.setup_ready("key"))
-            self.assertEqual(cache._pin_counts, {})
-
-    def test_pinned_setup_directory_is_not_evicted(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            cache = NodeCache(tmp, max_bytes=32)
-            pinned = Path(cache.setup_dir("pinned"))
-            victim = Path(cache.setup_dir("victim"))
-            (pinned / "data.bin").write_bytes(b"a" * 24)
-            time.sleep(0.01)
-            (victim / "data.bin").write_bytes(b"b" * 24)
-            cache.pin_setup("pinned")
-            try:
-                cache.evict_if_needed()
-                self.assertTrue(pinned.exists())
-                self.assertFalse(victim.exists())
-            finally:
-                cache.unpin_setup("pinned")
 
 
 class StageAdmissionTests(unittest.TestCase):

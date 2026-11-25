@@ -276,8 +276,7 @@ class NodeAttemptTests(unittest.TestCase):
             lease.output_prefix.CopyFrom(
                 to_pb_artifact(ArtifactRef("filesystem", str(root / "published")))
             )
-            with ExitStack() as pins:
-                task = node.prepare_local_task(lease, pins)
+            task = node.prepare_local_task(lease)
             self.assertFalse((Path(task.output_dir) / "old.csv").exists())
 
     def test_failed_job_removes_local_attempt(self):

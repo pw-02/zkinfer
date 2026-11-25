@@ -667,7 +667,8 @@ class Coordinator:
                 for request in self.active_requests.values():
                     for queued_job in request.proof_jobs:
                         if (queued_job.job_status == JobStatus.QUEUED
-                                and queued_job.profiling_file_path == job.profiling_file_path):
+                                and queued_job.profiling_file_path == job.profiling_file_path
+                                and queued_job.artifact_key == job.artifact_key):
                             queued_job.profiling_data = job_report
                             queued_job.predicted_duration_s = float(
                                 estimates.get("job_runtime_s") or 0.0

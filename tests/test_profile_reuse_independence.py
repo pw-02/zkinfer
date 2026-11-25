@@ -1,7 +1,6 @@
 """Resource profiles must not control whether proving artifacts are reused."""
 import ast
 import __future__
-from contextlib import ExitStack, nullcontext
 import importlib.util
 import json
 import logging
@@ -48,10 +47,10 @@ class ProfileIndependenceTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.store = config.SetupStoreConfig(False, "filesystem", str(self.root / "setup"), None, "",
                                              resource_profiles_root_dir=str(self.root / "profiles"))
-        self.profile_dir = self.root / "profiles/model/partition/key"
+        self.profile_dir = self.root / "profiles/model/partition"
         self.profile_dir.mkdir(parents=True)
-        self.cold = {"job_runtime(s)": 100, "max_process_memory(GB)": 40}
-        self.warm = {"job_runtime(s)": 20, "max_process_memory(GB)": 10}
+        self.cold = {"setup_key": "key", "job_runtime(s)": 100, "max_process_memory(GB)": 40}
+        self.warm = {"setup_key": "key", "job_runtime(s)": 20, "max_process_memory(GB)": 10}
         (self.profile_dir / "cold_resource_profile.json").write_text(json.dumps(self.cold))
         (self.profile_dir / "resource_profile.json").write_text(json.dumps(self.warm))
         ns = dict(logging=logging, os=os, time=time, Path=Path, EZKL_SETUP_IDENTITY={},
@@ -125,7 +124,7 @@ class ProfileIndependenceTests(unittest.TestCase):
         cls = next(n for n in source.body if isinstance(n, ast.ClassDef) and n.name == "Coordinator")
         method = next(n for n in cls.body if isinstance(n, ast.FunctionDef)
                       and n.name == "_write_job_report_and_profile")
-        report = {"job_runtime(s)": 120, "max_process_memory(GB)": 42}
+        report = {"setup_key": "key", "job_runtime(s)": 120, "max_process_memory(GB)": 42}
         ns = dict(write_job_report=lambda *a, **kw: report,
                   save_json=lambda obj, path, **kw: Path(path).write_text(json.dumps(obj)),
                   get_profile_estimates=profiles.get_profile_estimates,
@@ -148,35 +147,33 @@ class ProfileIndependenceTests(unittest.TestCase):
         cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "NodeSupervisor")
         method = next(n for n in cls.body if isinstance(n, ast.FunctionDef)
                       and n.name == "prepare_local_task")
-        ns = dict(time=time, shutil=shutil, copy_run_metadata=lambda *a: None,
+        transfer = SimpleNamespace(
+            materialize=lambda ref, name: (name, {"materialize_time(s)": 0.0}),
+            restore_setup=Mock(side_effect=AssertionError("cold must not restore setup")),
+        )
+        ns = dict(time=time, shutil=shutil, Path=Path, copy_run_metadata=lambda *a: None,
                   from_pb_artifact=lambda value: value,
+                  ArtifactTransfer=lambda workspace: transfer,
                   LocalProverTask=lambda **kw: SimpleNamespace(**kw))
         exec(compile(ast.Module(body=[method], type_ignores=[]), "supervisor", "exec",
                      flags=__future__.annotations.compiler_flag), ns)
-        cache = SimpleNamespace(
-            pinned_setup=lambda key: nullcontext(),
-            materialize_model_with_metrics=lambda *a: ("model.onnx", {}),
-            materialized_artifact=lambda *a, **kw: nullcontext(("input.json", {})),
-            restore_setup_with_metrics=Mock(side_effect=AssertionError("cold must not restore setup")),
-        )
         node = SimpleNamespace(resource_sampling_interval_sec=0.25)
         cfg = SimpleNamespace(setup_store=self.store, node=node,
                               request_store=SimpleNamespace(backend="filesystem", s3_bucket=None))
         owner = SimpleNamespace(
-            cfg=cfg, cache=cache, node_id="node", metadata_snapshot=None,
+            cfg=cfg, node_id="node", metadata_snapshot=None,
             stage_admission_dir=str(self.root / "state"),
             stage_cfg=SimpleNamespace(enabled=True, mode="whole_job", memory_safety_reserve_gb=8,
                                       history_percentile=0.9),
             _job_paths=lambda lease: (self.root / "request", self.root / "tmp", self.root / "out"))
         lease = SimpleNamespace(lease_id="lease", setup_key="key", job_id="job", request_id="req",
-                                model=None, input=None, predicted_peak_memory_gb=40,
+                                model=None, input=SimpleNamespace(uri="input.json"), predicted_peak_memory_gb=40,
                                 output_prefix=SimpleNamespace(uri="output", backend="filesystem", s3_bucket=""))
-        with ExitStack() as stack:
-            task = ns["prepare_local_task"](owner, lease, stack)
-            self.assertEqual(Path(task.setup_dir), self.root / "tmp/setup")
-            self.assertEqual(list(Path(task.setup_dir).iterdir()), [])
-            self.assertEqual(task.predicted_peak_memory_gb, 40)
-            cache.restore_setup_with_metrics.assert_not_called()
+        task = ns["prepare_local_task"](owner, lease)
+        self.assertEqual(Path(task.setup_dir), self.root / "tmp/setup")
+        self.assertEqual(list(Path(task.setup_dir).iterdir()), [])
+        self.assertEqual(task.predicted_peak_memory_gb, 40)
+        transfer.restore_setup.assert_not_called()
 
 
 if __name__ == "__main__":

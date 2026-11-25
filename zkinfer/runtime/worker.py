@@ -2,7 +2,7 @@
 
 The runtime no longer treats a worker process as the distributed scheduling unit.
 Run this module or zkinfer.runtime.node.supervisor to start one node-level agent
-per machine/instance. The node agent manages local cache, resource admission,
+per machine/instance. The node agent manages artifact transfers, resource admission,
 and stateless prover task subprocesses.
 """
 

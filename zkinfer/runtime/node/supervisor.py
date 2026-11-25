@@ -561,7 +561,7 @@ class NodeSupervisor:
                         exc_info=True,
                     )
 
-    def prepare_local_task(self, lease, _legacy_context=None) -> LocalProverTask:
+    def prepare_local_task(self, lease) -> LocalProverTask:
         prepare_started = time.perf_counter()
         lease_id = lease.lease_id
         request_dir, tmp_dir, output_dir = self._job_paths(lease)
