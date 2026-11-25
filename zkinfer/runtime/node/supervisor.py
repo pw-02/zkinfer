@@ -684,12 +684,18 @@ class NodeSupervisor:
                     time.sleep(self.poll_interval_sec)
                     continue
                 self.start_lease(lease)
+        except KeyboardInterrupt:
+            self.logger.info("Shutdown requested; draining active proof jobs")
         finally:
-            self.stop_event.set()
-            heartbeat_thread.join(timeout=5)
-            self._join_active_threads()
-            if self.channel:
-                self.channel.close()
+            # Keep heartbeats alive while outstanding leases finish.
+            try:
+                self._join_active_threads()
+            finally:
+                self.stop_event.set()
+                heartbeat_thread.join(timeout=5)
+                if self.channel:
+                    self.channel.close()
+            self.logger.info("Node supervisor stopped successfully")
 
 
 @hydra.main(config_path="../../config", config_name="config", version_base=None)
