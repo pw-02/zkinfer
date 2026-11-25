@@ -18,7 +18,7 @@ preparation:
   max_pending: 8 # Waiting preparations; reject new requests when full.
 
 scheduling:
-  policy: resource_aware # fifo | lpt | resource_aware
+  policy: fifo # fifo | lpt | resource_aware
   max_concurrent_jobs: 1 # 1 = isolated; null = admission-controlled concurrency.
   memory_admission: disabled # disabled | whole_job | stage
   memory_reserve_gib: 8 # RAM reserved for the OS and other processes.
