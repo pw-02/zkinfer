@@ -128,6 +128,11 @@ class ManagedProcess:
                 self.proc.wait(timeout=timeout_sec)
         if self.tee_thread is not None:
             self.tee_thread.join(timeout=timeout_sec)
+        graceful = graceful and self.proc.returncode == 0
+        if graceful:
+            self.logger.info("%s exited successfully", self.name)
+        else:
+            self.logger.warning("%s did not shut down cleanly (exit code %s)", self.name, self.proc.returncode)
         return graceful
 
 
@@ -370,7 +375,8 @@ def cleanup_request_store(
         request_dir = request_root / request_id
         if any(request_dir == path or request_dir in path.parents for path in protected):
             raise ValueError("Request cleanup would remove reusable setup or experiment records")
-        shutil.rmtree(request_dir, ignore_errors=True)
+        if request_dir.exists():
+            shutil.rmtree(request_dir)
         logger.info(
             "Deleted canonical request data for %s; reusable setup and experiment records retained",
             request_id,
@@ -476,7 +482,10 @@ def run(cfg: DictConfig) -> None:
         )
         if successful and stopped_cleanly:
             from zkinfer.profiling.collect_reports import collect
-            collect(Path(str(cfg.paths.runs_dir)))
+            logger.info("Generating request profiling reports")
+            for report, count in collect(Path(str(cfg.paths.runs_dir))):
+                logger.info("Saved %s (%d phase occurrences)", report, count)
+            logger.info("Cleaning temporary storage according to output settings")
             cleanup_request_store(cfg, logger, submitted_request_ids)
             root = Path(str(cfg.paths.runs_dir)).resolve() / "storage"
             if not cfg.output.get("keep_cache", True) and (root / "cache").exists():
@@ -484,8 +493,12 @@ def run(cfg: DictConfig) -> None:
             if (root / "runtime").exists():
                 shutil.rmtree(root / "runtime")
             prune_empty_run_dirs(Path(str(cfg.paths.runs_dir)), submitted_request_ids)
+            logger.info("Experiment completed successfully")
+            logger.info("Results saved to %s", cfg.paths.runs_dir)
         else:
             logger.warning("Run failed, was interrupted, or required forced shutdown; retaining diagnostic storage")
+            if successful:
+                raise RuntimeError("Workloads completed but runtime shutdown failed; finalization skipped")
 
 
 @hydra.main(config_path="./config", config_name="runtime_experiment", version_base=None)
