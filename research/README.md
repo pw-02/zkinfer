@@ -27,6 +27,7 @@ evidence. Record failures as well as successful requests.
 | [E10 — Concurrent proof serving](E10_concurrent_serving/README.md) | Runtime exists; evaluate |
 | [E11 — Distributed scheduling and scaling](E11_distributed_scaling/README.md) | Preliminary; verify |
 | [E12 — Combined end-to-end evaluation](E12_end_to_end/README.md) | Planned |
+| [E13 — Storage-aware proving-key materialization](E13_key_materialization/README.md) | Implemented; validation pending |
 
 ## Local run names
 
