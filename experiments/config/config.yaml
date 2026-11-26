@@ -1,10 +1,10 @@
 # Edit this file, then run: bash experiments/scripts/launch_tmux.sh
 # Logs, measurements and reports are always retained in experiments/runs/.
 
-workload: mnist_classifier # Name of a YAML file in config/workload/ (without .yaml).
+workload: nano_gpt_4_layers_64_embd # Name of a YAML file in config/workload/ (without .yaml). options: mobilenet_v2, nano_gpt_4_layers_64_embd
 
 partitioning:
-  enabled: true # false proves the entire model as one job.
+  enabled: false # false proves the entire model as one job.
   size: 1 # Number of consecutive ONNX operators per partition.
   simplify: true
   # Fixed-point scale propagation cap; 0 means positive incoming scales use local calibration.
@@ -27,19 +27,19 @@ cache:
   # true: reuse compatible artifacts, or generate and cache if missing.
   # false: regenerate without reading or updating that artifact cache.
   circuits: true # Calibrated settings and compiled circuits.
-  keys: true # Proving and verification keys.
+  keys: false # Proving and verification keys.
 
 resources:
   coordinator_threads: null # Rayon pool for preparation and verification; null = auto.
   prover_threads: null # Rayon pool per proof subprocess; null = auto.
 
 resource_model:
-  use_history: true # Load historical estimates for scheduling and admission.
-  update_history: true # Update estimates from completed jobs.
+  use_history: false # Load historical estimates for scheduling and admission.
+  update_history: false # Update estimates from completed jobs.
 
 profiling:
   mode: research # basic | research | debug (retains extra diagnostic files).
-  sampling_interval_sec: 0.1 # CPU/RSS sampling interval in seconds.
+  sampling_interval_sec: 5 # CPU/RSS sampling interval in seconds.
 
 output:
   # Retain proofs and witnesses after successful execution.

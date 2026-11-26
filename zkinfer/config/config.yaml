@@ -17,7 +17,7 @@ node:
   runs_dir: experiments/runs/requests
   logs_dir: logs/nodes
   runtime_state_dir: storage/node/runtime # Stage reservations and admission history.
-  job_poll_interval_sec: 5
+  job_poll_interval_sec: 0.5
 
 partitioning:
   enabled: true

@@ -1,0 +1,7 @@
+name: nano_gpt_2_layers_32_embd
+onnx_file: experiments/models/nanoGPT/nano_gpt_2_layers_32_embd.onnx
+input_file: experiments/models/nanoGPT/input_shared.json
+input_shapes:
+  input:
+  - 1
+  - 64

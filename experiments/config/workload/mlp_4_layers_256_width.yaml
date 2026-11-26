@@ -1,0 +1,7 @@
+name: mlp_4_layers_256_width
+onnx_file: experiments/models/mlp/mlp_4_layers_256_width.onnx
+input_file: experiments/models/mlp/input.json
+input_shapes:
+  input:
+  - 1
+  - 784

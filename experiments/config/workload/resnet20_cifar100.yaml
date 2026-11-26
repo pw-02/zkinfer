@@ -1,0 +1,5 @@
+name: resnet20_cifar100
+onnx_file: experiments/models/resnet20_cifar100/resnet20_cifar100.onnx
+input_file: experiments/models/mobilenet/input.json
+input_shapes:
+  x: [1,3,32,32]

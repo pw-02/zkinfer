@@ -1,108 +1,103 @@
+"""Generate synthetic nanoGPT ONNX benchmarks and zkInfer workload configs.
 
-
+Architecture adapted from https://github.com/karpathy/nanoGPT
+Preserves the finite attention mask and opset used by the supplied generator.
 """
-Reference: https://github.com/karpathy/nanoGPT
-"""
-
+import argparse
 import json
 import math
 from dataclasses import dataclass
+from pathlib import Path
+
+import onnx
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
-import sys
-import os
+import yaml
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
+
+SEED = 42
+BLOCK_SIZE = 64
+SEQ_LENGTH = 64
+VOCAB_SIZE = 65
+N_HEAD = 4
+OPSET_VERSION = 10
+
+MODEL_DIR = Path(__file__).resolve().parent
+EXPERIMENTS_DIR = MODEL_DIR.parent.parent
+PROJECT_DIR = EXPERIMENTS_DIR.parent
+WORKLOAD_DIR = EXPERIMENTS_DIR / 'config' / 'workload'
+
+CONFIGURATIONS = [
+    (2, 32),
+    (4, 32),
+    (2, 64),
+    (4, 64),
+    (8, 64),
+    (10, 64),
+    (20, 64),
+    (2, 128),
+    (4, 128),
+    (8, 128),
+]
 
 
 def new_gelu(x):
-    """
-    Implementation of the GELU activation function currently in Google BERT repo (identical to OpenAI GPT).
-    Reference: Gaussian Error Linear Units (GELU) paper: https://arxiv.org/abs/1606.08415
-    """
-    return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * x * x * x)))
+    return 0.5 * x * (1.0 + torch.tanh(
+        math.sqrt(2.0 / math.pi) * (x + 0.044715 * x * x * x)
+    ))
 
 
 class LayerNorm(nn.Module):
-    """ LayerNorm but with an optional bias. PyTorch doesn't support simply bias=False """
-
     def __init__(self, ndim, bias):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(ndim))
         self.bias = nn.Parameter(torch.zeros(ndim)) if bias else None
 
-    def forward(self, input):
-        return F.layer_norm(input, self.weight.shape, self.weight, self.bias, 1e-5)
+    def forward(self, x):
+        return F.layer_norm(x, self.weight.shape, self.weight, self.bias, 1e-5)
 
 
 class CausalSelfAttention(nn.Module):
-
     def __init__(self, config):
         super().__init__()
         assert config.n_embd % config.n_head == 0
-        # key, query, value projections for all heads, but in a batch
-        self.c_attn = nn.Linear(
-            config.n_embd, 3 * config.n_embd, bias=config.bias)
-        # output projection
+        self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd, bias=config.bias)
         self.c_proj = nn.Linear(config.n_embd, config.n_embd, bias=config.bias)
-        # regularization
         self.attn_dropout = nn.Dropout(config.dropout)
         self.resid_dropout = nn.Dropout(config.dropout)
         self.n_head = config.n_head
         self.n_embd = config.n_embd
-        self.dropout = config.dropout
-
-        # causal mask to ensure that attention is only applied to the left in the input sequence
-        self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size))
-                             .view(1, 1, config.block_size, config.block_size))
+        self.register_buffer('bias', torch.tril(torch.ones(
+            config.block_size, config.block_size
+        )).view(1, 1, config.block_size, config.block_size))
 
     def forward(self, x):
-        B, T, C = x.size()  # batch size, sequence length, embedding dimensionality (n_embd)
-        # calculate query, key, values for all heads in batch and move head forward to be the batch dim
+        B, T, C = x.size()
         q, k, v = self.c_attn(x).split(self.n_embd, dim=2)
-        k = k.view(B, T, self.n_head, C //
-                   self.n_head).transpose(1, 2)  # (B, nh, T, hs)
-        q = q.view(B, T, self.n_head, C //
-                   self.n_head).transpose(1, 2)  # (B, nh, T, hs)
-        v = v.view(B, T, self.n_head, C //
-                   self.n_head).transpose(1, 2)  # (B, nh, T, hs)
-
-        # manual implementation of attention
-        # q shape:(B, nh, T, hs), k transpose shape (B, nh, hs, T) -> (B, nh, T, T)
+        k = k.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
+        q = q.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
+        v = v.view(B, T, self.n_head, C // self.n_head).transpose(1, 2)
         att = (q @ k.transpose(-2, -1)) * (1.0 / math.sqrt(k.size(-1)))
         att = att.masked_fill(self.bias[:, :, :T, :T] == 0, float(-10))
-        att = F.softmax(att, dim=-1)
-        att = self.attn_dropout(att)
-        y = att @ v  # (B, nh, T, T) x (B, nh, T, hs) -> (B, nh, T, hs)
-        # re-assemble all head outputs side by side
+        att = self.attn_dropout(F.softmax(att, dim=-1))
+        y = att @ v
         y = y.transpose(1, 2).contiguous().view(B, T, C)
-
-        y = self.resid_dropout(self.c_proj(y))
-        return y
+        return self.resid_dropout(self.c_proj(y))
 
 
 class MLP(nn.Module):
-
     def __init__(self, config):
         super().__init__()
-        self.c_fc = nn.Linear(
-            config.n_embd, 4 * config.n_embd, bias=config.bias)
-        self.c_proj = nn.Linear(
-            4 * config.n_embd, config.n_embd, bias=config.bias)
+        self.c_fc = nn.Linear(config.n_embd, 4 * config.n_embd, bias=config.bias)
+        self.c_proj = nn.Linear(4 * config.n_embd, config.n_embd, bias=config.bias)
         self.dropout = nn.Dropout(config.dropout)
 
     def forward(self, x):
-        x = self.c_fc(x)
-        x = new_gelu(x)
-        x = self.c_proj(x)
-        x = self.dropout(x)
-        return x
+        return self.dropout(self.c_proj(new_gelu(self.c_fc(x))))
 
 
 class Block(nn.Module):
-
     def __init__(self, config):
         super().__init__()
         self.ln_1 = LayerNorm(config.n_embd, bias=config.bias)
@@ -118,25 +113,19 @@ class Block(nn.Module):
 
 @dataclass
 class GPTConfig:
-    block_size: int = 1024
-    # GPT-2 vocab_size of 50257, padded up to nearest multiple of 64 for efficiency
-    vocab_size: int = 50304
-    n_layer: int = 12
-    n_head: int = 12
-    n_embd: int = 768
+    block_size: int = BLOCK_SIZE
+    vocab_size: int = VOCAB_SIZE
+    n_layer: int = 4
+    n_head: int = N_HEAD
+    n_embd: int = 64
     dropout: float = 0.0
-    # True: bias in Linears and LayerNorms, like GPT-2. False: a bit better and faster
-    bias: bool = True
+    bias: bool = False
 
 
 class GPT(nn.Module):
-
     def __init__(self, config):
         super().__init__()
-        assert config.vocab_size is not None
-        assert config.block_size is not None
         self.config = config
-
         self.transformer = nn.ModuleDict(dict(
             wte=nn.Embedding(config.vocab_size, config.n_embd),
             wpe=nn.Embedding(config.block_size, config.n_embd),
@@ -144,96 +133,121 @@ class GPT(nn.Module):
             h=nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
             ln_f=LayerNorm(config.n_embd, bias=config.bias),
         ))
-
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
-
-        # weight-tying
-        # https://paperswithcode.com/method/weight-tying
         self.transformer.wte.weight = self.lm_head.weight
-        self.block = Block(config)
-        # init all weights
         self.apply(self._init_weights)
-        # apply special scaled init to the residual projections, per GPT-2 paper
-        for pn, p in self.named_parameters():
-            if pn.endswith('c_proj.weight'):
-                torch.nn.init.normal_(
-                    p, mean=0.0, std=0.02/math.sqrt(2 * config.n_layer))
-
-        # report number of parameters
-        print(f"number of parameters: {self.get_num_params()}")
-        # print("number of parameters: %.2fM" % (self.get_num_params()/1e6,))
+        for name, param in self.named_parameters():
+            if name.endswith('c_proj.weight'):
+                nn.init.normal_(param, mean=0.0,
+                                std=0.02 / math.sqrt(2 * config.n_layer))
 
     def get_num_params(self, non_embedding=True):
-        """
-        Return the number of parameters in the model.
-        For non-embedding count (default), the position embeddings get subtracted.
-        The token embeddings would too, except due to the parameter sharing these
-        params are actually used as weights in the final layer, so we include them.
-        """
-        n_params = sum(p.numel() for p in self.parameters())
+        count = sum(p.numel() for p in self.parameters())
         if non_embedding:
-            n_params -= self.transformer.wpe.weight.numel()
-        return n_params
+            count -= self.transformer.wpe.weight.numel()
+        return count
 
     def _init_weights(self, module):
         if isinstance(module, nn.Linear):
-            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            nn.init.normal_(module.weight, mean=0.0, std=0.02)
             if module.bias is not None:
-                torch.nn.init.zeros_(module.bias)
+                nn.init.zeros_(module.bias)
         elif isinstance(module, nn.Embedding):
-            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            nn.init.normal_(module.weight, mean=0.0, std=0.02)
 
-    def forward(self, idx, targets=None):
-        device = idx.device
+    def forward(self, idx):
         b, t = idx.size()
-        assert t <= self.config.block_size, f"Cannot forward sequence of length {t}, block size is only {self.config.block_size}"
-        pos = torch.arange(0, t, dtype=torch.long,
-                           device=device).unsqueeze(0)  # shape (1, t)
-
-        # # # forward the GPT model itself
-        # token embeddings of shape (b, t, n_embd), idx -> token_emb
-        idx = self.transformer.wte(idx)
-        # position embeddings of shape (1, t, n_embd)
-        pos_emb = self.transformer.wpe(pos)
-        idx = self.transformer.drop(idx + pos_emb)
-
+        assert t <= self.config.block_size
+        pos = torch.arange(0, t, dtype=torch.long, device=idx.device).unsqueeze(0)
+        x = self.transformer.drop(self.transformer.wte(idx) + self.transformer.wpe(pos))
         for block in self.transformer.h:
-            idx = block(idx)
-
-        idx = self.transformer.ln_f(idx)
-        idx = self.lm_head(idx)
-
-        return idx
-    
-n_layer = 4
-n_embd = 64
+            x = block(x)
+        return self.lm_head(self.transformer.ln_f(x))
 
 
-gptconf = GPTConfig(block_size=64, vocab_size=65, n_layer=n_layer,
-                    n_head=4, n_embd=n_embd, dropout=0.0, bias=False)
-model = GPT(gptconf)
-model.get_num_params()
+def generate_input():
+    """Reuse existing tokens; never silently replace an existing input file."""
+    path = MODEL_DIR / 'input.json'
+    shape = [1, SEQ_LENGTH]
+    if path.exists():
+        data = json.loads(path.read_text())
+        if data.get('input_shapes') != [shape] or len(data['input_data']) != 1:
+            raise ValueError(f'Expected one input of shape {shape} in {path}')
+        tokens = data['input_data'][0]
+        if len(tokens) != SEQ_LENGTH or any(
+            not isinstance(v, (int, float)) or not 0 <= v < VOCAB_SIZE or int(v) != v
+            for v in tokens
+        ):
+            raise ValueError(f'Invalid token IDs in {path}')
+        x = torch.tensor(tokens, dtype=torch.long).reshape(shape)
+        if 'output_data' in data:
+            # The original output is model-specific. Keep the original file intact.
+            path = MODEL_DIR / 'input_shared.json'
+            shared = {'input_shapes': [shape], 'input_data': [x.flatten().tolist()]}
+            if path.exists() and json.loads(path.read_text()) != shared:
+                raise ValueError(f'Existing {path} differs from original tokens')
+            if not path.exists():
+                path.write_text(json.dumps(shared, indent=4) + '\n')
+            print(f'Original input.json contains model-specific outputs; using {path.name} for new configs.')
+    else:
+        rng = torch.Generator().manual_seed(SEED)
+        x = torch.randint(VOCAB_SIZE, tuple(shape), generator=rng, dtype=torch.long)
+        path.write_text(json.dumps({'input_shapes': [shape],
+                                    'input_data': [x.flatten().tolist()]}, indent=4) + '\n')
+    return x, path
 
 
-shape = [1, 64]
-x = torch.randint(65, (1, 64))
-torch_out = model(x)
+def generate_model(n_layer, n_embd, x, input_path, overwrite=False):
+    if n_layer <= 0 or n_embd <= 0 or n_embd % N_HEAD:
+        raise ValueError('Layers must be positive; embedding must be a positive multiple of N_HEAD')
+    name = f'nano_gpt_{n_layer}_layers_{n_embd}_embd'
+    onnx_path = MODEL_DIR / f'{name}.onnx'
+    yaml_path = WORKLOAD_DIR / f'{name}.yaml'
+    if onnx_path.exists() and not overwrite:
+        print(f'Skipping existing model: {name}')
+    else:
+        torch.manual_seed(SEED)
+        model = GPT(GPTConfig(n_layer=n_layer, n_embd=n_embd)).cpu().eval()
+        with torch.no_grad():
+            torch.onnx.export(
+                model, x, str(onnx_path),
+                export_params=True, opset_version=OPSET_VERSION,
+                do_constant_folding=True, input_names=['input'],
+                output_names=['output'], dynamo=False,
+            )
+        print(f'Generated {name} | parameters={model.get_num_params(False):,} | '
+              f'size={onnx_path.stat().st_size / 1e6:.2f} MB')
+    onnx.checker.check_model(str(onnx_path))
+    workload = {
+        'name': name,
+        'onnx_file': onnx_path.relative_to(PROJECT_DIR).as_posix(),
+        'input_file': input_path.relative_to(PROJECT_DIR).as_posix(),
+        'input_shapes': {'input': list(x.shape)},
+    }
+    if not yaml_path.exists() or overwrite:
+        yaml_path.write_text(yaml.safe_dump(workload, sort_keys=False))
+        print(f'Workload: {yaml_path.name}')
+    else:
+        print(f'Preserving existing workload: {yaml_path.name}')
 
-torch.onnx.export(model, x, f"examples/onnx/nanoGPT/nano_gpt_{n_layer}_layers_{n_embd}_embd.onnx",
-                  export_params=True,        # store the trained parameter weights inside the model file
-                  opset_version=10,          # the ONNX version to export the model to
-                  do_constant_folding=True,  # whether to execute constant folding for optimization
-                  input_names=['input'],   # the model's input names
-                  output_names=['output']  # the model's output names
-                #   dynamic_axes={'input': {0: 'batch_size'},    # variable length axes
-                #                 'output': {0: 'batch_size'}})
-)
 
-d = ((x).detach().numpy()).reshape([-1]).tolist()
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--layers', type=int)
+    parser.add_argument('--embd', type=int)
+    parser.add_argument('--overwrite', action='store_true', help='Replace existing models and workload configs')
+    args = parser.parse_args()
+    if (args.layers is None) != (args.embd is None):
+        parser.error('--layers and --embd must be supplied together')
+    configs = CONFIGURATIONS if args.layers is None else [(args.layers, args.embd)]
+    if any(l <= 0 or e <= 0 or e % N_HEAD for l, e in configs):
+        parser.error(f'Layers must be positive and embedding must be a positive multiple of {N_HEAD}')
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    WORKLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    x, input_path = generate_input()
+    for n_layer, n_embd in configs:
+        generate_model(n_layer, n_embd, x, input_path, args.overwrite)
 
-data = dict(input_shapes=[shape],
-            input_data=[d],
-            output_data=[((o).detach().numpy()).reshape([-1]).tolist() for o in torch_out])
 
-# Serialize data into file:
-json.dump(data, open("input.json", 'w'))
+if __name__ == '__main__':
+    main()
