@@ -187,7 +187,7 @@ def common_overrides(cfg: DictConfig) -> List[str]:
             yield f"{prefix}={value if isinstance(value, str) and value.replace(chr(95), chr(97)).replace(chr(47), chr(97)).replace(chr(45), chr(97)).replace(chr(46), chr(97)).isalnum() else json.dumps(value)}"
 
     sections = ("coordinator", "node", "partitioning", "preparation", "scheduling",
-                "resources", "cache", "resource_model", "profiling", "verification",
+                "resources", "proving", "cache", "resource_model", "profiling", "verification",
                 "storage", "jobs", "heartbeat")
     return [arg for section in sections
             for arg in flatten(section, OmegaConf.to_container(cfg[section], resolve=True))]
