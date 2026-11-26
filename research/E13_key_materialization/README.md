@@ -85,7 +85,7 @@ Derived tables in [results/](results/README.md); plots in [figures/](figures/REA
 
 ## Run registration and findings
 
-Register source runs in [the master index](../experiment_index.csv) under `E13`. Record representation, storage condition, page-cache condition and actual cache hits in notes; pin backend commits. Raw data remains in `experiments/runs/` or its original archive. No run IDs have been inferred. Record reproducible analysis commands and verified findings here as experiments complete.
+Register source runs in [the master index](../experiment_index.csv) under `E13`. Record only run identity and optional context in the index. Analysis derives representation and cache conditions directly from raw reports. Document hardware, storage and exact backend commits in the experiment notes when not captured by the runtime. Raw data remains in `experiments/runs/` or its original archive. No run IDs have been inferred. Record reproducible analysis commands and verified findings here as experiments complete.
 
 ## Reproducible analysis
 
@@ -102,11 +102,13 @@ python research/E13_key_materialization/plot.py
 
 Replace the example directory names with real paths, including all repetitions.
 Registration is idempotent by experiment/run/request identity. Optional
-`--storage-condition`, `--page-cache-condition`, `--hardware`,
-`--ezkl-commit`, `--halo2-commit` and `--notes` annotate a batch of runs;
-supply only values known to apply to that batch. Unknown values stay blank.
-The recorded zkInfer revision comes from process snapshots, not the current
-checkout. Use actual key-cache measurements rather than requested cache settings.
+`--notes` records context not available in the raw files. The index contains
+only run identity, source path, optional repetition and notes. Analysis extracts
+configuration, cache hits, measured page residency, thread count and recorded
+software provenance directly from the original run files. Repetition labels are
+assigned during analysis if not supplied. Hardware, storage topology and exact
+EZKL/Halo2 commits are not reliably recorded by the current runtime; document
+them separately and do not mix runs from different environments in a comparison.
 
 The analysis writes:
 

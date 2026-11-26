@@ -9,9 +9,10 @@ launchers and configurations.
 
 Register one row per request and experiment in [experiment_index.csv](experiment_index.csv).
 Use repository-relative paths where possible; external archives may use absolute
-paths. The same run can support several experiments. Leave unknown fields blank;
-never infer cold/warm state from a configuration flag alone. Use actual cache-hit
-evidence. Record failures as well as successful requests.
+paths. The same run can support several experiments. The index only identifies runs and requests, with optional repetition and notes.
+Analysis reads configuration, metrics and provenance directly from raw artifacts.
+Never infer cold/warm state from configuration alone. Record failures as well as
+successful requests.
 
 | Experiment | Status (initial, provisional) |
 | --- | --- |
@@ -47,14 +48,14 @@ cache events for actual conditions. Existing run directories are unchanged.
 ## Workflow
 
 1. Run the local experiment launcher or other explicitly documented runtime workflow; do not relocate raw runs.
-2. Register its request ID, source path, experimental conditions and provenance in the master index.
+2. Register its request ID and source path in the master index; add optional notes for context not recorded in raw data.
 3. Add analysis code to the relevant experiment directory (or reuse linked existing code).
 4. Write derived tables to `results/` and publication plots to `figures/`.
 5. Update the experiment README with findings, limitations and exact analysis commands.
 
 Generated results and figures are ignored by default to avoid committing large
 datasets. Deliberately selected publication outputs can be tracked explicitly.
-The index is the single source of truth; no separate hand-maintained run lists.
+The index is the single source of truth for run selection; raw artifacts are the source of truth for measurements and configuration.
 
 ## Measurement conventions
 
