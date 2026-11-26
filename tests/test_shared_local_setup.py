@@ -122,8 +122,6 @@ class ArtifactTransferTests(unittest.TestCase):
         self.assertTrue(prover.compile_circuit()[0])
         with self.assertRaises(RuntimeError):
             prover._save_settings({})
-        with self.assertRaises(RuntimeError):
-            prover.setup_and_compute_proof()
         (self.shared / "pk.json").unlink()
         with self.assertRaises(FileNotFoundError):
             prover._try_load_keys_from_cache()

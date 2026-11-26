@@ -85,14 +85,6 @@ class StageMetricsTests(unittest.TestCase):
         self.assertEqual(metrics['stage_admission_witness_memory_error(GB)'], 5)
         self.assertNotIn('stage_admission_witness_memory_abs_pct_error', metrics)
 
-    def test_fused_measurement_can_be_partial_or_from_older_wheel(self):
-        estimates = {'stage_admission_fused_keygen_prove_predicted_memory(GB)': 10}
-        for inputs, expected in (({}, None), ({'stage_key_gen_max_memory(GB)': 3}, 3),
-                                 ({'stage_fused_keygen_prove_max_memory(GB)': 6}, 6),
-                                 ({'stage_proving_max_memory(GB)': math.nan}, None)):
-            metrics = ProverTaskRunner._prediction_error_metrics(inputs, estimates)
-            self.assertEqual(metrics['stage_admission_fused_keygen_prove_actual_memory(GB)'], expected)
-
     def run_path(self, warm=False, setup_only=False):
         stages = EZKLProofStages.__new__(EZKLProofStages)
         events = []
@@ -103,33 +95,23 @@ class StageMetricsTests(unittest.TestCase):
         stages.compile_circuit = Mock(return_value=(False, 0, 0))
         stages.get_srs = Mock()
         stages.gen_witness = Mock()
-        stages._try_load_keys_from_cache = Mock(return_value=(warm, 0))
-        stages._publish_generated_keys = Mock(return_value=0)
-        def fused():
-            events.extend(['WAITING_FOR_FUSED_KEYGEN_PROVE', 'FUSED_KEYGEN_PROVE',
-                           'KEY_GEN', 'PROVING'])
-            return {'keygen_time_s': 1, 'prove_time_s': 1, 'total_time_s': 2}
-        stages.setup_and_compute_proof = Mock(side_effect=fused)
-        stages.compute_proof = Mock(side_effect=lambda: events.append('PROVING'))
         def keys():
-            events.append('KEY_GEN')
-            return False, 0, 0
+            events.append('KEY_CACHE_HIT' if warm else 'KEY_GEN')
+            return warm, 0, 0
         stages.gen_keys = Mock(side_effect=keys)
-        stages.run_all(setup_only=setup_only)
-        return stages, events
+        stages.compute_proof = Mock(side_effect=lambda: events.append('PROVING'))
+        metrics, _ = stages.run_all(setup_only=setup_only)
+        return stages, events, metrics
 
-    def test_cold_run_all_has_one_real_keygen_after_admission(self):
-        _, events = self.run_path()
-        self.assertEqual(events.count('KEY_GEN'), 1)
-        self.assertLess(events.index('FUSED_KEYGEN_PROVE'), events.index('KEY_GEN'))
-        self.assertEqual(events[0], 'CHECKING_SETUP_CACHE')
+    def test_cold_run_generates_keys_before_proving(self):
+        stages, events, metrics = self.run_path()
+        self.assertEqual(events, ['KEY_GEN', 'PROVING', 'DONE'])
+        self.assertFalse(metrics['ezkl_key_gen_used_cache'])
 
-    def test_warm_run_all_has_no_keygen_and_setup_only_still_generates_keys(self):
-        stages, events = self.run_path(warm=True)
-        self.assertNotIn('KEY_GEN', events)
-        stages.setup_and_compute_proof.assert_not_called()
-        stages.compute_proof.assert_called_once()
-        stages, events = self.run_path(setup_only=True)
-        self.assertEqual(events.count('KEY_GEN'), 1)
-        stages.setup_and_compute_proof.assert_not_called()
+    def test_warm_run_reuses_keys_and_setup_only_does_not_prove(self):
+        stages, events, metrics = self.run_path(warm=True)
+        self.assertEqual(events, ['KEY_CACHE_HIT', 'PROVING', 'DONE'])
+        self.assertTrue(metrics['ezkl_key_gen_used_cache'])
+        stages, events, _ = self.run_path(setup_only=True)
         stages.gen_keys.assert_called_once()
+        stages.compute_proof.assert_not_called()

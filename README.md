@@ -96,7 +96,6 @@ GETTING_SRS
 GENERATING_WITNESS
 KEY_GEN
 PROVING
-FUSED_KEYGEN_PROVE
 ```
 
 The additional EZKL/Halo2 tracing around parameter loading and key-generation internals is characterization instrumentation only unless a later experiment establishes a useful controllable boundary.

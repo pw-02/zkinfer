@@ -20,97 +20,32 @@ from zkinfer.proto import zkservice_pb2 as pb
 
 
 class ObservabilityTests(unittest.TestCase):
-    def fused_stages(self, root, version=1, fail=False):
-        stages = StageAwareEZKLProofStages.__new__(StageAwareEZKLProofStages)
-        stages.status_file = str(root / "status.txt")
-        stages._transition_path = root / "stage_transitions.csv"
-        stages._transition_started = time.perf_counter()
-        stages.admission_metrics = {"stage_admission_wait_time(s)": 0.0}
-        stages.logger = logging.getLogger("test")
-
-        @contextmanager
-        def hold(stage):
-            yield {"wait_time_s": 0.1, "memory_gb": 0.0, "samples": 0, "source": "test"}
-
-        stages.admission = SimpleNamespace(hold=hold)
-        stages.srs_path = "srs"
-        for attr in [
-            "witness_path",
-            "compiled_circuit_path",
-            "vk_path",
-            "pk_path",
-            "proof_path",
-        ]:
-            setattr(stages, attr, attr)
-
-        def native(**kwargs):
-            if version:
-                base = kwargs["stage_trace_elapsed_base_s"]
-                with (root / "fused_stage_transitions.csv").open("w", newline="") as file:
-                    writer = csv.writer(file)
-                    writer.writerow(["timestamp_unix_us", "elapsed_s", "stage", "event"])
-                    for i, stage in enumerate(
-                        ["KEY_GEN", "PROVING", "PERSISTING_KEYS", "PERSISTING_PROOF"]
-                    ):
-                        writer.writerow([int(time.time() * 1e6), base + i, stage, "enter"])
-            else:
-                self.assertNotIn("stage_trace_elapsed_base_s", kwargs)
-            if fail:
-                raise RuntimeError("native failed")
-            return {"total_time_s": 4}
-
-        stages._load_fused_ezkl = lambda: SimpleNamespace(
-            stage_trace_version=version,
-            setup_and_prove=native,
-        )
-        return stages
-
-    def test_fused_events_close_wait_and_preserve_native_timestamps(self):
+    def test_separate_stage_events(self):
         with TemporaryDirectory() as tmp:
-            stages = self.fused_stages(Path(tmp))
-            stages.setup_and_compute_proof()
+            root = Path(tmp)
+            stages = StageAwareEZKLProofStages.__new__(StageAwareEZKLProofStages)
+            stages.status_file = str(root / "status.txt")
+            stages._transition_path = root / "stage_transitions.csv"
+            stages._transition_started = time.perf_counter()
+            stages.admission_metrics = {"stage_admission_wait_time(s)": 0.0}
+            @contextmanager
+            def hold(stage):
+                yield {"wait_time_s": 0.1, "memory_gb": 0.0, "samples": 0, "source": "test"}
+            stages.admission = SimpleNamespace(hold=hold)
+            stages._try_load_keys_from_cache = Mock(return_value=(False, 0))
+            stages._upload_to_cache = Mock(return_value=0)
+            stages.srs_path = "srs"
+            stages.ezkl = SimpleNamespace(setup=Mock(), prove=Mock())
+            for attr in ("witness_path", "compiled_circuit_path", "vk_path", "pk_path", "proof_path"):
+                setattr(stages, attr, attr)
+            stages.gen_keys()
+            stages.compute_proof()
             with stages._transition_path.open() as file:
                 events = list(csv.DictReader(file))
-            self.assertEqual(
-                [event["stage"] for event in events],
-                [
-                    "WAITING_FOR_FUSED_KEYGEN_PROVE",
-                    "FUSED_KEYGEN_PROVE",
-                    "KEY_GEN",
-                    "PROVING",
-                    "PERSISTING_KEYS",
-                    "PERSISTING_PROOF",
-                ],
-            )
-            self.assertEqual(
-                float(events[-1]["elapsed_s"]) - float(events[2]["elapsed_s"]),
-                3,
-            )
-            self.assertTrue(all(event["timestamp"].endswith("+00:00") for event in events))
-            self.assertTrue(
-                stages.admission_metrics["ezkl_fused_stage_trace_available"]
-            )
-
-    def test_old_wheel_does_not_leave_execution_labeled_waiting(self):
-        with TemporaryDirectory() as tmp:
-            stages = self.fused_stages(Path(tmp), version=0)
-            (Path(tmp) / "fused_stage_transitions.csv").write_text("stale trace")
-            stages.setup_and_compute_proof()
-            self.assertFalse(
-                stages.admission_metrics["ezkl_fused_stage_trace_available"]
-            )
-            with stages._transition_path.open() as file:
-                self.assertEqual(
-                    list(csv.DictReader(file))[-1]["stage"],
-                    "FUSED_KEYGEN_PROVE",
-                )
-
-    def test_failed_native_call_preserves_partial_stage_events(self):
-        with TemporaryDirectory() as tmp:
-            stages = self.fused_stages(Path(tmp), fail=True)
-            with self.assertRaisesRegex(RuntimeError, "native failed"):
-                stages.setup_and_compute_proof()
-            self.assertIn("PROVING", stages._transition_path.read_text())
+            self.assertEqual([event["stage"] for event in events],
+                             ["WAITING_FOR_KEY_GEN", "KEY_GEN", "WAITING_FOR_PROVING", "PROVING"])
+            stages.ezkl.setup.assert_called_once()
+            stages.ezkl.prove.assert_called_once()
 
     def test_response_and_submit_log_use_coordinator_policy(self):
         coordinator = SimpleNamespace(

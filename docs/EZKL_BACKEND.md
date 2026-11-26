@@ -1,41 +1,14 @@
 # EZKL backend notes
 
-zkInfer uses a custom EZKL/Halo2 fork rather than treating EZKL as an opaque CLI. The serving path remains file-backed so reusable setup artifacts can live in the node cache and shared storage, while the cold fused path avoids immediately serializing and reloading a proving key before proof construction.
+zkInfer uses the standard EZKL setup and prove APIs, with custom Halo2 profiling. Circuit and key caching are independently controlled by the experiment configuration.
 
 ## Cold versus warm proving
 
-A **warm** execution restores compatible settings, compiled circuit, PK, and VK from reusable setup and then generates the request-specific witness and proof.
+A cold key execution calls `ezkl.setup` to generate and serialize the VK and PK, then calls `ezkl.prove` to load the PK and construct the proof. A warm key execution skips setup and uses compatible cached keys. The witness is generated per request during coordinator preparation.
 
-A **cold** execution has no reusable derived setup. The custom fused path keeps the circuit, prover parameters, and newly generated proving key alive from key generation into proof construction, then persists reusable setup afterward.
+The key generation time includes key serialization; proof time includes key loading and proof serialization. Cold jobs still require temporary PK storage when persistent key caching is disabled.
 
-```text
-load witness + compiled circuit
-load SRS/prover params
-KEY_GEN
-  generate VK/PK in memory
-PROVING
-  prove with the same in-memory PK
-PERSISTING_KEYS
-  write PK/VK for future warm requests
-PERSISTING_PROOF
-  write proof
-```
-
-This does not create an in-memory proving-key cache across requests. It only removes the immediate generate -> serialize -> deserialize cycle within one cold execution.
-
-The custom EZKL wheel must be rebuilt whenever the Rust/PyO3 implementation changes.
-
-## Key-generation instrumentation
-
-The current EZKL instrumentation also records trace-only boundaries around:
-
-```text
-LOAD_PARAMS
-KEYGEN_VK
-KEYGEN_PK
-```
-
-These events are for characterization. They are not scheduler-visible admission boundaries. They should become controllable runtime stages only if measurement shows a resource-distinct boundary that the backend can safely expose.
+Halo2 phase and key-component instrumentation remain available.
 
 ## Stage-labelled resource traces
 
@@ -50,8 +23,6 @@ GETTING_SRS
 GENERATING_WITNESS
 KEY_GEN
 PROVING
-PERSISTING_KEYS
-PERSISTING_PROOF
 DONE
 ```
 
@@ -76,8 +47,6 @@ node:
 `memory_safety_reserve_gb` is a fixed node reserve that remains unavailable to proof workloads independently of prediction history.
 
 CPU is measured for characterization but is not an admission constraint.
-
-The fused cold call is admitted as `FUSED_KEYGEN_PROVE` because Python cannot intervene between key generation and proof construction inside the Rust call. Its memory estimate conservatively uses the larger available historical envelope from `KEY_GEN` and `PROVING` when both have been observed.
 
 Stage-admission metrics include wait time, predicted memory, actual memory, prediction error, estimate source, and historical sample count.
 
