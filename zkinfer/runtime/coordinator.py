@@ -31,6 +31,7 @@ from zkinfer.storage.shared_store import SharedStorage
 from zkinfer.storage.io import save_json
 from zkinfer.verification.request_manifest import write_request_artifact_manifest
 from zkinfer.verification.verifier import RuntimeVerifier
+from zkinfer.verification.verification_runner import run_verification
 
 
 class PreparationQueueFull(RuntimeError):
@@ -904,7 +905,7 @@ class Coordinator:
         if not self.verifier:
             return {"enabled": False, "valid": True}
         try:
-            report = self.verifier.verify_request(request).to_dict()
+            report = run_verification(request, self.verifier, self.preparation_rayon_threads)
             if request.reports_dir:
                 save_json(
                     report,

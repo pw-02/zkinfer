@@ -165,6 +165,10 @@ class NodeSupervisor:
                     exc,
                     exc.code(),
                 )
+                if action == "PollNode" and exc.code() not in (
+                    grpc.StatusCode.DEADLINE_EXCEEDED, grpc.StatusCode.UNAVAILABLE,
+                ):
+                    raise
                 # gRPC channels reconnect automatically; closing a shared channel
                 # here would cancel concurrent heartbeat/result calls.
                 if attempt < max_retries:
@@ -717,12 +721,22 @@ class NodeSupervisor:
             daemon=True,
         )
         heartbeat_thread.start()
+        backoff = max(0.25, self.poll_interval_sec)
         try:
-            while True:
+            while not self.stop_event.is_set():
                 if not self.can_accept_more_work():
                     time.sleep(self.poll_interval_sec)
                     continue
-                lease = self.poll_for_job()
+                try:
+                    lease = self.poll_for_job()
+                except grpc.RpcError as exc:
+                    if exc.code() not in (grpc.StatusCode.DEADLINE_EXCEEDED, grpc.StatusCode.UNAVAILABLE):
+                        raise
+                    self.logger.warning("Coordinator temporarily unavailable; retrying poll in %.1fs", backoff)
+                    self.stop_event.wait(backoff)
+                    backoff = min(30.0, backoff * 2)
+                    continue
+                backoff = max(0.25, self.poll_interval_sec)
                 if not lease.job_available:
                     time.sleep(self.poll_interval_sec)
                     continue
