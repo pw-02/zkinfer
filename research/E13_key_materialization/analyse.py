@@ -20,9 +20,9 @@ GIB = 2**30
 METRICS = ("size_gib", "serialize_s", "deserialize_s", "reconstruct_s",
            "materialize_s", "residual_s", "keygen_s", "prove_s",
            "request_s", "peak_rss_gib", "logical_read_gib", "load_gib_s",
-           "cached_fraction", "eviction_s", "probe_s")
-GROUP = ("model", "partition_size", "observed_page_cache", "cache_condition",
-         "circuit_cache_condition", "eviction_requested", "rayon_threads",
+           "cached_fraction", "eviction_s", "probe_s", "vk_size_gib")
+GROUP = ("model", "partition_size", "logrows", "page_cache_policy", "cache_condition",
+         "circuit_cache_condition", "configured_threads", "rayon_threads",
          "settings_digest", "setup_key", "srs_digest", "zkinfer_commit", "ezkl_version")
 FIELDS = ("experiment_id", "run_id", "request_id", "job_id", "lease_id", "source_path",
           "repetition", "notes", "representation", "requested_representation", *GROUP,
@@ -119,20 +119,33 @@ def extract(entry, checks, components):
         total = metric("pk_materialization_time(s)")
         count = metric("pk_materialization_count")
         residual = total - des - rec if None not in (total, des, rec) else None
-        cached = metric("pk_page_cache_cached_bytes_after") if truth(job.get("pk_page_cache_eviction_requested")) else metric("pk_page_cache_cached_bytes_before")
+        cached = metric("pk_page_cache_cached_bytes_after") if (truth(job.get("pk_page_cache_eviction_requested")) if truth(job.get("pk_page_cache_eviction_requested")) is not None else truth(get("proving.evict_pk_page_cache"))) else metric("pk_page_cache_cached_bytes_before")
         fraction = divide(cached, metric("pk_page_cache_file_bytes"))
-        observed = ("unknown" if fraction is None else "cold" if fraction == 0 else
-                    "resident" if fraction >= 0.99 else "partial")
+        configured_eviction = truth(get("proving.evict_pk_page_cache"))
+        reported_eviction = truth(job.get("pk_page_cache_eviction_requested"))
+        eviction = configured_eviction if configured_eviction is not None else reported_eviction
+        policy = "evict" if eviction is True else "normal" if eviction is False else "unknown"
+        if configured_eviction is not None and reported_eviction is not None and configured_eviction != reported_eviction:
+            check(jid, "warning", "Configured and reported page-cache policies differ")
+            policy = "mismatch"
+        settings = feature.get("settings") or {}
+        logrows = number(settings.get("run_args", {}).get("logrows"))
+        if logrows is None:
+            logrows = number(feature.get("halo2", {}).get("k"))
+        configured_threads = get("resources.prover_threads")
+        if logrows is not None and logrows.is_integer():
+            logrows = int(logrows)
         hit = truth(job.get("ezkl_key_gen_used_cache"))
         cache = "warm" if hit is True else "cold" if hit is False else "unknown"
         row = {**identity, "notes": entry.get("notes", ""),
                "model": get("workload") or req.get("request_name"),
                "partition_size": partition, "cache_condition": cache,
                "circuit_cache_condition": circuit,
-               "eviction_requested": truth(job.get("pk_page_cache_eviction_requested")),
+               "page_cache_policy": policy, "logrows": logrows,
+               "configured_threads": configured_threads if configured_threads is not None else ("auto" if OmegaConf.select(cfg, "resources") is not None and "prover_threads" in cfg.resources else ""),
                "zkinfer_commit": revision, "ezkl_version": ezkl_version,
                "job_id": jid, "lease_id": job.get("lease_id"), "representation": mode,
-               "requested_representation": requested, "observed_page_cache": observed,
+               "requested_representation": requested,
                "rayon_threads": job.get("prover_rayon_pool_size") or feature.get("rayon_pool_size"),
                "settings_digest": digest(feature.get("settings")), "setup_key": job.get("setup_key"),
                "srs_digest": job.get("prover_srs_sha256"), "verification": "valid" if verification.get("enabled") is True and verification.get("valid") is True else "invalid" if verification.get("enabled") is True and verification.get("valid") is False else "unconfirmed",
@@ -142,12 +155,15 @@ def extract(entry, checks, components):
                "keygen_s": metric("ezkl_key_gen_time(s)"), "prove_s": metric("ezkl_proof_time(s)"),
                "request_s": number(req.get("total_elapsed_time(s)")), "peak_rss_gib": metric("max_process_memory(GB)"),
                "logical_read_gib": read, "load_gib_s": divide(read, des), "cached_fraction": fraction,
-               "eviction_s": metric("pk_page_cache_eviction_time(s)"), "probe_s": metric("pk_page_cache_probe_time(s)")}
+               "eviction_s": metric("pk_page_cache_eviction_time(s)"), "probe_s": metric("pk_page_cache_probe_time(s)"),
+               "vk_size_gib": metric("vk_file_size(GB)")}
         errors = []
         if len(jobs) != 1 or str(row["job_status"]).upper() != "COMPLETED" or str(row["request_status"]).upper() != "COMPLETED":
             errors.append("Not a completed monolithic request")
         if row["verification"] != "valid":
             errors.append("Proof verification not confirmed")
+        if policy == "mismatch":
+            errors.append("Page-cache policy mismatch")
         if mode not in MODES or mode != requested:
             errors.append("Requested and observed representation differ or missing")
         if count != 1 or None in (size, des, rec, total) or size <= 0:
@@ -163,6 +179,8 @@ def extract(entry, checks, components):
         for k in GROUP:
             if row.get(k) is None or row[k] in ("", "unknown", "mixed"):
                 check(jid, "warning", f"Unconfirmed comparison field: {k}")
+        if fraction is None:
+            check(jid, "warning", "Page-cache residency not measured; policy does not establish residency")
         if row.get("circuit_cache_condition") != "hit":
             check(jid, "warning", "Circuit cache hit not confirmed")
         for error in errors:

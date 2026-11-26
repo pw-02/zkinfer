@@ -129,7 +129,20 @@ Logical deserialization throughput includes decoding and is not a device
 bandwidth benchmark. Break-even values and sensitivity plots are predictions,
 not independently measured bandwidth trials.
 
-Plots are emitted as 300-DPI PNG under `figures/group_NNN/` with condition metadata.
+Plots are emitted as 300-DPI PNG under
+`figures/<model>/<policy>_keys-<cache-condition>_<condition-hash>/`, with
+the workload name prefixed to each PNG and a `conditions.txt` file. The
+condition hash is stable when new workloads are added. Use `plot.py --model
+<workload>` to regenerate only one workload. Older group_NNN directories
+are not automatically removed.
+
+The analysis records `page_cache_policy` as normal, evict, or unknown, using
+the configured policy with a runtime-report fallback. A disagreement is flagged.
+Policy is not observed residency: measured cached fraction is retained when
+available, and missing residency is reported as a validation warning rather
+than a separate grouping dimension. For verified cold-cache claims, inspect
+the measured fraction. Logrows, configured threads, actual Rayon pool size
+and VK size are extracted from existing artifacts where available.
 All axes are linear. Bars show means, individual trials and sample standard
 deviation where available. Storage bars also report savings relative to Full.
 The materialization plot shows measured component times and total trial markers.

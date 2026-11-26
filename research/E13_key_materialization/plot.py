@@ -1,5 +1,8 @@
 """Generate readable, linear-axis E13 figures from measured trials."""
 import argparse
+import hashlib
+import json
+import re
 from pathlib import Path
 
 import matplotlib
@@ -40,7 +43,7 @@ def new_axes(title, ylabel, zero_floor=True):
 
 
 def save(fig, out, name):
-    fig.savefig(out / f"{name}.png", dpi=300, bbox_inches="tight", pad_inches=0.16)
+    fig.savefig(out / f"{out.parent.name}_{name}.png", dpi=300, bbox_inches="tight", pad_inches=0.16)
     plt.close(fig)
 
 
@@ -208,6 +211,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--input", type=Path, default=HERE / "results")
     p.add_argument("--output", type=Path, default=HERE / "figures")
+    p.add_argument("--model", help="Only plot this exact workload name")
     p.add_argument("--min-bandwidth", type=float, default=.25)
     p.add_argument("--max-bandwidth", type=float, default=3.0)
     args = p.parse_args()
@@ -215,15 +219,24 @@ def main():
         p.error("Bandwidth range must satisfy 0 < min < max")
     data = pd.read_csv(args.input / "measurements.csv", keep_default_na=False)
     data = data[data.eligible.astype(str).str.lower() == "true"].copy()
+    if args.model:
+        data = data[data.model == args.model].copy()
     if data.empty:
         raise SystemExit("No eligible measurements; inspect results/validation.csv")
     for metric in ("size_gib", "serialize_s", "deserialize_s", "reconstruct_s",
                    "materialize_s", "residual_s", "peak_rss_gib", "prove_s", "request_s"):
         data[metric] = pd.to_numeric(data[metric], errors="coerce")
     args.output.mkdir(parents=True, exist_ok=True)
-    for i, (key, group) in enumerate(data.groupby(list(GROUP), dropna=False, sort=True), 1):
-        out = args.output / f"group_{i:03d}"
-        out.mkdir(exist_ok=True)
+    for key, group in data.groupby(list(GROUP), dropna=False, sort=True):
+        conditions = dict(zip(GROUP, key))
+        # Stable across insertion of new models/conditions; readable prefix plus
+        # a short digest to distinguish otherwise identical visible labels.
+        slug = lambda value: re.sub(r"[^a-zA-Z0-9_-]+", "_", str(value)).strip("_") or "unknown"
+        model = slug(conditions["model"])
+        fingerprint = hashlib.sha256(json.dumps(conditions, sort_keys=True, default=str).encode()).hexdigest()[:10]
+        condition = f'{slug(conditions["page_cache_policy"])}_keys-{slug(conditions["cache_condition"])}_{fingerprint}'
+        out = args.output / model / condition
+        out.mkdir(parents=True, exist_ok=True)
         (out / "conditions.txt").write_text("\n".join(f"{k}: {v}" for k,v in zip(GROUP,key)) + "\n")
         modes = [m for m in MODES if m in set(group.representation)]
         bar(group, modes, out, "size_gib", "Proving-key storage", "Serialized size (GiB)", "pk_size", savings=True)
