@@ -93,3 +93,7 @@ Register source runs in [the master index](../experiment_index.csv) under `E13`.
 - EZKL file-level profiling: [87ec4c4](https://github.com/pw-02/ezkl/commit/87ec4c40079a1a328b7c4ad080fc930cefee16be)
 - zkInfer report integration: [435fca5](https://github.com/pw-02/zkinfer/commit/435fca54f03cd7fe67ef482a242021690830c80a)
 - [Configuration guide](../../docs/CONFIGURATION.md)
+
+### Optional targeted page-cache control
+
+Use `proving.evict_pk_page_cache: true` for isolated cold-page-cache trials; retain `false` for the normal baseline. Record eviction status, cached bytes before/after and eviction/probe duration from `job_report.csv`. A successful advisory call alone is not evidence of a cold read. Compare verified residency, keep unknown residency separate, and avoid concurrent reads of the same inode during isolated trials. Native PK materialization excludes eviction preparation; outer proving time includes it.

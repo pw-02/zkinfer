@@ -406,7 +406,8 @@ class NodeSupervisor:
                 stderr=subprocess.STDOUT,
                 text=True, encoding="utf-8", errors="replace", bufsize=1,
                 env={**rayon_environment(self.cfg.node.rayon_threads),
-                     "EZKL_PK_REPRESENTATION": self.cfg.node.key_representation},
+                     "EZKL_PK_REPRESENTATION": self.cfg.node.key_representation,
+                     "ZKINFER_EVICT_PK_PAGE_CACHE": "true" if self.cfg.node.evict_pk_page_cache else "false"},
             )
             with proc.stdout:
                 for line in proc.stdout:

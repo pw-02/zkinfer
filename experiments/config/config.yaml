@@ -25,6 +25,7 @@ scheduling:
 
 proving:
   key_representation: full # full | reduced | compact (newly generated keys).
+  evict_pk_page_cache: false # Linux: flush and request eviction of only the PK before proving.
 
 cache:
   # true: reuse compatible artifacts, or generate and cache if missing.

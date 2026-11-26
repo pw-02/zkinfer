@@ -45,6 +45,7 @@ class NodeConfig:
     runtime_state_dir: str
     rayon_threads: Optional[int] = None
     key_representation: str = "full"
+    evict_pk_page_cache: bool = False
 
 
 @dataclass(frozen=True)
@@ -391,6 +392,10 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
     if key_representation not in ("full", "reduced", "compact"):
         raise ValueError("proving.key_representation must be full, reduced or compact")
 
+    evict_pk_page_cache = cfg.get("proving", {}).get("evict_pk_page_cache", False)
+    if type(evict_pk_page_cache) is not bool:
+        raise ValueError("proving.evict_pk_page_cache must be a boolean")
+
     return RuntimeConfig(
         coordinator=CoordinatorConfig(
             host=cfg.coordinator.host,
@@ -422,6 +427,7 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             runtime_state_dir=str(node_runtime_state_dir),
             rayon_threads=resources.get("prover_threads"),
             key_representation=key_representation,
+            evict_pk_page_cache=evict_pk_page_cache,
         ),
         request_store=request_store,
         setup_store=setup_store,

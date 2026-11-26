@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple
 
+from zkinfer.profiling.pk_page_cache import prepare_pk_page_cache
 from zkinfer.storage.s3 import (
     download_file,
     upload_file,
@@ -98,6 +99,7 @@ class EZKLProofStages:
         self.proof_path = os.path.join(self.tmp_dir, "proof.pf")
 
         self.ezkl_settings_dict: Dict[str, Any] = {}
+        self.pk_page_cache_metrics: Dict[str, Any] = {}
 
     def configure_ezkl_env(self, artifact_dir: str) -> None:
         # Used by EZKL/Halo2 to emit profiling artifacts such as FFT/MSM/circuit reports.
@@ -456,6 +458,12 @@ class EZKLProofStages:
         if not self.srs_path:
             self.srs_path = self._resolve_srs_path()
 
+        # Execute inside the existing proof admission reservation, immediately
+        # before the native proving call, but outside native PK load timing.
+        self.pk_page_cache_metrics = prepare_pk_page_cache(
+            self.pk_path, evict=os.environ.get("ZKINFER_EVICT_PK_PAGE_CACHE") == "true",
+            logger=self.logger,
+        )
         self.ezkl.prove(
             self.witness_path,
             self.compiled_circuit_path,
@@ -519,6 +527,7 @@ class EZKLProofStages:
             start = time.perf_counter()
             self.compute_proof()
             metrics["ezkl_proof_time(s)"] = time.perf_counter() - start
+            metrics.update(self.pk_page_cache_metrics)
 
         metrics["ezkl_setup_time(s)"] = total_setup_time
         metrics["ezkl_setup_s3_read_time(s)"] = total_s3_read_time

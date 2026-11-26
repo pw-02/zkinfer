@@ -99,6 +99,22 @@ class LauncherConfigTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "proving.key_representation"):
                 load_config(path)
 
+    def test_pk_page_cache_setting(self):
+        from experiments.run_local_exp import common_overrides
+        from zkinfer.config.runtime import build_runtime_config
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "config.yaml"
+            for value in (False, True):
+                self.user.proving.evict_pk_page_cache = value
+                OmegaConf.save(self.user, path)
+                _, cfg = load_config(path, run_dir=tmp)
+                self.assertIs(build_runtime_config(cfg).node.evict_pk_page_cache, value)
+                self.assertIn(f"proving.evict_pk_page_cache={str(value).lower()}", common_overrides(cfg))
+            self.user.proving.evict_pk_page_cache = "invalid"
+            OmegaConf.save(self.user, path)
+            with self.assertRaisesRegex(ValueError, "proving.evict_pk_page_cache"):
+                load_config(path)
+
     def test_invalid_configuration(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "config.yaml"

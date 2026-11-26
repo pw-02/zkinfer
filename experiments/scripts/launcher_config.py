@@ -76,6 +76,8 @@ def _validate(user: DictConfig) -> None:
             _positive_int(value, f"resources.{kind}")
     _choice(user.get("proving", {}).get("key_representation", "full"),
             "proving.key_representation", ("full", "reduced", "compact"))
+    _boolean(user.get("proving", {}).get("evict_pk_page_cache", False),
+             "proving.evict_pk_page_cache")
     for kind in ("circuits", "keys"):
         _boolean(_reuse(user, kind), f"cache.{kind}")
     for kind in ("use_history", "update_history"):
