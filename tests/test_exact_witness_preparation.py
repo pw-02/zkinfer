@@ -178,6 +178,13 @@ def test_prepare_dag_and_cache_without_duplicate_witnesses(tmp_path):
     assert read_json(cold["first"].witness_path)["outputs"] == ezkl.witness_calls[1]
     assert ezkl.witness_calls[2] == [ezkl.witness_calls[1][0]] * 2
 
+    # Old cache metadata contained the EZKL fingerprint in the identity.
+    # A different backend build must still reuse the same circuit.
+    for entry in (tmp_path / "cache").glob("*/metadata.json"):
+        info = read_json(entry)
+        info["circuit"]["identity"]["ezkl"] = {"version": "old-build", "module_sha256": "old"}
+        write_json(entry, info)
+    ezkl.__version__ = "new-build"
     warm = prepare_partitions(
         partitions, tmp_path / "warm", cache_root=tmp_path / "cache", ezkl_module=ezkl
     )
@@ -188,6 +195,8 @@ def test_prepare_dag_and_cache_without_duplicate_witnesses(tmp_path):
         assert warm[name].settings_path == cold[name].settings_path
         assert warm[name].compiled_path == cold[name].compiled_path
         assert warm[name].witness_path != cold[name].witness_path
+        assert warm[name].artifact_identity() == cold[name].artifact_identity()
+        assert warm[name].metrics["backend_identity"]["version"] == "new-build"
 
 
 def test_high_scale_fallback_is_explicit_and_exact(tmp_path):

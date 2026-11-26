@@ -141,7 +141,6 @@ class PreparedPartition:
             "prepared_version": PREPARATION_VERSION,
             "settings_sha256": self.metrics.get("settings_sha256") or file_digest(self.settings_path),
             "compiled_sha256": self.metrics.get("compiled_sha256") or file_digest(self.compiled_path),
-            "backend_identity": self.metrics.get("backend_identity", {}),
         }
 
 
@@ -283,7 +282,6 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
     identity = {
         "version": PREPARATION_VERSION,
         "model": file_digest(model),
-        "ezkl": backend_identity,
         "candidate_scale": candidate,
         "visibility": ["public", "public", "fixed"],
     }
@@ -292,14 +290,18 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
         info = metadata(root)
         circuit = info.get("circuit", {})
         hashes = circuit.get("sha256", {})
-        if (circuit.get("identity") == identity and set(hashes) == set(names)
+        # Older metadata includes an EZKL binary fingerprint. Ignore it for
+        # compatibility; build identity is provenance, not a cache key.
+        cached_identity = circuit.get("identity", {})
+        if not isinstance(cached_identity, dict):
+            cached_identity = {}
+        identity_matches = all(cached_identity.get(k) == v for k, v in identity.items()
+                               if k in cached_identity) and all(k in cached_identity for k in identity)
+        if (identity_matches and set(hashes) == set(names)
                 and matches(root, hashes)):
             logger.info("Circuit cache hit: %s", root)
             return root / names[0], root / names[1], 0.0, 0.0, True
         if "circuit" in info:
-            cached_identity = circuit.get("identity", {})
-            if not isinstance(cached_identity, dict):
-                cached_identity = {}
             changed = [key for key, value in identity.items() if cached_identity.get(key) != value]
             logger.warning("Circuit cache miss at %s: %s; committed slot retained, preparing request-local circuit",
                            root, "identity differs: " + ", ".join(changed) if changed
@@ -315,7 +317,7 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
                 sources = dict(zip(names, (settings, compiled)))
                 hashes = {name: file_digest(path) for name, path in sources.items()}
                 publish_group(root, info, "circuit",
-                              {"identity": identity, "sha256": hashes}, sources)
+                              {"identity": identity, "sha256": hashes, "created_with": backend_identity}, sources)
                 return root / names[0], root / names[1], cal_s, comp_s, False
     settings, compiled, cal_s, comp_s = _run_setup(
         ezkl, model, calibration, directory, candidate
