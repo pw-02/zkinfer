@@ -1,1 +1,1 @@
-experiment_id,run_id,request_id,source_path,model,model_version,input_shape,partition_size,cache_condition,scheduler,admission,concurrency,nodes,rayon_threads,memory_budget_gib,repetition,status,zkinfer_commit,ezkl_commit,halo2_commit,notes
+experiment_id,run_id,request_id,source_path,model,model_version,input_shape,partition_size,cache_condition,scheduler,admission,concurrency,nodes,rayon_threads,memory_budget_gib,repetition,status,zkinfer_commit,ezkl_commit,halo2_commit,notes,key_representation,storage_condition,page_cache_condition,hardware,circuit_cache_condition
