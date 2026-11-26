@@ -32,7 +32,7 @@ class LauncherConfigTests(unittest.TestCase):
         self.user.scheduling.max_concurrent_jobs = 1
         self.assertEqual(
             make_run_name(self.user, now=self.now, suffix="abcd"),
-            "2026-11-25_12-30-00_bert_p4_keys-off_c1_fifo_noadm_exact_streaming_circuits-on_history-on_learn-on_abcd",
+            "2026-11-25_12-30-00_bert_p4_c1_fifo_abcd",
         )
 
     def test_monolithic_and_auto(self):

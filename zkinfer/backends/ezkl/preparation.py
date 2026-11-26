@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 import json
+import logging
 import math
 import os
 import tempfile
@@ -267,7 +268,9 @@ def _backend_identity(ezkl) -> dict:
 
 def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, backend_identity):
     """Publish a complete setup atomically; never reuse a partial setup."""
+    logger = logging.getLogger(__name__)
     if cache_root is None:
+        logger.info("Circuit cache disabled; calibrating %s", model)
         settings, compiled, cal_s, comp_s = _run_setup(
             ezkl, model, calibration, directory, candidate
         )
@@ -291,7 +294,18 @@ def _prepare_setup(ezkl, model, calibration, directory, cache_root, candidate, b
         hashes = circuit.get("sha256", {})
         if (circuit.get("identity") == identity and set(hashes) == set(names)
                 and matches(root, hashes)):
+            logger.info("Circuit cache hit: %s", root)
             return root / names[0], root / names[1], 0.0, 0.0, True
+        if "circuit" in info:
+            cached_identity = circuit.get("identity", {})
+            if not isinstance(cached_identity, dict):
+                cached_identity = {}
+            changed = [key for key, value in identity.items() if cached_identity.get(key) != value]
+            logger.warning("Circuit cache miss at %s: %s; committed slot retained, preparing request-local circuit",
+                           root, "identity differs: " + ", ".join(changed) if changed
+                           else "artifact hashes or files invalid")
+        else:
+            logger.info("Circuit cache miss: no committed circuit at %s", root)
         # A committed slot is never replaced, even if incompatible or damaged.
         if "circuit" not in info and not (set(info.get("keys", {}).get("sha256", {})) & set(names)):
             with tempfile.TemporaryDirectory(prefix=".circuit-", dir=root) as staging:

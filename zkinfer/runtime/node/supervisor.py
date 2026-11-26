@@ -493,11 +493,21 @@ class NodeSupervisor:
             setup_publish_metrics = {}
             if local_task.publish_keys:
                 transfer = ArtifactTransfer(tmp_dir / "transfer")
+                from zkinfer.storage.partition_cache import checked_digest
+                circuit_hashes = None
+                if local_task.prepared_settings_path and local_task.prepared_compiled_path:
+                    circuit_hashes = {
+                        "settings.json": checked_digest(local_task.prepared_settings_path),
+                        "network.compiled": checked_digest(local_task.prepared_compiled_path),
+                    }
                 setup_publish_metrics = transfer.publish_setup(
                     from_pb_artifact(lease.setup_cache), local_task.setup_key,
                     local_task.setup_dir, bool(local_task.prepared_witness_path),
                     srs_digest=result.metrics.get("prover_srs_sha256"),
+                    circuit_hashes=circuit_hashes,
                 )
+                self.logger.info("Key cache publication for %s: %s bytes published",
+                                 lease.job_id, setup_publish_metrics.get("bytes_published", 0))
 
             update_history = self.cfg.setup_store.resource_profiles_update_history
             if update_history is None:

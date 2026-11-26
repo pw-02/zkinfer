@@ -1,5 +1,6 @@
 """Resolve immutable filesystem artifacts without copying them."""
 from pathlib import Path
+import logging
 import time
 
 from zkinfer.storage import s3
@@ -67,7 +68,11 @@ class ArtifactTransfer:
             with partition_lock(ref.uri) as root:
                 info = metadata(root)
                 canonical = info.get("circuit", {}).get("sha256", {})
-                if "keys" not in info and (not canonical or canonical == circuit_hashes):
+                if "keys" in info:
+                    logging.getLogger(__name__).info("Key cache publication skipped: committed keys exist at %s", root)
+                elif canonical and canonical != circuit_hashes:
+                    logging.getLogger(__name__).warning("Key cache publication skipped: circuit hashes differ at %s", root)
+                else:
                     files = self.KEY_FILES if prepared else self.SETUP_FILES
                     sources = {name: Path(directory) / name for name in files}
                     hashes = {name: checked_digest(path) for name, path in sources.items()}

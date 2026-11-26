@@ -118,34 +118,13 @@ def make_run_name(
     """Describe requested settings, not observed cache hits or run outcomes."""
     timestamp = (now or datetime.now()).strftime("%Y-%m-%d_%H-%M-%S")
     partition = f"p{user.partitioning.size}" if user.partitioning.enabled else "mono"
-    setup = "keys-on" if _reuse(user, "keys") else "keys-off"
     cap = user.scheduling.max_concurrent_jobs
     concurrency = f"c{cap}" if cap is not None else "cauto"
-    admission = {
-        "disabled": "noadm",
-        "whole_job": "whole",
-        "stage": "stage",
-    }[user.scheduling.memory_admission]
-    policy = {
-        "fifo": "fifo",
-        "lpt": "lpt",
-        "resource_aware": "resource",
-    }[user.scheduling.policy]
+    policy = {"fifo": "fifo", "lpt": "lpt", "resource_aware": "resource"}[user.scheduling.policy]
     unique = suffix if suffix is not None else uuid.uuid4().hex[:8]
     if not re.fullmatch(r"[a-zA-Z0-9_-]+", unique):
         raise ValueError("Invalid run suffix")
-    return "_".join((
-        timestamp, user.workload, partition, setup, concurrency,
-        policy, admission,
-        "exact",
-        *(() if "preparation" not in user else (
-            user.preparation.get("dispatch", "batch"),
-            "circuits-on" if _reuse(user, "circuits") else "circuits-off",
-            "history-on" if user.resource_model.use_history else "history-off",
-            "learn-on" if user.resource_model.update_history else "learn-off",
-        )),
-        unique,
-    ))
+    return "_".join((timestamp, user.workload, partition, concurrency, policy, unique))
 
 
 def load_config(
