@@ -26,7 +26,7 @@ plt.rcParams.update({
 })
 
 
-def new_axes(title, ylabel):
+def new_axes(title, ylabel, zero_floor=True):
     fig, ax = plt.subplots(figsize=(6.6, 4.3), layout="constrained")
     ax.set_title(title, loc="left", pad=14)
     ax.set_ylabel(ylabel)
@@ -34,7 +34,8 @@ def new_axes(title, ylabel):
     ax.grid(axis="y", color="#DDE2E7", linewidth=0.8)
     ax.yaxis.set_major_locator(MaxNLocator(6))
     ax.tick_params(axis="both", length=0)
-    ax.set_ylim(bottom=0)
+    if zero_floor:
+        ax.set_ylim(bottom=0)
     return fig, ax
 
 
@@ -118,46 +119,88 @@ def materialization(group, modes, out):
 
 
 def bandwidth_plot(group, modes, out, low, high):
-    fig, ax = new_axes("Materialization vs. storage bandwidth", "Predicted time (s)")
+    fig, ax = new_axes("Predicted materialization vs. storage bandwidth",
+                       "Predicted time (s)", zero_floor=False)
     bandwidth = np.linspace(low, high, 500)
     predictions = {}
+    curves = []
     for mode in modes:
-        subset = group[group.representation == mode].dropna(subset=["size_gib", "reconstruct_s"])
+        subset = group[group.representation == mode].dropna(
+            subset=["size_gib", "reconstruct_s"])
         if subset.empty:
             continue
         size, cost = subset.size_gib.mean(), subset.reconstruct_s.mean()
+        if not np.isfinite([size, cost]).all() or size <= 0 or cost < 0:
+            continue
         predictions[mode] = (size, cost)
-        ax.plot(bandwidth, size / bandwidth + cost, color=COLORS[mode],
-                lw=2.4, label=mode.capitalize())
+        y = size / bandwidth + cost
+        curves.append(y)
+        ax.plot(bandwidth, y, color=COLORS[mode], lw=2.6,
+                label=mode.capitalize(), zorder=3)
     if not predictions:
         plt.close(fig)
         return
-    # Mark only pairwise intersections on the lower envelope, i.e. actual
-    # changes in the predicted best available representation.
+
+    # Use exact pairwise intersections to partition the plotted bandwidth
+    # range, then merge adjacent intervals with the same winning mode.
     names = list(predictions)
-    crossings = []
+    boundaries = {low, high}
     for i, first in enumerate(names):
         for second in names[i+1:]:
-            s1,c1 = predictions[first]
-            s2,c2 = predictions[second]
-            if c1 == c2:
-                continue
-            b = (s1-s2)/(c2-c1)
-            if not low <= b <= high:
-                continue
-            t = s1/b+c1
-            if t <= min(s/b+c for s,c in predictions.values()) + 1e-7:
-                crossings.append((b,t))
-    for b,t in sorted(set(crossings)):
-        ax.axvline(b, color="#9AA3AE", ls="--", lw=.9)
-        ax.scatter(b,t, color="#263645", s=24, zorder=5)
-    if crossings:
-        ax.text(.98,.70, "Predicted switch points:\n" + ", ".join(f"{b:.2f}" for b in sorted({b for b,t in crossings})) + " GiB/s",
-                transform=ax.transAxes, ha="right", va="top", fontsize=9,
-                bbox={"facecolor":"white","edgecolor":"none","alpha":.9})
-    ax.set(xlim=(low,high), xlabel="Assumed effective loading bandwidth (GiB/s)")
+            s1, c1 = predictions[first]
+            s2, c2 = predictions[second]
+            if c1 != c2:
+                b = (s1 - s2) / (c2 - c1)
+                if low < b < high:
+                    boundaries.add(b)
+    boundaries = sorted(boundaries)
+
+    def predicted_time(mode, b):
+        size, cost = predictions[mode]
+        return size / b + cost
+
+    regions = []
+    for left, right in zip(boundaries, boundaries[1:]):
+        middle = (left + right) / 2
+        winner = min(names, key=lambda mode: predicted_time(mode, middle))
+        if regions and regions[-1][2] == winner:
+            regions[-1] = (regions[-1][0], right, winner)
+        else:
+            regions.append((left, right, winner))
+
+    all_y = np.concatenate(curves)
+    ax.set_ylim(0, max(float(all_y.max()) * 1.18, 1e-6))
+    ax.set_xlim(low, high)
+    for left, right, winner in regions:
+        ax.axvspan(left, right, color=COLORS[winner], alpha=.09, lw=0, zorder=0)
+        # Axis-relative height keeps these labels stable when y limits change.
+        # Rotate labels in narrow regions rather than overlapping neighbours.
+        narrow = (right - left) / (high - low) < .17
+        if (right - left) / (high - low) >= .035:
+            ax.text((left + right) / 2, .96, winner.capitalize(),
+                    transform=ax.get_xaxis_transform(), ha="center", va="top",
+                    fontsize=9, fontweight="medium", color=COLORS[winner],
+                    rotation=90 if narrow else 0)
+
+    for i, (left, right, winner) in enumerate(regions[1:]):
+        b = left
+        t = predicted_time(winner, b)
+        ax.axvline(b, color="#8793A0", ls="--", lw=1.0, zorder=2)
+        ax.scatter(b, t, color="#263645", s=28, zorder=5)
+        # Alternate offsets so nearby switch-point annotations remain legible.
+        ax.annotate(f"{b:.2f} GiB/s", (b, t),
+                    xytext=(-8 if i % 2 == 0 else 8, 12 if i % 2 == 0 else -18),
+                    textcoords="offset points",
+                    ha="right" if i % 2 == 0 else "left",
+                    va="bottom" if i % 2 == 0 else "top",
+                    fontsize=9, color="#263645",
+                    bbox={"facecolor": "white", "edgecolor": "none", "alpha": .9, "pad": 2})
+
+    ax.set_xlabel("Assumed effective loading bandwidth (GiB/s)")
     ax.xaxis.set_major_locator(MaxNLocator(7))
-    ax.legend(loc="upper right")
+    ax.legend(loc="upper center", bbox_to_anchor=(.5, -.19), ncol=len(names),
+              fontsize=10, title="Shading: predicted fastest representation",
+              title_fontsize=9)
     save(fig, out, "bandwidth_sensitivity")
 
 
