@@ -393,11 +393,10 @@ class Coordinator:
                 return None
             self._mark_job_in_progress_locked(job, node.node_id)
             self.logger.info(
-                "Leased job %s | %s to node=%s lease=%s",
+                "Assigned job %s to %s | request=%s",
                 job.job_id,
-                job.job_name,
                 node.node_id,
-                job.lease_id,
+                job.inference_request_id,
             )
             return job
 
@@ -455,7 +454,7 @@ class Coordinator:
             for node_id in dead_nodes:
                 elapsed_sec = (now - self.node_heartbeats[node_id]).total_seconds()
                 self.logger.warning(
-                    "Node %s timed out after %.1fs; requeuing all of its leased jobs",
+                    "Node %s timed out after %.1fs; requeuing its assigned jobs",
                     node_id,
                     elapsed_sec,
                 )
@@ -501,7 +500,7 @@ class Coordinator:
                 )
             if job.assigned_node_id != node_id:
                 self.logger.error(
-                    "Job %s result came from node %s but was leased to %s",
+                    "Job %s result came from node %s but was assigned to %s",
                     job_id,
                     node_id,
                     job.assigned_node_id,
@@ -509,7 +508,7 @@ class Coordinator:
                 return False
             if not lease_id or lease_id != job.lease_id:
                 self.logger.error(
-                    "Stale lease result for job %s: got %s expected %s",
+                    "Rejected stale result for job %s: assignment token %s, expected %s",
                     job_id,
                     lease_id,
                     job.lease_id,
@@ -616,7 +615,7 @@ class Coordinator:
                 request_id=job.inference_request_id,
                 job_id=job.job_id,
             )
-        self.logger.info("Requeued job %s after node failure", job.job_name)
+        self.logger.info("Requeued job %s after node failure", job.job_id)
 
     def _complete_job_locked(self, job: ProofJob) -> None:
         self.active_jobs.pop(job.job_id, None)
@@ -630,10 +629,10 @@ class Coordinator:
 
         parent_request = self.active_requests.get(job.inference_request_id)
         if not parent_request:
-            self.logger.info("Job %s completed", job.job_name)
+            self.logger.info("Job %s completed", job.job_id)
             return
 
-        total = len(parent_request.proof_jobs)
+        total = parent_request.expected_job_count or len(parent_request.proof_jobs)
         completed = sum(
             1 for item in parent_request.proof_jobs if item.job_status == JobStatus.COMPLETED
         )
@@ -648,8 +647,8 @@ class Coordinator:
         )
         percent = (100.0 * completed / total) if total else 0.0
         self.logger.info(
-            "Job %s completed | request=%s progress=%d/%d (%.1f%%) | running=%d | queued=%d | failed=%d",
-            job.job_name,
+            "Completed job %s | request=%s | progress=%d/%d (%.1f%%) | running=%d queued=%d failed=%d",
+            job.job_id,
             parent_request.request_id,
             completed,
             total,
@@ -668,8 +667,8 @@ class Coordinator:
         job.retry_count += 1
         if job.retry_count <= job.max_retries:
             self.logger.warning(
-                "Job %s failed; retrying %d/%d",
-                job.job_name,
+                "Job %s failed; retry %d/%d",
+                job.job_id,
                 job.retry_count,
                 job.max_retries,
             )
@@ -700,7 +699,7 @@ class Coordinator:
                 request_id=job.inference_request_id,
                 job_id=job.job_id,
             )
-        self.logger.error("Job %s failed permanently: %s", job.job_name, message)
+        self.logger.error("Job %s failed permanently: %s", job.job_id, message)
         return False
 
     def _finalize_job(

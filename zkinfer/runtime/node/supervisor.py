@@ -317,13 +317,13 @@ class NodeSupervisor:
         ack = self.safe_grpc_call(_call, action=f"SubmitJobResult({status})")
         if not ack.ok:
             self.logger.warning(
-                "Coordinator rejected %s for job %s lease=%s",
+                "Coordinator rejected %s for job %s (assignment token=%s)",
                 status,
                 lease.job_id,
                 lease.lease_id,
             )
             return False
-        self.logger.info("Submitted %s for job %s", status, lease.job_id)
+        self.logger.info("Reported job %s: %s", lease.job_id, status)
         return True
 
     def send_heartbeat(self) -> None:
@@ -352,7 +352,7 @@ class NodeSupervisor:
     def start_lease(self, lease) -> None:
         with self.active_lock:
             if lease.job_id in self.active_jobs:
-                self.logger.warning("Ignoring duplicate lease for active job %s", lease.job_id)
+                self.logger.warning("Ignoring duplicate assignment for active job %s", lease.job_id)
                 return
             self.lease_memory_reservations_gb[lease.job_id] = max(
                 0.0,
@@ -367,10 +367,10 @@ class NodeSupervisor:
             self.active_jobs[lease.job_id] = thread
             thread.start()
         self.logger.info(
-            "Started prover subprocess controller for job %s lease=%s predicted_peak=%.2fGB",
+            "Accepted job %s | predicted peak memory=%s",
             lease.job_id,
-            lease.lease_id,
-            float(lease.predicted_peak_memory_gb or 0.0),
+            (f"{lease.predicted_peak_memory_gb:.2f} GiB"
+             if lease.predicted_peak_memory_gb > 0 else "unknown"),
         )
 
     def _run_lease_thread(self, lease) -> None:
@@ -506,7 +506,7 @@ class NodeSupervisor:
                     srs_digest=result.metrics.get("prover_srs_sha256"),
                     circuit_hashes=circuit_hashes,
                 )
-                self.logger.info("Key cache publication for %s: %s bytes published",
+                self.logger.info("Key cache | job=%s | bytes saved=%s",
                                  lease.job_id, setup_publish_metrics.get("bytes_published", 0))
 
             update_history = self.cfg.setup_store.resource_profiles_update_history
