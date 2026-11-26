@@ -22,6 +22,7 @@ from zkinfer.profiling.msm_fft_parser import (
     summarize_msm_report,
 )
 from zkinfer.profiling.resource_parser import parse_resource_usage_file
+from zkinfer.profiling.key_metrics import summarize_key_metrics
 from zkinfer.profiling.halo2_phases import write_phase_report
 from zkinfer.profiling.execution_trace import write_execution_trace
 from zkinfer.profiling.job_features import save_circuit_features
@@ -483,6 +484,12 @@ class ProverTaskRunner:
             self.logger.warning("Failed to correlate Halo2 phases: %s", exc)
             phase_metrics = {"halo2_phase_trace_error": str(exc)}
 
+        try:
+            key_metrics = summarize_key_metrics(Path(task.output_dir) / "halo2_key_metrics.csv")
+        except Exception:
+            self.logger.warning("Failed to summarize proving-key metrics", exc_info=True)
+            key_metrics = {}
+
         prediction_metrics = self._prediction_error_metrics(
             resource_metrics,
             ezkl_metrics,
@@ -496,6 +503,7 @@ class ProverTaskRunner:
             "input_materialize_time(s)": task.input_materialize_time_s,
             **resource_metrics,
             **phase_metrics,
+            **key_metrics,
             "pk_file_size(GB)": proof_stages.get_pk_file_size_gb(),
             "vk_file_size(GB)": proof_stages.get_vk_file_size_gb(),
             **read_csv_first_row(os.path.join(task.output_dir, "halo2_circuit.csv")),

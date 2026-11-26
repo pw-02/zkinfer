@@ -80,3 +80,7 @@ or NFS reads.
 ### Proving-key representation
 
 `proving.key_representation: full | reduced | compact` selects the persistent format of newly generated keys. The default is `full`. The node passes this setting to each prover subprocess as `EZKL_PK_REPRESENTATION`. Updated EZKL/Halo2 bindings automatically detect the stored representation when reading. Existing cached keys are reused irrespective of the requested representation; to compare formats set `cache.keys: false` (or use separate cache roots). This setting does not change the in-memory proving algorithm or verification keys. Results record the requested representation, not necessarily the format of a cache hit.
+
+### Proving-key profiling
+
+In research/debug mode, `halo2_key_metrics.csv` records component serialization, deserialization (logical bytes consumed), reconstruction, actual loaded representation and file-level materialization and serialization totals. `job_report.csv` summarizes these as `pk_*` fields and distinguishes `requested_key_representation` from the actual `pk_representation`. Materialization includes deserialization and reconstruction; do not add these nested timings to the total. Serialization includes buffered flush, not an fsync. Missing measurements are blank, not zero. Cached keys have no new serialization time. Updated native bindings are required.
