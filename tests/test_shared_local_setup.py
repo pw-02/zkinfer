@@ -69,6 +69,29 @@ class ArtifactTransferTests(unittest.TestCase):
         (self.shared / "pk.json").unlink()
         self.assertFalse(self.transfer.restore_setup(self.ref, "key", target, False)["paths"])
 
+    def test_prepared_keys_can_be_cached_independently_of_canonical_circuit(self):
+        from zkinfer.storage.partition_cache import save_metadata
+        root = self.root / "independent"
+        root.mkdir()
+        canonical = {"settings.json": "canonical-settings", "network.compiled": "canonical-compiled"}
+        save_metadata(root, {"circuit": {"sha256": canonical}})
+        ref = ArtifactRef("filesystem", str(root))
+        source = self.root / "generated-keys"
+        source.mkdir()
+        for name in ArtifactTransfer.KEY_FILES:
+            (source / name).write_bytes(b"key")
+        actual = {"settings.json": "fresh-settings", "network.compiled": "fresh-compiled"}
+        metrics = self.transfer.publish_setup(ref, "fresh-circuit-key", source, True,
+                                              srs_digest="srs", circuit_hashes=actual)
+        self.assertGreater(metrics["bytes_published"], 0)
+        self.assertTrue(self.transfer.restore_setup(ref, "fresh-circuit-key", root, True,
+                                                    srs_digest="srs")["paths"])
+        self.assertFalse(self.transfer.restore_setup(ref, "canonical-circuit-key", root, True,
+                                                     srs_digest="srs")["paths"])
+        from zkinfer.storage.partition_cache import metadata
+        self.assertEqual(metadata(root)["circuit"]["sha256"], canonical)
+        self.assertEqual(metadata(root)["keys"]["circuit_sha256"], actual)
+
     def test_srs_mismatch_is_not_restored(self):
         self.assertFalse(self.transfer.restore_setup(self.ref, "key", self.root, False,
                                                      srs_digest="different")["paths"])

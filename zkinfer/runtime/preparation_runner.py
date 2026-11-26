@@ -17,7 +17,7 @@ def run_preparation(request, builder, shared, setup_store, max_retries,
                     rayon_threads, *, on_plan=None, on_job_ready=None):
     run_dir = Path(request.run_dir)
     run_dir.mkdir(parents=True, exist_ok=True)
-    log_path = run_dir / "preparation_process.log"
+    log_path = run_dir / "request_preparation.log"
     jobs = []
     expected = None
     seen = set()

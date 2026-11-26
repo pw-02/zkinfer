@@ -346,7 +346,7 @@ def prune_empty_run_dirs(run_dir: Path, request_ids: List[str]) -> None:
 
 def run(cfg: DictConfig, workloads=None) -> None:
     active_log = ActiveRunLog()
-    active_log.set_path(Path(str(cfg.paths.runs_dir)) / "run.log")
+    active_log.set_path(Path(str(cfg.paths.runs_dir)) / "logs" / "run.log")
     logger = setup_logger(active_log)
     group = ProcessGroup(logger)
     env = make_env(cfg)

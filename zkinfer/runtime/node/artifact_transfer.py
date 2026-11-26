@@ -70,8 +70,10 @@ class ArtifactTransfer:
                 canonical = info.get("circuit", {}).get("sha256", {})
                 if "keys" in info:
                     logging.getLogger(__name__).info("Key cache publication skipped: committed keys exist at %s", root)
-                elif canonical and canonical != circuit_hashes:
-                    logging.getLogger(__name__).warning("Key cache publication skipped: circuit hashes differ at %s", root)
+                elif prepared and (not circuit_hashes or set(circuit_hashes) != {"settings.json", "network.compiled"}):
+                    logging.getLogger(__name__).warning("Key cache publication skipped: missing prepared circuit hashes at %s", root)
+                elif not prepared and canonical:
+                    logging.getLogger(__name__).warning("Legacy key bundle cannot replace committed circuit at %s", root)
                 else:
                     files = self.KEY_FILES if prepared else self.SETUP_FILES
                     sources = {name: Path(directory) / name for name in files}

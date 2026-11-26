@@ -36,7 +36,7 @@ class ProverProcessReportingTests(unittest.TestCase):
             root = Path(tmp)
             task = self._task(root)
             _persist_task_metadata(task)
-            path = root / "output" / "config" / "task.json"
+            path = root / "output" / "task_config.json"
             self.assertTrue(path.exists())
             payload = json.loads(path.read_text(encoding="utf-8"))
             self.assertEqual(payload["job_id"], "job")

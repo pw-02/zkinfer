@@ -48,7 +48,7 @@ def _write_json_atomic(path: str, payload: dict) -> None:
 def _persist_task_metadata(task: LocalProverTask) -> None:
     """Keep the effective per-job task after the temporary workdir is removed."""
     _write_json_atomic(
-        str(Path(task.output_dir) / "config" / "task.json"),
+        str(Path(task.output_dir) / "task_config.json"),
         task.to_dict(),
     )
 
