@@ -1,6 +1,6 @@
 # E13 — Storage-aware proving-key materialization
 
-**Initial status:** Implementation committed; native build and experimental validation pending.
+**Status:** Analysis tooling available; registered empirical results pending.
 
 ## Research question
 
@@ -86,6 +86,50 @@ Derived tables in [results/](results/README.md); plots in [figures/](figures/REA
 ## Run registration and findings
 
 Register source runs in [the master index](../experiment_index.csv) under `E13`. Record representation, storage condition, page-cache condition and actual cache hits in notes; pin backend commits. Raw data remains in `experiments/runs/` or its original archive. No run IDs have been inferred. Record reproducible analysis commands and verified findings here as experiments complete.
+
+## Reproducible analysis
+
+Run from the repository root in the experiment Conda environment. Select only the
+runs belonging to E13 (do not glob unrelated runs). For example:
+
+```bash
+python research/register_runs.py --experiment E13 --runs \
+    experiments/runs/RUN_FULL_1 experiments/runs/RUN_REDUCED_1 \
+    experiments/runs/RUN_COMPACT_1
+python research/E13_key_materialization/analyse.py
+python research/E13_key_materialization/plot.py
+```
+
+Replace the example directory names with real paths, including all repetitions.
+Registration is idempotent by experiment/run/request identity. Optional
+`--storage-condition`, `--page-cache-condition`, `--hardware`,
+`--ezkl-commit`, `--halo2-commit` and `--notes` annotate a batch of runs;
+supply only values known to apply to that batch. Unknown values stay blank.
+The recorded zkInfer revision comes from process snapshots, not the current
+checkout. Use actual key-cache measurements rather than requested cache settings.
+
+The analysis writes:
+
+- `results/measurements.csv`: one row per canonical job, with eligibility flag.
+- `results/component_measurements.csv`: original native component rows with provenance.
+- `results/summary.csv`: per-condition, per-representation, per-metric count, mean,
+  sample SD, median and range.
+- `results/break_even.csv`: analytical pairwise thresholds where defined.
+- `results/validation.csv`: errors, missing provenance and repetition warnings.
+
+The pilot requires one completed job per request, confirmed verification,
+matching observed representation and one complete materialization. Missing
+provenance produces warnings, not fabricated values: inspect validation before
+claiming controlled comparisons. Unknown provenance and partially resident page
+cache are not evidence of matching physical storage conditions. Separate known
+conditions are grouped independently. A sampled peak RSS is not an exact peak.
+Logical deserialization throughput includes decoding and is not a device
+bandwidth benchmark. Break-even values and sensitivity plots are predictions,
+not independently measured bandwidth trials.
+
+Plots are emitted as PDF/PNG under `figures/group_NNN/` with condition metadata.
+Generated outputs remain gitignored; the index and scripts are tracked.
+No raw runs are relocated or modified.
 
 ## Implementation references
 
