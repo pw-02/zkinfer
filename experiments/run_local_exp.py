@@ -297,27 +297,6 @@ def submit_workload(
     )
 
 
-def save_request_metadata(
-    cfg: DictConfig,
-    workload_cfg: DictConfig,
-    request_id: str,
-) -> Path:
-    request_dir = Path(str(cfg.paths.runs_dir)) / "requests" / request_id
-    config_dir = request_dir / "config"
-    logs_dir = request_dir / "logs"
-    config_dir.mkdir(parents=True, exist_ok=True)
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    OmegaConf.save(config=cfg, f=config_dir / "experiment_config.yaml")
-    OmegaConf.save(config=workload_cfg, f=config_dir / "workload_config.yaml")
-    (config_dir / "runtime_partitioning.txt").write_text(
-        f"enabled={str(bool(cfg.partitioning.enabled)).lower()}\n"
-        f"partition_size={int(cfg.partitioning.size)}\n"
-        f"runtime_mode={_runtime_partition_mode(cfg)}\n",
-        encoding="utf-8",
-    )
-    return logs_dir
-
-
 def cleanup_request_store(
     cfg: DictConfig,
     logger: logging.Logger,
@@ -349,7 +328,7 @@ def cleanup_request_store(
 def prune_empty_run_dirs(run_dir: Path, request_ids: List[str]) -> None:
     """Remove only empty, run-owned temporary directories."""
     root = run_dir.resolve()
-    targets = [root / "storage"]
+    targets = [root / ".runtime" / "storage", root / "storage"]
     targets.extend(root / "requests" / rid / "tmp" for rid in request_ids
                    if rid and Path(rid).name == rid and rid not in (".", ".."))
     for target in targets:
@@ -365,8 +344,9 @@ def prune_empty_run_dirs(run_dir: Path, request_ids: List[str]) -> None:
                 pass  # Never remove nonempty directories.
 
 
-def run(cfg: DictConfig) -> None:
+def run(cfg: DictConfig, workloads=None) -> None:
     active_log = ActiveRunLog()
+    active_log.set_path(Path(str(cfg.paths.runs_dir)) / "run.log")
     logger = setup_logger(active_log)
     group = ProcessGroup(logger)
     env = make_env(cfg)
@@ -408,12 +388,11 @@ def run(cfg: DictConfig) -> None:
 
         for workload_name in cfg.suite.workloads:
             try:
-                workload_cfg = load_workload_cfg(workload_name)
+                workload_cfg = (workloads[workload_name] if workloads is not None
+                                else load_workload_cfg(workload_name))
                 logger.info("Running workload: %s", workload_cfg.name)
                 request_id = submit_workload(client, cfg, workload_cfg)
                 submitted_request_ids.append(request_id)
-                logs_dir = save_request_metadata(cfg, workload_cfg, request_id)
-                active_log.set_path(logs_dir / "run.log")
                 logger.info("Submitted request %s", request_id)
                 wait_for_request(
                     client,
@@ -426,8 +405,6 @@ def run(cfg: DictConfig) -> None:
             except Exception as exc:
                 logger.exception("Workload failed: %s", workload_name)
                 failures.append((workload_name, str(exc)))
-            finally:
-                active_log.close()
 
         if failures:
             for name, error in failures:
@@ -436,7 +413,6 @@ def run(cfg: DictConfig) -> None:
         successful = True
         logger.info("All workloads completed")
     finally:
-        active_log.close()
         stopped_cleanly = group.stop_all()
         wait_for_port_closed(
             cfg.coordinator.host,
@@ -462,7 +438,9 @@ def run(cfg: DictConfig) -> None:
         else:
             logger.warning("Run failed, was interrupted, or required forced shutdown; retaining diagnostic storage")
             if successful:
+                active_log.close()
                 raise RuntimeError("Workloads completed but shutdown or reporting failed; cleanup skipped")
+        active_log.close()
 
 
 def main():
@@ -480,11 +458,13 @@ def main():
     run_dir = Path(str(cfg.paths.runs_dir)) / make_run_name(user)
     configure_run_paths(cfg, user, run_dir)
     run_dir.mkdir(parents=True, exist_ok=False)
-    (run_dir / "config").mkdir()
-    OmegaConf.save(user, run_dir / "config" / "experiment.yaml")
-    OmegaConf.save(cfg, run_dir / "config" / "effective.yaml", resolve=True)
+    workloads = {name: load_workload_cfg(name) for name in cfg.suite.workloads}
+    snapshot = OmegaConf.merge(cfg, {"workload_definitions": {
+        name: OmegaConf.to_container(value, resolve=True) for name, value in workloads.items()
+    }})
+    OmegaConf.save(snapshot, run_dir / "config.yaml", resolve=True)
     print(f"Run directory: {run_dir}", flush=True)
-    run(cfg)
+    run(cfg, workloads)
 
 
 if __name__ == "__main__":

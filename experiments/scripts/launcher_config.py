@@ -101,12 +101,12 @@ def configure_run_paths(cfg: DictConfig, user: DictConfig, run_dir: str | Path) 
     """Keep request artifacts and coordinator state private to each run."""
     root = Path(run_dir).resolve()
     cfg.paths.runs_dir = str(root)
-    cfg.storage.request_path = str(root / "storage" / "requests")
+    cfg.storage.request_path = str(root / ".runtime" / "storage" / "requests")
     cfg.coordinator.runs_dir = str(root / "requests")
     cfg.node.runs_dir = str(root / "requests")
     cfg.coordinator.logs_dir = str(root / "logs")
     cfg.node.logs_dir = str(root / "logs")
-    cfg.coordinator.state_db_path = str(root / "coordinator_state.sqlite3")
+    cfg.coordinator.state_db_path = str(root / ".runtime" / "coordinator_state.sqlite3")
 
 
 def make_run_name(

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from zkinfer.profiling.run_metadata import save_process_metadata, copy_run_metadata
+from zkinfer.profiling.run_metadata import save_process_metadata
 
 import logging
 import copy
@@ -44,7 +44,7 @@ class Coordinator:
     def __init__(self, runtime_config: RuntimeConfig, logger: logging.Logger, resolved_config=None):
         self.logger = logger
         self.metadata_snapshot = save_process_metadata(
-            Path(runtime_config.coordinator.runs_dir).parent / "config",
+            Path(runtime_config.coordinator.runs_dir).parent / ".runtime" / "processes",
             "coordinator", runtime_config, resolved_config)
         self.runs_dir = Path(runtime_config.coordinator.runs_dir)
         self.request_store_config = runtime_config.request_store
@@ -350,7 +350,6 @@ class Coordinator:
         reports_dir = run_dir / "reports"
         run_dir.mkdir(parents=True, exist_ok=True)
         reports_dir.mkdir(parents=True, exist_ok=True)
-        copy_run_metadata(self.metadata_snapshot, run_dir)
         request.run_dir = str(run_dir)
         request.reports_dir = str(reports_dir)
 

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from zkinfer.profiling.run_metadata import save_process_metadata, copy_run_metadata
+from zkinfer.profiling.run_metadata import save_process_metadata
 
 import json
 import logging
@@ -97,7 +97,7 @@ class NodeSupervisor:
     ):
         self.cfg = runtime_config
         self.metadata_snapshot = save_process_metadata(
-            Path(self.cfg.node.runs_dir).parent / "config",
+            Path(self.cfg.node.runs_dir).parent / ".runtime" / "processes",
             "node",
             runtime_config,
             resolved_config,
@@ -591,7 +591,6 @@ class NodeSupervisor:
             elif directory.exists():
                 shutil.rmtree(directory)
             directory.mkdir(parents=True, exist_ok=True)
-        copy_run_metadata(self.metadata_snapshot, request_dir)
 
         setup_key = lease.setup_key or lease.job_id
         transfer = ArtifactTransfer(tmp_dir / "transfer")

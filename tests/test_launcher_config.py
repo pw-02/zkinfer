@@ -35,6 +35,14 @@ class LauncherConfigTests(unittest.TestCase):
             "2026-11-25_12-30-00_bert_p4_c1_fifo_abcd",
         )
 
+    def test_internal_run_paths(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            configure_run_paths(self.cfg, self.user, root)
+            self.assertEqual(self.cfg.storage.request_path, str(root / ".runtime" / "storage" / "requests"))
+            self.assertEqual(self.cfg.coordinator.state_db_path, str(root / ".runtime" / "coordinator_state.sqlite3"))
+            self.assertEqual(self.cfg.node.runs_dir, str(root / "requests"))
+
     def test_monolithic_and_auto(self):
         self.user.partitioning.enabled = False
         self.user.scheduling.max_concurrent_jobs = None
