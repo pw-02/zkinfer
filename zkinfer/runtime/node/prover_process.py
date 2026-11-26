@@ -90,6 +90,18 @@ def run_task(task_file: str, result_file: str) -> int:
     _persist_task_metadata(task)
 
     try:
+        import ezkl
+
+        logger.info(
+            "Prover runtime | pid=%s | python=%s | ezkl=%s | "
+            "ENABLE_ICICLE_GPU=%s | CUDA_VISIBLE_DEVICES=%s",
+            os.getpid(),
+            sys.executable,
+            ezkl.__file__,
+            os.getenv("ENABLE_ICICLE_GPU", "unset"),
+            os.getenv("CUDA_VISIBLE_DEVICES", "unset"),
+        )
+
         result = ProverTaskRunner(logger=logger).run(task)
         _normalize_disabled_admission_metrics(task, result.metrics)
         payload = {
