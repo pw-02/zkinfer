@@ -83,6 +83,22 @@ class LauncherConfigTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "resources.prover_threads"):
                     load_config(path)
 
+    def test_key_representation(self):
+        from experiments.run_local_exp import common_overrides
+        from zkinfer.config.runtime import build_runtime_config
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "config.yaml"
+            for value in ("full", "reduced", "compact"):
+                self.user.proving.key_representation = value
+                OmegaConf.save(self.user, path)
+                _, cfg = load_config(path, run_dir=tmp)
+                self.assertEqual(build_runtime_config(cfg).node.key_representation, value)
+                self.assertIn(f"proving.key_representation={value}", common_overrides(cfg))
+            self.user.proving.key_representation = "invalid"
+            OmegaConf.save(self.user, path)
+            with self.assertRaisesRegex(ValueError, "proving.key_representation"):
+                load_config(path)
+
     def test_invalid_configuration(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "config.yaml"

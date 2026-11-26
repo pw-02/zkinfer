@@ -42,6 +42,9 @@ resources:
   coordinator_threads: null # Native Rayon pool for preparation and verification.
   prover_threads: null # Rayon pool per prover process. null = automatic.
 
+proving:
+  key_representation: full # full | reduced | compact (newly generated keys).
+
 cache:
   path: storage/cache
   circuits: true # Reuse compatible calibrated settings and compiled circuits.

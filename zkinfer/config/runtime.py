@@ -44,6 +44,7 @@ class NodeConfig:
     stage_admission: StageAdmissionConfig
     runtime_state_dir: str
     rayon_threads: Optional[int] = None
+    key_representation: str = "full"
 
 
 @dataclass(frozen=True)
@@ -386,6 +387,10 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
         if value is not None and (type(value) is not int or value < 1):
             raise ValueError(f"resources.{kind} must be a positive integer or null")
 
+    key_representation = cfg.get("proving", {}).get("key_representation", "full")
+    if key_representation not in ("full", "reduced", "compact"):
+        raise ValueError("proving.key_representation must be full, reduced or compact")
+
     return RuntimeConfig(
         coordinator=CoordinatorConfig(
             host=cfg.coordinator.host,
@@ -416,6 +421,7 @@ def build_runtime_config(cfg: DictConfig, process_role: Optional[str] = None) ->
             stage_admission=stage_admission,
             runtime_state_dir=str(node_runtime_state_dir),
             rayon_threads=resources.get("prover_threads"),
+            key_representation=key_representation,
         ),
         request_store=request_store,
         setup_store=setup_store,

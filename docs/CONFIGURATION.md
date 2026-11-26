@@ -76,3 +76,7 @@ Filesystem output publication uses hard links where possible, with a cross-devic
 copy only when needed. Optional debug retention and verifier snapshots can
 still copy artifacts. Direct references do not eliminate native deserialization
 or NFS reads.
+
+### Proving-key representation
+
+`proving.key_representation: full | reduced | compact` selects the persistent format of newly generated keys. The default is `full`. The node passes this setting to each prover subprocess as `EZKL_PK_REPRESENTATION`. Updated EZKL/Halo2 bindings automatically detect the stored representation when reading. Existing cached keys are reused irrespective of the requested representation; to compare formats set `cache.keys: false` (or use separate cache roots). This setting does not change the in-memory proving algorithm or verification keys. Results record the requested representation, not necessarily the format of a cache hit.

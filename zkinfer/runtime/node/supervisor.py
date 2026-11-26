@@ -405,7 +405,8 @@ class NodeSupervisor:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True, encoding="utf-8", errors="replace", bufsize=1,
-                env=rayon_environment(self.cfg.node.rayon_threads),
+                env={**rayon_environment(self.cfg.node.rayon_threads),
+                     "EZKL_PK_REPRESENTATION": self.cfg.node.key_representation},
             )
             with proc.stdout:
                 for line in proc.stdout:
@@ -429,6 +430,7 @@ class NodeSupervisor:
                 f"{payload.get('error', 'unknown error')}; see {log_file}"
             )
         result = ProverTaskResult.from_dict(payload["result"])
+        result.metrics["requested_key_representation"] = self.cfg.node.key_representation
         result.metrics["prover_subprocess_wall_time(s)"] = wall_time
         result.metrics["prover_subprocess_pid"] = int(payload.get("pid") or 0)
         return result

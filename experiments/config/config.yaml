@@ -23,6 +23,9 @@ scheduling:
   memory_admission: disabled # disabled | whole_job | stage
   memory_reserve_gib: 8 # RAM reserved for the OS and other processes.
 
+proving:
+  key_representation: full # full | reduced | compact (newly generated keys).
+
 cache:
   # true: reuse compatible artifacts, or generate and cache if missing.
   # false: regenerate without reading or updating that artifact cache.
