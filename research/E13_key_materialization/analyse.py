@@ -217,20 +217,34 @@ def main():
                                 "sd": statistics.stdev(values) if len(values) > 1 else None,
                                 "median": statistics.median(values) if values else None,
                                 "min": min(values) if values else None, "max": max(values) if values else None})
-        for larger, smaller in (("full", "reduced"), ("full", "compact"), ("reduced", "compact")):
-            a, b = means[larger], means[smaller]
+        for baseline, alternative in (("full", "reduced"), ("full", "compact"), ("reduced", "compact")):
+            a, b = means[baseline], means[alternative]
             if all(k in d for d in (a,b) for k in ("size_gib", "reconstruct_s")):
                 ds = a["size_gib"] - b["size_gib"]
                 dc = b["reconstruct_s"] - a["reconstruct_s"]
-                thresholds.append({**context, "larger": larger, "smaller": smaller,
-                                   "saved_gib": ds, "extra_reconstruct_s": dc,
-                                   "break_even_gib_s": ds / dc if ds > 0 and dc > 0 else None})
+                thresholds.append({**context, "baseline_representation": baseline,
+                                   "alternative_representation": alternative,
+                                   "baseline_size_gib": a["size_gib"],
+                                   "alternative_size_gib": b["size_gib"],
+                                   "storage_saved_gib": ds,
+                                   "storage_saved_pct": 100 * ds / a["size_gib"],
+                                   "extra_reconstruction_s": dc,
+                                   "break_even_gib_s": ds / dc if ds * dc > 0 else None,
+                                   "interpretation": (
+                                       "Alternative faster below threshold; baseline faster above"
+                                       if ds > 0 and dc > 0 else
+                                       "Alternative no slower at any positive bandwidth"
+                                       if ds >= 0 and dc <= 0 else
+                                       "Baseline no slower at any positive bandwidth"
+                                       if ds <= 0 and dc >= 0 else
+                                       "Alternative faster above threshold; baseline faster below"
+                                   )})
     out = args.output
     write_csv(out / "measurements.csv", rows, FIELDS)
     write_csv(out / "component_measurements.csv", components, ["experiment_id","run_id","request_id","source_path","repetition","job_id","lease_id","representation","row","component","operation","bytes","duration_s"])
     write_csv(out / "validation.csv", checks, ["experiment_id","run_id","request_id","source_path","repetition","job_id","level","message"])
     write_csv(out / "summary.csv", summary, [*GROUP,"representation","metric","n","mean","sd","median","min","max"])
-    write_csv(out / "break_even.csv", thresholds, [*GROUP,"larger","smaller","saved_gib","extra_reconstruct_s","break_even_gib_s"])
+    write_csv(out / "break_even.csv", thresholds, [*GROUP,"baseline_representation","alternative_representation","baseline_size_gib","alternative_size_gib","storage_saved_gib","storage_saved_pct","extra_reconstruction_s","break_even_gib_s","interpretation"])
     print(f"{len(rows)} jobs; {sum(r['eligible'] for r in rows)} eligible; {len(groups)} comparison groups. See {out / 'validation.csv'}")
 
 

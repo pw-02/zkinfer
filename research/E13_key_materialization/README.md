@@ -129,7 +129,22 @@ Logical deserialization throughput includes decoding and is not a device
 bandwidth benchmark. Break-even values and sensitivity plots are predictions,
 not independently measured bandwidth trials.
 
-Plots are emitted as PDF/PNG under `figures/group_NNN/` with condition metadata.
+Plots are emitted as 300-DPI PNG under `figures/group_NNN/` with condition metadata.
+All axes are linear. Bars show means, individual trials and sample standard
+deviation where available. Storage bars also report savings relative to Full.
+The materialization plot shows measured component times and total trial markers.
+The bandwidth plot uses an assumed range of 0.25–3 GiB/s (override with
+`--min-bandwidth` and `--max-bandwidth`) and marks predicted optimal-representation
+switch points within the plotted range. It is an analytical prediction, not a
+measured bandwidth sweep.
+
+In `break_even.csv`, the baseline and alternative are the two compared
+representations. Storage savings equal baseline size minus alternative size;
+extra reconstruction equals alternative reconstruction minus baseline
+reconstruction. The break-even bandwidth is their ratio when a positive
+intersection exists. For the usual smaller-but-more-computationally-expensive
+alternative, it is predicted faster below the threshold and slower above it.
+Pairwise thresholds need not be global optimal-representation switch points.
 Generated outputs remain gitignored; the index and scripts are tracked.
 No raw runs are relocated or modified.
 
