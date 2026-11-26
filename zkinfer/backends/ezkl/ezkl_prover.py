@@ -1,5 +1,3 @@
-import importlib
-import importlib.util
 import json
 import logging
 import math
@@ -7,7 +5,6 @@ import os
 import shutil
 import time
 from pathlib import Path
-from types import ModuleType
 from typing import Any, Dict, Optional, Tuple
 
 from zkinfer.storage.s3 import (
@@ -44,7 +41,6 @@ class EZKLProofStages:
         import ezkl
 
         self.ezkl = ezkl
-        self._fused_ezkl: Optional[ModuleType] = None
 
         self.input_data_path = input_data_path
         self.prepared_witness_path = prepared_witness_path
@@ -121,54 +117,6 @@ class EZKLProofStages:
 
         with open(self.status_file, "w", encoding="utf-8") as f:
             f.write(stage)
-
-    def _load_fused_ezkl(self) -> ModuleType:
-        """Load the auxiliary PyO3 module exported by the custom EZKL wheel.
-
-        The custom EZKL shared library exports both ``PyInit_ezkl`` (the
-        existing bindings) and ``PyInit__ezkl_fused`` (the new cold-path
-        binding). Loading the same shared object under the second module name
-        lets us add the fused operation without replacing the large legacy
-        binding file.
-        """
-        if self._fused_ezkl is not None:
-            return self._fused_ezkl
-
-        try:
-            native_ezkl = importlib.import_module("ezkl.ezkl")
-        except ImportError as exc:
-            raise RuntimeError(
-                "Cannot import the native EZKL extension. Rebuild/install the custom "
-                "pw-02/ezkl wheel containing the fused setup+prove binding."
-            ) from exc
-
-        extension_path = getattr(native_ezkl, "__file__", None)
-        if not extension_path:
-            raise RuntimeError(
-                "Cannot locate the native EZKL extension module. Rebuild/install the custom "
-                "pw-02/ezkl wheel containing the fused setup+prove binding."
-            )
-
-        spec = importlib.util.spec_from_file_location("_ezkl_fused", extension_path)
-        if spec is None or spec.loader is None:
-            raise RuntimeError(
-                f"Could not load _ezkl_fused from EZKL extension: {extension_path}"
-            )
-
-        try:
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-        except Exception as exc:
-            raise RuntimeError(
-                "The installed EZKL extension does not expose the fused setup+prove "
-                "module. Rebuild the wheel from pw-02/ezkl:sacdad27."
-            ) from exc
-
-        if not hasattr(module, "setup_and_prove"):
-            raise RuntimeError("_ezkl_fused is missing setup_and_prove")
-
-        self._fused_ezkl = module
-        return module
 
     def _try_load_from_cache(self, local_path: str, filename: str) -> Tuple[bool, float]:
         if self.proving_cache_read_only:
@@ -515,44 +463,6 @@ class EZKLProofStages:
             srs_path=self.srs_path,
         )
 
-    def setup_and_compute_proof(self) -> Dict[str, float]:
-        """Cold path: generate keys and prove without re-reading the new PK."""
-        if self.proving_cache_read_only:
-            raise RuntimeError("Cannot generate keys in read-only setup")
-        if not self.srs_path:
-            self.srs_path = self._resolve_srs_path()
-
-        fused_ezkl = self._load_fused_ezkl()
-        trace_options = {}
-        if self.status_file:
-            Path(self.status_file).with_name("fused_stage_transitions.csv").unlink(missing_ok=True)
-        if getattr(fused_ezkl, "stage_trace_version", 0) >= 1:
-            trace_options["stage_trace_elapsed_base_s"] = (
-                time.perf_counter() - self._transition_started
-                if hasattr(self, "_transition_started") else 0.0
-            )
-        result = fused_ezkl.setup_and_prove(
-            **trace_options,
-            witness=self.witness_path,
-            model=self.compiled_circuit_path,
-            vk_path=self.vk_path,
-            pk_path=self.pk_path,
-            proof_path=self.proof_path,
-            srs_path=self.srs_path,
-            proof_type="single",
-            disable_selector_compression=False,
-            status_path=self.status_file,
-        )
-
-        return {key: float(value) for key, value in dict(result).items()}
-
-    def _publish_generated_keys(self) -> float:
-        self._update_status("PUBLISHING_KEYS")
-        s3_write_time = 0.0
-        s3_write_time += self._upload_to_cache(self.pk_path, "pk.json")
-        s3_write_time += self._upload_to_cache(self.vk_path, "vk.json")
-        return s3_write_time
-
     def run_all(self, setup_only: bool = False) -> Dict[str, Any]:
         total_setup_time = 0.0
         total_s3_read_time = 0.0
@@ -593,85 +503,21 @@ class EZKLProofStages:
         metrics["ezkl_prepared_witness"] = bool(self.prepared_witness_path)
         total_setup_time += elapsed
 
-        if setup_only:
+        start = time.perf_counter()
+        used_cache, s3_read_time, s3_write_time = self.gen_keys()
+        key_elapsed = time.perf_counter() - start
+        metrics["ezkl_key_gen_time(s)"] = key_elapsed
+        metrics["ezkl_key_gen_used_cache"] = used_cache
+        metrics["ezkl_key_gen_s3_read_time(s)"] = s3_read_time
+        metrics["ezkl_key_gen_s3_write_time(s)"] = s3_write_time
+        total_setup_time += key_elapsed
+        total_s3_read_time += s3_read_time
+        total_s3_write_time += s3_write_time
+
+        if not setup_only:
             start = time.perf_counter()
-            used_cache, s3_read_time, s3_write_time = self.gen_keys()
-            key_elapsed = time.perf_counter() - start
-
-            metrics["ezkl_key_gen_time(s)"] = key_elapsed
-            metrics["ezkl_key_gen_used_cache"] = used_cache
-            metrics["ezkl_key_gen_s3_read_time(s)"] = s3_read_time
-            metrics["ezkl_key_gen_s3_write_time(s)"] = s3_write_time
-            metrics["ezkl_used_fused_setup_and_prove"] = False
-
-            total_setup_time += key_elapsed
-            total_s3_read_time += s3_read_time
-            total_s3_write_time += s3_write_time
-        else:
-            # A warm hit keeps the existing prove path. A cold miss uses the
-            # fused Rust path so the freshly generated PK never needs to be
-            # serialized and immediately deserialized before the first proof.
-            self._update_status("CHECKING_SETUP_CACHE")
-            cache_start = time.perf_counter()
-            used_cache, s3_read_time = self._try_load_keys_from_cache()
-            cache_lookup_time = time.perf_counter() - cache_start
-
-            if used_cache:
-                metrics["ezkl_key_gen_time(s)"] = cache_lookup_time
-                metrics["ezkl_key_gen_used_cache"] = True
-                metrics["ezkl_key_gen_s3_read_time(s)"] = s3_read_time
-                metrics["ezkl_key_gen_s3_write_time(s)"] = 0.0
-                metrics["ezkl_used_fused_setup_and_prove"] = False
-
-                total_setup_time += cache_lookup_time
-                total_s3_read_time += s3_read_time
-
-                start = time.perf_counter()
-                self.compute_proof()
-                metrics["ezkl_proof_time(s)"] = time.perf_counter() - start
-            else:
-                fused_wall_start = time.perf_counter()
-                fused = self.setup_and_compute_proof()
-                fused_wall_time = time.perf_counter() - fused_wall_start
-
-                s3_write_time = self._publish_generated_keys()
-
-                keygen_time = fused.get("keygen_time_s", 0.0)
-                prove_time = fused.get("prove_time_s", 0.0)
-                key_persist_time = fused.get("key_persist_time_s", 0.0)
-                proof_persist_time = fused.get("proof_persist_time_s", 0.0)
-                fused_internal_total = fused.get("total_time_s", fused_wall_time)
-                unattributed_time = max(
-                    0.0,
-                    fused_internal_total
-                    - keygen_time
-                    - prove_time
-                    - key_persist_time
-                    - proof_persist_time,
-                )
-
-                metrics["ezkl_key_gen_time(s)"] = keygen_time
-                metrics["ezkl_key_persist_time(s)"] = key_persist_time
-                metrics["ezkl_proof_persist_time(s)"] = proof_persist_time
-                metrics["ezkl_fused_unattributed_time(s)"] = unattributed_time
-                metrics["ezkl_fused_internal_total_time(s)"] = fused_internal_total
-                metrics["ezkl_fused_setup_and_prove_wall_time(s)"] = fused_wall_time
-                metrics["ezkl_key_gen_used_cache"] = False
-                metrics["ezkl_key_gen_s3_read_time(s)"] = 0.0
-                metrics["ezkl_key_gen_s3_write_time(s)"] = s3_write_time
-                metrics["ezkl_used_fused_setup_and_prove"] = True
-                metrics["ezkl_proof_time(s)"] = prove_time + proof_persist_time
-
-                # Setup accounting excludes proof construction itself but
-                # includes one-time circuit/witness loading inside the fused
-                # call, local key persistence, and remote cache publication.
-                total_setup_time += (
-                    keygen_time
-                    + key_persist_time
-                    + unattributed_time
-                    + s3_write_time
-                )
-                total_s3_write_time += s3_write_time
+            self.compute_proof()
+            metrics["ezkl_proof_time(s)"] = time.perf_counter() - start
 
         metrics["ezkl_setup_time(s)"] = total_setup_time
         metrics["ezkl_setup_s3_read_time(s)"] = total_s3_read_time

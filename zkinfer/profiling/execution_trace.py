@@ -18,16 +18,13 @@ def write_execution_trace(directory):
     directory = Path(directory)
     events = []
     target = directory / "execution_trace.csv"
-    if not any((directory / name).is_file() for name in ("stage_transitions.csv", "fused_stage_transitions.csv", "halo2_stage_transitions.csv")):
+    if not any((directory / name).is_file() for name in ("stage_transitions.csv", "halo2_stage_transitions.csv")):
         if target.is_file():
             with target.open(newline="", encoding="utf-8") as f:
                 return list(csv.DictReader(f))
         return events
-    # Runtime already imports fused EZKL events; retain their provenance in a
-    # separate stream rather than pretending all records are disjoint intervals.
     for filename, source in [
         ("stage_transitions.csv", "runtime"),
-        ("fused_stage_transitions.csv", "ezkl"),
         ("halo2_stage_transitions.csv", "halo2"),
     ]:
         path = directory / filename
@@ -44,12 +41,6 @@ def write_execution_trace(directory):
                     "duration_s": row.get("duration_s", ""),
                     "elapsed_s": row.get("elapsed_s", ""),
                 })
-    # Imported fused transitions duplicate runtime enter records. Prefer the
-    # original EZKL record when the timestamps and stage names coincide.
-    fused = {(r["timestamp_unix_us"], r["stage"]) for r in events if r["source"] == "ezkl"}
-    events = [r for r in events if not (
-        r["source"] == "runtime" and r["event"] == "enter" and
-        (r["timestamp_unix_us"], r["stage"]) in fused)]
     events.sort(key=lambda r: r["timestamp_unix_us"])
     if events:
         temporary = target.with_suffix(".csv.tmp")

@@ -221,38 +221,6 @@ class StageAwareEZKLProofStages(EZKLProofStages):
         with self._admit("PROVING"):
             return super().compute_proof()
 
-    def setup_and_compute_proof(self) -> Dict[str, float]:
-        with self._admit("FUSED_KEYGEN_PROVE"):
-            self._update_status("FUSED_KEYGEN_PROVE")
-            try:
-                return super().setup_and_compute_proof()
-            finally:
-                trace = (
-                    Path(self.status_file).with_name("fused_stage_transitions.csv")
-                    if self.status_file
-                    else None
-                )
-                available = trace is not None and trace.exists()
-                self.admission_metrics["ezkl_fused_stage_trace_available"] = available
-                if available:
-                    with trace.open(newline="", encoding="utf-8") as file:
-                        for row in csv.DictReader(file):
-                            timestamp = datetime.fromtimestamp(
-                                int(row["timestamp_unix_us"]) / 1_000_000,
-                                timezone.utc,
-                            ).isoformat(timespec="microseconds")
-                            self._record_transition(
-                                row["stage"],
-                                timestamp,
-                                float(row["elapsed_s"]),
-                            )
-                else:
-                    self.logger.warning(
-                        "EZKL wheel lacks detailed fused stage events; "
-                        "combined execution is recorded. Rebuild the wheel."
-                    )
-
-
 class ProverTaskRunner:
     """Execute one proof using local paths only."""
 
@@ -321,7 +289,7 @@ class ProverTaskRunner:
             events = write_execution_trace(root)
             if not events or not (root / "execution_trace.csv").is_file():
                 return
-            for name in ("stage_transitions.csv", "fused_stage_transitions.csv",
+            for name in ("stage_transitions.csv",
                          "halo2_stage_transitions.csv", "halo2_circuit.csv",
                          "halo2_phase_resources.csv", "admission_profile_before.json",
                          "halo2_structure.json", "rayon_pool_size.txt",
@@ -461,17 +429,7 @@ class ProverTaskRunner:
             return number if math.isfinite(number) and number >= 0 else None
 
         def stage_actual(stage, metric):
-            stages = (
-                ("key_gen", "proving", "fused_keygen_prove")
-                if stage == "fused_keygen_prove"
-                else (stage,)
-            )
-            values = [
-                observed(resource_metrics.get(f"stage_{name}_{metric}"))
-                for name in stages
-            ]
-            values = [value for value in values if value is not None]
-            return max(values) if values else None
+            return observed(resource_metrics.get(f"stage_{stage}_{metric}"))
 
         result: Dict[str, Any] = {}
         prefix = "stage_admission_"

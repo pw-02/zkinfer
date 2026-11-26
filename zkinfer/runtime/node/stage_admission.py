@@ -194,14 +194,6 @@ class StageResourceHistory:
                     "samples": min(item["samples"] for item in parts),
                     "source": "historical_whole_job",
                 }
-        elif stage == "FUSED_KEYGEN_PROVE":
-            parts = [estimate_one("KEY_GEN"), estimate_one("PROVING")]
-            if all(item is not None for item in parts):
-                return {
-                    "memory_gb": max(item["memory_gb"] for item in parts),
-                    "samples": min(item["samples"] for item in parts),
-                    "source": "historical_fused",
-                }
         else:
             direct = estimate_one(stage)
             if direct is not None:

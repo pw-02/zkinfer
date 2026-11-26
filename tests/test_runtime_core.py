@@ -293,13 +293,6 @@ class StageAdmissionTests(unittest.TestCase):
                 with controller.hold("CALIBRATING") as info:
                     self.assertAlmostEqual(info["memory_gb"], 53)
 
-    def test_partial_fused_history_does_not_drop_unobserved_stage(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            history = StageResourceHistory(Path(tmp) / "profiles")
-            history.update_from_metrics("a", {"stage_key_gen_max_memory(GB)": 12})
-            estimate = history.estimate("a", "FUSED_KEYGEN_PROVE", 40, .9)
-            self.assertEqual(estimate["memory_gb"], 40)
-
     def test_resource_reservations_are_shared_across_processes(self):
         with tempfile.TemporaryDirectory() as tmp:
             controller = StageAdmissionController(
