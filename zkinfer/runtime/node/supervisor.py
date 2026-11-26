@@ -402,10 +402,18 @@ class NodeSupervisor:
                     "--result_file",
                     str(result_file),
                 ],
-                stdout=log,
+                stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                text=True, encoding="utf-8", errors="replace", bufsize=1,
                 env=rayon_environment(self.cfg.node.rayon_threads),
             )
+            with proc.stdout:
+                for line in proc.stdout:
+                    log.write(line)
+                    log.flush()
+                    if "PROGRESS: " in line:
+                        self.logger.info("Job %s | %s", task.job_id,
+                                         line.split("PROGRESS: ", 1)[1].strip())
             return_code = proc.wait()
         wall_time = time.perf_counter() - started
 
@@ -489,7 +497,13 @@ class NodeSupervisor:
             with self.active_lock:
                 self.active_tasks[lease.job_id] = local_task
 
+            self.logger.info("Job %s | key cache %s", lease.job_id,
+                             "hit" if local_task.cached_pk_path else "miss" if self.cfg.setup_store.enabled else "disabled")
             result = self._run_prover_subprocess(local_task)
+            self.logger.info("Job %s | proof ready | key stage %.2fs | proving %.2fs | total %.2fs",
+                             lease.job_id, result.metrics.get("ezkl_key_gen_time(s)", 0.0),
+                             result.metrics.get("ezkl_proof_time(s)", 0.0),
+                             result.metrics.get("prover_subprocess_wall_time(s)", 0.0))
             setup_publish_metrics = {}
             if local_task.publish_keys:
                 transfer = ArtifactTransfer(tmp_dir / "transfer")

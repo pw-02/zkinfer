@@ -231,6 +231,7 @@ def _run_setup(ezkl, model: Path, calibration: Path, directory: Path, candidate:
     directory.mkdir(parents=True, exist_ok=True)
     settings = directory / "settings.json"
     compiled = directory / "network.compiled"
+    progress = logging.getLogger("zkinfer.preparation.progress")
     args = ezkl.PyRunArgs()
     args.input_visibility = "public"
     args.output_visibility = "public"
@@ -238,12 +239,14 @@ def _run_setup(ezkl, model: Path, calibration: Path, directory: Path, candidate:
     if candidate is not None:
         args.input_scale = candidate
         args.param_scale = candidate
+    progress.info("Calibrating circuit")
     started = time.perf_counter()
     ezkl.gen_settings(str(model), str(settings), py_run_args=args)
     kwargs = {} if candidate is None else {"scales": [candidate]}
     if not ezkl.calibrate_settings(str(calibration), str(model), str(settings), "resources", **kwargs):
         raise RuntimeError("EZKL calibration returned false")
     calibration_s = time.perf_counter() - started
+    progress.info("Calibration complete | %.2fs; compiling circuit", calibration_s)
     started = time.perf_counter()
     ezkl.compile_circuit(str(model), str(compiled), str(settings))
     compilation_s = time.perf_counter() - started
@@ -366,7 +369,9 @@ def prepare_partitions(
     external_inputs: dict[str, list] = {}
     prepared = {}
 
+    progress = logging.getLogger("zkinfer.preparation.progress")
     for index, name in enumerate(order):
+        progress.info("Partition %d/%d | %s", index + 1, len(order), name)
         partition = by_name[name]
         inputs, outputs = specs[name]
         directory = root / f"{index:05d}"
@@ -425,6 +430,7 @@ def prepare_partitions(
             )
             candidate = None
         settings_path, compiled_path, cal_s, comp_s, cache_hit = setup
+        progress.info("Partition %d/%d | circuit cache %s | calibration %.2fs | compilation %.2fs", index + 1, len(order), "hit" if cache_hit else "miss" if partition_cache_root is not None else "disabled", cal_s, comp_s)
         settings = read_json(settings_path)
         input_scales, output_scales = validate_settings(settings, len(inputs), len(outputs))
         setup_s = time.perf_counter() - start_setup
@@ -445,6 +451,7 @@ def prepare_partitions(
         input_path = directory / "input.json"
         witness_path = directory / "witness.json"
         write_json(input_path, {"input_data": exact_inputs})
+        progress.info("Partition %d/%d | generating witness", index + 1, len(order))
         started = time.perf_counter()
         ezkl_module.gen_witness(str(input_path), str(compiled_path), str(witness_path))
         witness_s = time.perf_counter() - started
@@ -482,6 +489,7 @@ def prepare_partitions(
                 "compiled_bytes": compiled_path.stat().st_size,
             },
         )
+        progress.info("Partition %d/%d | witness ready | %.2fs | logrows=%s", index + 1, len(order), witness_s, settings["run_args"]["logrows"])
         if on_prepared is not None:
             on_prepared(prepared[name])
     return prepared

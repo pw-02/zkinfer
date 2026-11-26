@@ -1,7 +1,7 @@
 """Fresh-process request preparation with incremental, file-backed IPC.
 
 Only small JSON descriptors cross the process boundary. The parent owns
-scheduler state, leases and SQLite. Child logs never share the event channel.
+scheduler state, leases and SQLite. Only explicit progress messages share the event channel.
 """
 from __future__ import annotations
 
@@ -42,6 +42,13 @@ def run(task_file, event_dir):
         emit(events, index, {"kind": kind, **payload})
         index += 1
 
+    class ProgressHandler(logging.Handler):
+        def emit(self, record):
+            send("progress", message=record.getMessage())
+
+    progress = logging.getLogger("zkinfer.preparation.progress")
+    handler = ProgressHandler()
+    progress.addHandler(handler)
     try:
         builder = RequestBuilder(logging.getLogger("preparation"), **task["builder"])
         shared = SharedStorage(**task["storage"])
@@ -67,6 +74,8 @@ def run(task_file, event_dir):
         send("failed", error=str(exc) or type(exc).__name__,
              metrics=request.preparation_metrics)
         return 1
+    finally:
+        progress.removeHandler(handler)
 
 
 if __name__ == "__main__":

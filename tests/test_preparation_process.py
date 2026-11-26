@@ -73,8 +73,18 @@ sys.exit(int(sys.argv[4]))
         self.assertEqual(published, [self.job.job_id])
         self.assertEqual(jobs[0].job_id, self.job.job_id)
         self.assertEqual(self.request.preparation_metrics["child_metric"], 12)
-        self.assertTrue((Path(self.request.run_dir) / "preparation_process.log").exists())
+        self.assertTrue((Path(self.request.run_dir) / "request_preparation.log").exists())
         self.assertEqual(list(Path(self.request.run_dir).glob(".preparation-*")), [])
+
+    def test_progress_event_is_logged(self):
+        events = [{"kind": "plan", "count": 1},
+                  {"kind": "progress", "message": "Calibrating circuit"},
+                  self.job_event(), {"kind": "complete", "metrics": {}}]
+        with patch("zkinfer.runtime.preparation_runner.subprocess.Popen",
+                   side_effect=self.fake_child(events)):
+            with self.assertLogs(self.builder.logger, level="INFO") as logs:
+                self.run_child()
+        self.assertIn("Calibrating circuit", "\n".join(logs.output))
 
     def test_crash_after_partial_publication_is_failure(self):
         events = [{"kind": "plan", "count": 2}, self.job_event()]

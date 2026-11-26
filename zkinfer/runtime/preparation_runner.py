@@ -23,6 +23,8 @@ def run_preparation(request, builder, shared, setup_store, max_retries,
     seen = set()
     terminal = None
     started = time.perf_counter()
+    logger = builder.logger
+    logger.info("Request %s | preparing model", request.request_id)
     with tempfile.TemporaryDirectory(prefix=".preparation-", dir=run_dir) as tmp:
         directory = Path(tmp)
         events = directory / "events"
@@ -70,8 +72,11 @@ def run_preparation(request, builder, shared, setup_store, max_retries,
                         if expected is not None or type(count) is not int or count < 1:
                             raise RuntimeError("Invalid preparation plan")
                         expected = count
+                        logger.info("Request %s | planned %d proof jobs", request.request_id, count)
                         if on_plan is not None:
                             on_plan(count)
+                    elif kind == "progress":
+                        logger.info("Request %s | %s", request.request_id, event["message"])
                     elif kind == "job":
                         job = CoordinatorStateStore._job_from_dict(event["job"])
                         if (expected is None or len(jobs) >= expected
@@ -82,6 +87,7 @@ def run_preparation(request, builder, shared, setup_store, max_retries,
                         jobs.append(job)
                         if on_job_ready is not None:
                             on_job_ready(job)
+                        logger.info("Request %s | job ready %d/%d | %s", request.request_id, len(jobs), expected, job.job_id)
                     elif kind in {"complete", "failed"}:
                         terminal = event
                     else:
@@ -101,6 +107,7 @@ def run_preparation(request, builder, shared, setup_store, max_retries,
                     raise RuntimeError(f"Preparation subprocess exited with code {code}: {detail}; see {log_path}")
                 if expected is None or len(jobs) != expected:
                     raise RuntimeError("Preparation subprocess returned an incomplete plan")
+                logger.info("Request %s | preparation complete | %d jobs | %.2fs", request.request_id, len(jobs), time.perf_counter() - started)
                 return jobs
             finally:
                 if proc.poll() is None:

@@ -837,11 +837,15 @@ class Coordinator:
             )
         else:
             if self.verifier:
+                self.logger.info("Request %s | verifying %d proofs", parent_request.request_id, len(parent_request.proof_jobs))
                 verify_started = time.perf_counter()
                 verification_report = self._verify_request_if_enabled(parent_request)
                 parent_request.preparation_metrics["verification_time(s)"] = (
                     time.perf_counter() - verify_started
                 )
+                self.logger.info("Request %s | verification %s | %.2fs", parent_request.request_id,
+                                 "passed" if verification_report and verification_report.get("valid") else "failed",
+                                 parent_request.preparation_metrics["verification_time(s)"])
             else:
                 exact = parent_request.preparation_metrics.get("witness_preparation_mode") == "upfront"
                 verification_report = {

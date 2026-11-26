@@ -381,10 +381,6 @@ class EZKLProofStages:
         settings = self._load_settings()
         logrows = settings["run_args"]["logrows"]
 
-        self.logger.info("Generating local SRS")
-        self.logger.info("srs_dir: %s", self.srs_dir)
-        self.logger.info("srs_path: %s", self.srs_path)
-        self.logger.info("logrows: %s", logrows)
 
         if os.path.exists(self.srs_path) and not self.proving_cache_overwrite:
             self.logger.info(
@@ -394,6 +390,7 @@ class EZKLProofStages:
             )
             return
 
+        self.logger.info("PROGRESS: Preparing SRS | logrows=%s", logrows)
         from zkinfer.storage.partition_cache import partition_lock
         import tempfile
         # All nodes use the same configured SRS path; never expose a partial file.
@@ -427,12 +424,15 @@ class EZKLProofStages:
         )
 
     def gen_keys(self):
-        self._update_status("KEY_GEN")
+        self._update_status("CHECKING_KEY_CACHE")
 
         used_cache, s3_read_time = self._try_load_keys_from_cache()
         if used_cache:
+            self.logger.info("PROGRESS: Key cache hit; reusing PK/VK")
             return True, s3_read_time, 0.0
 
+        self._update_status("KEY_GEN")
+        self.logger.info("PROGRESS: Generating PK/VK")
         if not self.srs_path:
             self.srs_path = self._resolve_srs_path()
 
@@ -451,6 +451,7 @@ class EZKLProofStages:
 
     def compute_proof(self):
         self._update_status("PROVING")
+        self.logger.info("PROGRESS: Generating proof")
 
         if not self.srs_path:
             self.srs_path = self._resolve_srs_path()
