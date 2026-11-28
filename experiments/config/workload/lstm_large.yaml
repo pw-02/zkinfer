@@ -1,0 +1,5 @@
+name: lstm_large
+onnx_file: experiments/models/lstm/lstm_large.onnx
+input_file: experiments/models/lstm/lstm_large_input.json
+input_shapes:
+  input: [1, 128, 128]
