@@ -1,0 +1,5 @@
+name: lstm
+onnx_file: experiments/models/lstm/lstm.onnx
+input_file: experiments/models/lstm/input.json
+input_shapes:
+  input: [1, 32, 128]
