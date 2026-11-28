@@ -1,0 +1,5 @@
+name: vae_decoder_medium
+onnx_file: experiments/models/vae_decoder/vae_decoder_medium.onnx
+input_file: experiments/models/vae_decoder/vae_decoder_medium_input.json
+input_shapes:
+  input: [1, 128]
