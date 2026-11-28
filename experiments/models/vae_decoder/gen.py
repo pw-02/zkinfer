@@ -1,4 +1,5 @@
 """Randomly initialized VAE decoder adapted from the zkbc benchmark."""
+import argparse
 import json
 from pathlib import Path
 
@@ -8,18 +9,20 @@ import torch.nn as nn
 OUTPUT_DIR = Path(__file__).resolve().parent
 
 class SmallVAE(nn.Module):
-    def __init__(self):
+    def __init__(self, channels=32, spatial_size=16):
         super().__init__()
-        self.fc_decode = nn.Linear(128, 32 * 16 * 16)
+        self.channels = channels
+        self.spatial_size = spatial_size
+        self.fc_decode = nn.Linear(128, channels * spatial_size**2)
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(32, 16, 4, stride=2, padding=1),
+            nn.ConvTranspose2d(channels, channels // 2, 4, stride=2, padding=1),
             nn.ReLU(),
-            nn.ConvTranspose2d(16, 3, 4, stride=2, padding=1),
+            nn.ConvTranspose2d(channels // 2, 3, 4, stride=2, padding=1),
             nn.Sigmoid(),
         )
 
     def forward(self, z):
-        return self.decoder(self.fc_decode(z).reshape(-1, 32, 16, 16))
+        return self.decoder(self.fc_decode(z).reshape(-1, self.channels, self.spatial_size, self.spatial_size))
 
 
 def export(model, x, filename, output_names):
@@ -39,7 +42,7 @@ def export(model, x, filename, output_names):
         dynamo=False,
     )
 
-    with (OUTPUT_DIR / "input.json").open("w") as f:
+    with (OUTPUT_DIR / ("input.json" if filename == "vae_decoder.onnx" else Path(filename).stem + "_input.json")).open("w") as f:
         json.dump({
             "input_data": [x.flatten().tolist()],
             "output_data": [y.flatten().tolist() for y in outputs],
@@ -51,6 +54,18 @@ def export(model, x, filename, output_names):
 
 
 if __name__ == "__main__":
-    torch.manual_seed(42)
-    export(SmallVAE(), 0.1 * torch.rand(1, 128),
-           "vae_decoder.onnx", ["output"])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--size", choices=["original", "medium", "large", "all"],
+                        default="all")
+    args = parser.parse_args()
+    variants = {
+        "original": (32, 16, "vae_decoder.onnx"),
+        "medium": (64, 16, "vae_decoder_medium.onnx"),
+        "large": (64, 32, "vae_decoder_large.onnx"),
+    }
+    for name, (channels, spatial, filename) in variants.items():
+        if args.size not in ("all", name):
+            continue
+        torch.manual_seed(42)
+        export(SmallVAE(channels, spatial), 0.1 * torch.rand(1, 128),
+               filename, ["output"])
